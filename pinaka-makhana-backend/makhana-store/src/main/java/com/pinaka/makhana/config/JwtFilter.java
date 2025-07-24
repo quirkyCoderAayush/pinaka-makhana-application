@@ -71,7 +71,5 @@ public class JwtFilter extends GenericFilter {
 		}
 
 		chain.doFilter(request, response);
-		System.out.println("Requested URI: " + http.getRequestURI());
-		System.out.println("Authorization Header: " + authHeader);
 	}
 }

@@ -1,5 +1,40 @@
 HELP.md
+# Ignore IDEs
+.idea/
+*.iml
+*.log
+
+# Ignore macOS / Windows system files
+.DS_Store
+Thumbs.db
+
+# Ignore Eclipse & STS metadata
 .metadata/
+
+# Java / Maven / Spring Boot (backend)
+target/
+*.class
+
+# Node.js / Vite (frontend)
+node_modules/
+dist/
+.env
+.env.*
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS generated files
+*.swp
+*.swo
+
+# Ignore build artifacts
+build/
+coverage/
+
 
 #Maven
 target/

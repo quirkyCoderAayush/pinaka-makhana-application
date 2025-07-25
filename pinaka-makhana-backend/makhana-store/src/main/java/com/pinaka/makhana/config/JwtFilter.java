@@ -43,7 +43,8 @@ public class JwtFilter extends GenericFilter {
 
 		if ((path.equals("/api/products") && http.getMethod().equals("GET"))
 				|| (path.startsWith("/api/products/") && http.getMethod().equals("GET"))
-				|| path.startsWith("/api/auth")) {
+				|| path.startsWith("/api/auth")
+				|| path.startsWith("/api/coupons")) {
 			chain.doFilter(request, response);
 			return;
 		}

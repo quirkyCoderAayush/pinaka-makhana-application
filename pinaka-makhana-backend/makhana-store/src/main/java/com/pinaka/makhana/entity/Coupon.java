@@ -99,6 +99,14 @@ public class Coupon {
         this.code = code;
         this.updatedAt = LocalDateTime.now();
     }
+    
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     public String getDescription() {
         return description;

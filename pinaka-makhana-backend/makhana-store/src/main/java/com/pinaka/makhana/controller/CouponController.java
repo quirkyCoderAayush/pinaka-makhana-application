@@ -91,4 +91,10 @@ public class CouponController {
         Double discount = couponService.calculateDiscount(code, amount, firstTimeUser);
         return ResponseEntity.ok(discount);
     }
+    
+    @PostMapping("/increment-usage/{code}")
+    public ResponseEntity<Void> incrementCouponUsage(@PathVariable String code) {
+        couponService.incrementCouponUsage(code);
+        return ResponseEntity.ok().build();
+    }
 }

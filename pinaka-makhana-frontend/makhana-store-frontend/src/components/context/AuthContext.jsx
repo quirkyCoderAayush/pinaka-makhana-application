@@ -28,6 +28,10 @@ export const AuthProvider = ({ children }) => {
     if (token && userData) {
       try {
         const parsedUser = JSON.parse(userData);
+        // Ensure hasOrders property exists (for backward compatibility)
+        if (parsedUser && typeof parsedUser.hasOrders === 'undefined') {
+          parsedUser.hasOrders = false;
+        }
         setUser(parsedUser);
         setIsAuthenticated(true);
       } catch (error) {
@@ -51,7 +55,8 @@ export const AuthProvider = ({ children }) => {
         name: name,
         fullName: name, // Map name to fullName for frontend compatibility
         email: credentials.email, // Keep email from credentials
-        role: role
+        role: role,
+        hasOrders: false // Initialize hasOrders property
       };
       
       localStorage.setItem('token', token);

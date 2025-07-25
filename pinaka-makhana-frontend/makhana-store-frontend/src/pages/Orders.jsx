@@ -6,7 +6,7 @@ import { getProductImage } from '../utils/productImageMapper';
 import apiService from '../services/api';
 
 const Orders = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, updateUser } = useAuth();
   const { showSuccess, showError } = useToast();
   const { addToCart } = useContext(CartContext);
   const [orders, setOrders] = useState([]);
@@ -31,6 +31,12 @@ const Orders = () => {
         new Date(b.orderDate || b.createdAt) - new Date(a.orderDate || a.createdAt)
       );
       setOrders(sortedOrders);
+      
+      // Update user object with hasOrders property if orders exist
+      if (user && sortedOrders.length > 0 && !user.hasOrders) {
+        const updatedUser = { ...user, hasOrders: true };
+        updateUser(updatedUser);
+      }
     } catch (err) {
       console.error('Error fetching orders:', err);
       setError('Failed to load order history. Please try again later.');

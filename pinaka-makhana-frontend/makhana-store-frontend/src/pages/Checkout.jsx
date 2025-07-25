@@ -8,7 +8,7 @@ import apiService from '../services/api';
 
 const Checkout = () => {
   const { cartItems, clearCart, loading } = useContext(CartContext);
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, updateUser } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
   
@@ -176,6 +176,12 @@ const Checkout = () => {
       // Clear cart and redirect
       clearCart();
       showSuccess('Order placed successfully! You will receive confirmation shortly.');
+      
+      // Update user's hasOrders property if this is their first order
+      if (user && !user.hasOrders) {
+        const updatedUser = { ...user, hasOrders: true };
+        updateUser(updatedUser);
+      }
       
       // Redirect to orders page
       setTimeout(() => {

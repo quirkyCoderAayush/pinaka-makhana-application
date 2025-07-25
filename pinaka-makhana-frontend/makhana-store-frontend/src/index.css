@@ -1,3 +1,5 @@
+@import './styles/smooth-scroll.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,4 +20,13 @@
 
 .delay-2000 {
   animation-delay: 2s;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
 }

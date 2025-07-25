@@ -7,17 +7,20 @@ import { CartProvider } from './components/context/CartContext.jsx'
 import { AuthProvider } from './components/context/AuthContext.jsx'
 import { ToastProvider } from './components/context/ToastContext.jsx'
 import { FavoritesProvider } from './components/context/FavoritesContext.jsx'
+import { AdminProvider } from './components/context/AdminContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <ToastProvider>
         <AuthProvider>
-          <FavoritesProvider>
-            <CartProvider>
-              <App />
-            </CartProvider>
-          </FavoritesProvider>
+          <AdminProvider>
+            <FavoritesProvider>
+              <CartProvider>
+                <App />
+              </CartProvider>
+            </FavoritesProvider>
+          </AdminProvider>
         </AuthProvider>
       </ToastProvider>
     </BrowserRouter>

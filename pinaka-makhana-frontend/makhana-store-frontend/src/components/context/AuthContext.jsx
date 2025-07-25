@@ -104,6 +104,55 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+  // Add updateUser for updating user details locally
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
+  // Add updateProfilePicture for updating only the profile picture
+  const updateProfilePicture = (base64Image) => {
+    const updatedUser = { ...user, profilePicture: base64Image };
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
+  // Address management (localStorage, per user)
+  const getAddresses = () => {
+    if (!user) return [];
+    const all = JSON.parse(localStorage.getItem('addresses') || '{}');
+    return all[user.email] || [];
+  };
+
+  const saveAddresses = (addresses) => {
+    if (!user) return;
+    const all = JSON.parse(localStorage.getItem('addresses') || '{}');
+    all[user.email] = addresses;
+    localStorage.setItem('addresses', JSON.stringify(all));
+  };
+
+  const addAddress = (address) => {
+    const addresses = getAddresses();
+    const newAddress = { ...address, id: Date.now() };
+    const updated = [...addresses, newAddress];
+    saveAddresses(updated);
+    return updated;
+  };
+
+  const updateAddress = (address) => {
+    const addresses = getAddresses();
+    const updated = addresses.map(a => a.id === address.id ? address : a);
+    saveAddresses(updated);
+    return updated;
+  };
+
+  const deleteAddress = (id) => {
+    const addresses = getAddresses();
+    const updated = addresses.filter(a => a.id !== id);
+    saveAddresses(updated);
+    return updated;
+  };
+
   const value = {
     user,
     isAuthenticated,
@@ -111,6 +160,12 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateUser,
+    updateProfilePicture,
+    getAddresses,
+    addAddress,
+    updateAddress,
+    deleteAddress,
   };
 
   return (

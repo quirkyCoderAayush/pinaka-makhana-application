@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const FavoritesContext = createContext();
+export { FavoritesContext };  // Add this line to export the context
 
 export const useFavorites = () => {
   const context = useContext(FavoritesContext);

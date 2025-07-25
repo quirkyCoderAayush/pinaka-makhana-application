@@ -4,6 +4,7 @@ import { CartContext } from "../components/context/CartContext";
 import QuantitySelector from "../components/QuantitySelector";
 import FavoriteButton from "../components/FavoriteButton";
 import ApiService from "../services/api";
+import { useIntersectionObserver, usePerformanceOptimization } from "../hooks/useSmoothScroll";
 import makhanaImage from "../images/makhana.png";
 import pack1 from "../images/pack1.jpg";
 import pack2 from "../images/pack2.jpg";
@@ -48,6 +49,10 @@ const Home = () => {
   const [quantities, setQuantities] = useState({}); // Track quantity for each product
   const [displayLimit, setDisplayLimit] = useState(4);
   const [showingAll, setShowingAll] = useState(false);
+
+  // Initialize smooth scrolling and performance optimizations
+  useIntersectionObserver();
+  usePerformanceOptimization();
 
   // Load products from backend
   useEffect(() => {
@@ -108,7 +113,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black overflow-hidden flex items-center pt-20">
+      <section id="hero" className="hero-section relative min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black overflow-hidden flex items-center pt-20">
         {/* Animated Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-72 h-72 bg-red-500 rounded-full mix-blend-multiply animate-pulse"></div>
@@ -271,7 +276,7 @@ const Home = () => {
       </section>
 
       {/* Products Section */}
-      <section className="py-16 px-8 relative overflow-hidden">
+      <section id="products" className="products-section py-16 px-8 relative overflow-hidden">
         {/* Beautiful Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 opacity-60"></div>
         
@@ -309,8 +314,8 @@ const Home = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {displayedProducts.map((product) => (
-              <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative">
+            {displayedProducts.map((product, index) => (
+              <div key={product.id} className={`fade-in bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative`} style={{ transitionDelay: `${index * 0.1}s` }}>
                 <Link to={`/product/${product.id}`} className="block aspect-square overflow-hidden cursor-pointer">
                   <img 
                     src={product.image} 
@@ -357,32 +362,17 @@ const Home = () => {
           </div>
           
           {/* Show More/Less Button */}
-          {products.length > 4 && (
-            <div className="text-center mt-12">
-              {!showingAll ? (
-                <button
-                  onClick={handleShowMore}
-                  className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-8 py-3 rounded-full font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2 mx-auto"
-                >
-                  <span>Show More Products</span>
-                  <span className="bg-white/20 text-white text-sm px-2 py-1 rounded-full">
-                    +{products.length - 4}
-                  </span>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-              ) : (
-                <button
-                  onClick={handleShowLess}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-800 px-8 py-3 rounded-full font-medium border border-gray-300 hover:border-gray-400 transition-all duration-300 flex items-center space-x-2 mx-auto"
-                >
-                  <span>Show Less</span>
-                  <svg className="w-5 h-5 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-              )}
+          {products.length > 3 && (
+            <div className="text-center mt-8">
+              <Link 
+                to="/products"
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-300"
+              >
+                Show More Products
+                <svg className="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
             </div>
           )}
         </div>

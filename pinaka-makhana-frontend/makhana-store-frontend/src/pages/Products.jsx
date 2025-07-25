@@ -301,20 +301,19 @@ const Products = () => {
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar - Filters */}
-          <div className="lg:w-1/4">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-28">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Filters</h3>
-              
+          <aside className="lg:w-1/4">
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 sticky top-28 min-h-[400px] transition-all duration-300 z-20">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 tracking-tight border-b pb-3 border-gray-100">Filters</h3>
               {/* Search */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <div className="mb-8">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Search</label>
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 shadow-sm hover:border-red-400"
                   />
                   <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -323,12 +322,12 @@ const Products = () => {
               </div>
 
               {/* Category Filter */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <div className="mb-8">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 shadow-sm hover:border-red-400"
                 >
                   {getCategories().map(category => (
                     <option key={category} value={category}>
@@ -339,9 +338,8 @@ const Products = () => {
               </div>
 
               {/* Price Range */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">Price Range</label>
-                
+              <div className="mb-8">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Price Range</label>
                 {/* Min and Max Price Inputs */}
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div>
@@ -357,7 +355,7 @@ const Products = () => {
                           const value = Math.max(0, parseInt(e.target.value) || 0);
                           setPriceRange([Math.min(value, priceRange[1]), priceRange[1]]);
                         }}
-                        className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
+                        className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm transition-all duration-200 hover:border-red-400"
                         placeholder="0"
                       />
                     </div>
@@ -375,13 +373,12 @@ const Products = () => {
                           const value = Math.max(0, parseInt(e.target.value) || 0);
                           setPriceRange([priceRange[0], Math.max(value, priceRange[0])]);
                         }}
-                        className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
+                        className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm transition-all duration-200 hover:border-red-400"
                         placeholder={maxPrice.toString()}
                       />
                     </div>
                   </div>
                 </div>
-
                 {/* Range Slider */}
                 <div className="relative">
                   <div className="flex items-center space-x-3">
@@ -426,7 +423,6 @@ const Products = () => {
                     </div>
                     <span className="text-xs text-gray-500">₹{maxPrice}+</span>
                   </div>
-                  
                   {/* Quick price filters */}
                   <div className="flex flex-wrap gap-2 mt-3">
                     {(() => {
@@ -441,7 +437,7 @@ const Products = () => {
                       <button
                         key={index}
                         onClick={() => setPriceRange([range.min, range.max])}
-                        className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                        className={`px-3 py-1 text-xs rounded-full border transition-colors duration-200 font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-red-400 hover:bg-red-50 hover:text-red-600 ${
                           priceRange[0] === range.min && priceRange[1] === range.max
                             ? 'bg-red-500 text-white border-red-500'
                             : 'bg-white text-gray-600 border-gray-300 hover:border-red-300 hover:text-red-600'
@@ -462,12 +458,12 @@ const Products = () => {
                   setPriceRange([0, maxPrice]);
                   setSortBy('relevance');
                 }}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-colors text-sm"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-colors text-sm font-semibold mt-2 shadow-sm"
               >
                 Reset Filters
               </button>
             </div>
-          </div>
+          </aside>
 
           {/* Main Content */}
           <div className="lg:w-3/4">

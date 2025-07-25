@@ -21,6 +21,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ProductManagement from './pages/admin/ProductManagement';
 import OrderManagement from './pages/admin/OrderManagement';
 import UserManagement from './pages/admin/UserManagement';
+import CouponManagement from './pages/admin/CouponManagement';
 
 function App() {
   return (
@@ -139,6 +140,11 @@ function App() {
         <Route path="/admin/users" element={
           <AdminRoute>
             <UserManagement />
+          </AdminRoute>
+        } />
+        <Route path="/admin/coupons" element={
+          <AdminRoute>
+            <CouponManagement />
           </AdminRoute>
         } />
       </Routes>

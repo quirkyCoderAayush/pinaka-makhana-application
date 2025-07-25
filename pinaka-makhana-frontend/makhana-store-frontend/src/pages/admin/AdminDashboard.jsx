@@ -16,13 +16,15 @@ const AdminDashboard = () => {
     totalProducts: 0,
     totalOrders: 0,
     totalUsers: 0,
+    totalCoupons: 0,
     revenue: 0
   });
   const [analyticsData, setAnalyticsData] = useState({
     ordersByStatus: [],
     topProducts: [],
     monthlyOrders: [],
-    userActivity: []
+    userActivity: [],
+    couponUsage: []
   });
 
   useEffect(() => {
@@ -55,15 +57,19 @@ const AdminDashboard = () => {
       // Get users using the corrected API
       const users = await apiService.getAllUsers();
       
+      // Get coupons
+      const coupons = await apiService.getAllCoupons();
+      
       setStats({
         totalProducts: products?.length || 0,
         totalOrders: orders?.length || 0,
         totalUsers: users?.length || 0,
+        totalCoupons: coupons?.length || 0,
         revenue: totalRevenue || 0
       });
 
-      // Generate analytics data
-      generateAnalyticsData(products, orders, users);
+      // Generate analytics data (now async)
+      await generateAnalyticsData(products, orders, users);
     } catch (error) {
       console.error('Failed to load dashboard stats:', error);
       // Set some default values if API fails
@@ -71,12 +77,20 @@ const AdminDashboard = () => {
         totalProducts: 0,
         totalOrders: 0,
         totalUsers: 0,
+        totalCoupons: 0,
         revenue: 0
       });
     }
   };
 
-  const generateAnalyticsData = (products, orders, users) => {
+  const generateAnalyticsData = async (products, orders, users) => {
+    // Get coupons for analytics
+    let coupons = [];
+    try {
+      coupons = await apiService.getAllCoupons();
+    } catch (error) {
+      console.error('Failed to load coupons for analytics:', error);
+    }
     // Orders by status
     const statusCounts = {};
     orders.forEach(order => {
@@ -130,6 +144,15 @@ const AdminDashboard = () => {
       value: user.totalOrders || 0
     }));
 
+    // Coupon usage analytics
+    const topCoupons = coupons
+      .sort((a, b) => (b.usageCount || 0) - (a.usageCount || 0))
+      .slice(0, 5)
+      .map(coupon => ({
+        label: coupon.code,
+        value: coupon.usageCount || 0
+      }));
+
     setAnalyticsData({
       ordersByStatus: ordersByStatus.length > 0 ? ordersByStatus : [
         { label: 'Placed', value: 0 },
@@ -142,6 +165,9 @@ const AdminDashboard = () => {
       ],
       monthlyOrders: monthlyData,
       userActivity: userActivity.length > 0 ? userActivity : [
+        { label: 'No data', value: 0 }
+      ],
+      couponUsage: topCoupons.length > 0 ? topCoupons : [
         { label: 'No data', value: 0 }
       ]
     });
@@ -256,6 +282,17 @@ const AdminDashboard = () => {
                       </Link>
                       
                       <Link
+                        to="/admin/coupons"
+                        onClick={() => setIsProfileOpen(false)}
+                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                        </svg>
+                        <span>Coupons</span>
+                      </Link>
+                      
+                      <Link
                         to="/"
                         onClick={() => setIsProfileOpen(false)}
                         className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
@@ -335,6 +372,16 @@ const AdminDashboard = () => {
                 </svg>
                 <span>Users</span>
               </Link>
+              
+              <Link
+                to="/admin/coupons"
+                className="flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z" />
+                </svg>
+                <span>Coupons</span>
+              </Link>
             </div>
           </div>
         </nav>
@@ -393,6 +440,20 @@ const AdminDashboard = () => {
 
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex items-center">
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z" />
+                  </svg>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Total Coupons</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalCoupons}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center">
                 <div className="p-2 bg-yellow-100 rounded-lg">
                   <svg className="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582z" />
@@ -410,7 +471,7 @@ const AdminDashboard = () => {
           {/* Quick Actions */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Link
                 to="/admin/products/new"
                 className="flex items-center justify-center space-x-2 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
@@ -418,7 +479,17 @@ const AdminDashboard = () => {
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                 </svg>
-                <span>Add New Product</span>
+                <span>Add Product</span>
+              </Link>
+              
+              <Link
+                to="/admin/coupons"
+                className="flex items-center justify-center space-x-2 bg-purple-500 hover:bg-purple-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z" />
+                </svg>
+                <span>Manage Coupons</span>
               </Link>
               
               <Link
@@ -471,6 +542,12 @@ const AdminDashboard = () => {
                 data={analyticsData.userActivity}
                 type="bar"
                 color="orange"
+              />
+              <AnalyticsChart
+                title="Most Used Coupons"
+                data={analyticsData.couponUsage}
+                type="bar"
+                color="pink"
               />
             </div>
           </div>

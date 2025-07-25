@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { CartContext } from "../components/context/CartContext";
 import { useAuth } from "../components/context/AuthContext";
 import { useToast } from "../components/context/ToastContext";
@@ -8,10 +8,31 @@ import apiService from "../services/api";
 
 const Cart = () => {
   const { cartItems, removeFromCart, clearCart, loading } = useContext(CartContext);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [availableCoupons, setAvailableCoupons] = useState([]);
+  const [loadingCoupons, setLoadingCoupons] = useState(false);
+  
+  // Fetch available coupons
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      if (isAuthenticated) {
+        setLoadingCoupons(true);
+        try {
+          const coupons = await apiService.getActiveCoupons();
+          setAvailableCoupons(coupons);
+        } catch (error) {
+          console.error('Failed to fetch coupons:', error);
+        } finally {
+          setLoadingCoupons(false);
+        }
+      }
+    };
+    
+    fetchCoupons();
+  }, [isAuthenticated]);
   
   // Calculate total - handle both backend and local cart formats
   const total = cartItems.reduce((acc, item) => {
@@ -128,6 +149,32 @@ const Cart = () => {
                     </div>
                   </div>
                 </div>
+                
+                {/* Available Coupons Section */}
+                {isAuthenticated && availableCoupons.length > 0 && (
+                  <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">Available Coupons</h3>
+                    {loadingCoupons ? (
+                      <p className="text-xs text-gray-500">Loading coupons...</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {availableCoupons.slice(0, 2).map(coupon => (
+                          <div key={coupon.id} className="text-xs bg-white p-2 rounded border border-gray-200">
+                            <div className="flex justify-between items-center">
+                              <span className="font-medium text-red-600">{coupon.code}</span>
+                              <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">Save up to ₹{coupon.maximumDiscountAmount || '?'}</span>
+                            </div>
+                            <p className="text-gray-600 text-xs mt-1">{coupon.description}</p>
+                          </div>
+                        ))}
+                        {availableCoupons.length > 2 && (
+                          <p className="text-xs text-gray-500 mt-1">+ {availableCoupons.length - 2} more coupons</p>
+                        )}
+                        <p className="text-xs text-gray-600 mt-1 italic">Proceed to checkout to apply coupons</p>
+                      </div>
+                    )}
+                  </div>
+                )}
                 
                 <button 
                   onClick={handleCheckout}

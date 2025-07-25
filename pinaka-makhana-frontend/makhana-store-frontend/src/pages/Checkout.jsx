@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { CartContext } from '../components/context/CartContext';
 import { useAuth } from '../components/context/AuthContext';
 import { useToast } from '../components/context/ToastContext';
@@ -20,15 +20,44 @@ const Checkout = () => {
     address: '',
     city: '',
     pincode: '',
-    paymentMethod: 'cod' // cod = Cash on Delivery
+    paymentMethod: 'cod', // cod = Cash on Delivery
+    couponCode: ''
   });
+  
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [availableCoupons, setAvailableCoupons] = useState([]);
+  const [loadingCoupons, setLoadingCoupons] = useState(false);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  
+  // Fetch available coupons
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      if (isAuthenticated) {
+        setLoadingCoupons(true);
+        try {
+          const coupons = await apiService.getActiveCoupons();
+          setAvailableCoupons(coupons);
+        } catch (error) {
+          console.error('Failed to fetch coupons:', error);
+        } finally {
+          setLoadingCoupons(false);
+        }
+      }
+    };
+    
+    fetchCoupons();
+  }, [isAuthenticated]);
 
-  // Calculate total
-  const total = cartItems.reduce((acc, item) => {
+  // Calculate subtotal
+  const subtotal = cartItems.reduce((acc, item) => {
     const price = item.product?.price || item.price || 0;
     const quantity = item.quantity || 1;
     return acc + (price * quantity);
   }, 0);
+  
+  // Calculate total after discount
+  const total = subtotal - couponDiscount;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -36,6 +65,58 @@ const Checkout = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Reset coupon if coupon code is changed
+    if (name === 'couponCode' && couponApplied) {
+      setCouponApplied(false);
+      setCouponDiscount(0);
+    }
+  };
+  
+  const handleApplyCoupon = async () => {
+    if (!orderForm.couponCode) {
+      showError('Please enter a coupon code');
+      return;
+    }
+    
+    setValidatingCoupon(true);
+    try {
+      // First validate the coupon
+      const isValid = await apiService.validateCoupon(
+        orderForm.couponCode, 
+        subtotal, 
+        !user.hasOrders // Assuming first time user if no orders
+      );
+      
+      if (isValid) {
+        // If valid, calculate the discount
+        const discount = await apiService.calculateDiscount(
+          orderForm.couponCode, 
+          subtotal, 
+          !user.hasOrders
+        );
+        
+        setCouponDiscount(discount);
+        setCouponApplied(true);
+        showSuccess(`Coupon applied! You saved ₹${discount}`);
+      } else {
+        showError('Invalid coupon or cannot be applied to this order');
+        setCouponApplied(false);
+        setCouponDiscount(0);
+      }
+    } catch (error) {
+      console.error('Coupon validation failed:', error);
+      showError('Failed to apply coupon. Please try again.');
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+  
+  const handleRemoveCoupon = () => {
+    setCouponApplied(false);
+    setCouponDiscount(0);
+    setOrderForm(prev => ({ ...prev, couponCode: '' }));
+    showSuccess('Coupon removed');
   };
 
   const handlePlaceOrder = async (e) => {
@@ -69,8 +150,28 @@ const Checkout = () => {
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
       
+      // Prepare order data
+      const orderData = {
+        ...orderForm,
+        couponCode: couponApplied ? orderForm.couponCode : null,
+        subtotal,
+        discount: couponDiscount,
+        total
+      };
+      
       // Place order in backend
-      const response = await apiService.placeOrder();
+      const response = await apiService.placeOrder(orderData);
+      
+      // If coupon was applied, increment its usage
+      if (couponApplied) {
+        try {
+          // Call the API service to increment coupon usage
+          await apiService.incrementCouponUsage(orderForm.couponCode);
+        } catch (error) {
+          console.error('Failed to update coupon usage:', error);
+          // Non-critical error, don't show to user
+        }
+      }
       
       // Clear cart and redirect
       clearCart();
@@ -276,11 +377,80 @@ const Checkout = () => {
                 })}
               </div>
 
+              {/* Coupon Code Section */}
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Apply Coupon</h3>
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    name="couponCode"
+                    value={orderForm.couponCode}
+                    onChange={handleInputChange}
+                    placeholder="Enter coupon code"
+                    disabled={couponApplied}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-gray-100"
+                  />
+                  {couponApplied ? (
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="px-3 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={validatingCoupon || !orderForm.couponCode}
+                      className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {validatingCoupon ? 'Applying...' : 'Apply'}
+                    </button>
+                  )}
+                </div>
+                
+                {loadingCoupons ? (
+                  <p className="text-xs text-gray-500 mt-2">Loading available coupons...</p>
+                ) : availableCoupons.length > 0 ? (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500">Available coupons:</p>
+                    <div className="mt-1 space-y-1">
+                      {availableCoupons.slice(0, 3).map(coupon => (
+                        <div key={coupon.id} className="text-xs bg-gray-50 p-2 rounded border border-gray-200">
+                          <div className="flex justify-between">
+                            <span className="font-medium">{coupon.code}</span>
+                            <button 
+                              type="button" 
+                              onClick={() => {
+                                setOrderForm(prev => ({ ...prev, couponCode: coupon.code }));
+                                setCouponApplied(false);
+                                setCouponDiscount(0);
+                              }}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              Use
+                            </button>
+                          </div>
+                          <p className="text-gray-600">{coupon.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              
               <div className="border-t border-gray-200 pt-4">
                 <div className="flex justify-between text-gray-600 mb-2">
                   <span>Subtotal ({cartItems.length} items)</span>
-                  <span>₹{total}</span>
+                  <span>₹{subtotal}</span>
                 </div>
+                {couponApplied && (
+                  <div className="flex justify-between text-green-600 mb-2">
+                    <span>Coupon Discount</span>
+                    <span>-₹{couponDiscount}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-gray-600 mb-2">
                   <span>Delivery</span>
                   <span className="text-green-600">Free</span>

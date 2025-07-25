@@ -216,6 +216,61 @@ class ApiService {
     // In a real scenario, you'd implement this endpoint in the backend
     return Promise.resolve({ message: 'Order status update not implemented in backend yet' });
   }
+
+  // Coupon APIs
+  async getAllCoupons() {
+    return this.request('/coupons');
+  }
+
+  async getActiveCoupons() {
+    return this.request('/coupons/active');
+  }
+
+  async getFirstTimeCoupons() {
+    return this.request('/coupons/first-time');
+  }
+
+  async getCoupon(id) {
+    return this.request(`/coupons/${id}`);
+  }
+
+  async getCouponByCode(code) {
+    return this.request(`/coupons/code/${code}`);
+  }
+
+  async validateCoupon(code, amount, isFirstTimeUser = false) {
+    return this.request(`/coupons/validate?code=${code}&amount=${amount}&firstTimeUser=${isFirstTimeUser}`);
+  }
+
+  async calculateDiscount(code, amount, isFirstTimeUser = false) {
+    return this.request(`/coupons/calculate?code=${code}&amount=${amount}&firstTimeUser=${isFirstTimeUser}`);
+  }
+
+  async createCoupon(couponData) {
+    return this.request('/coupons', {
+      method: 'POST',
+      body: JSON.stringify(couponData),
+    });
+  }
+
+  async updateCoupon(id, couponData) {
+    return this.request(`/coupons/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(couponData),
+    });
+  }
+
+  async deleteCoupon(id) {
+    return this.request(`/coupons/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async incrementCouponUsage(code) {
+    return this.request(`/coupons/increment-usage/${code}`, {
+      method: 'POST',
+    });
+  }
 }
 
 export default new ApiService();

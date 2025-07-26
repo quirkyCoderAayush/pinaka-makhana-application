@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,6 +52,17 @@ public class CartController {
 		String email = extractEmail(authHeader);
 		cartService.removeFromCart(email, productId);
 		return ResponseEntity.ok("Product removed from cart successfully");
+	}
+
+	// 🔄 Update cart item quantity
+	@PutMapping("/update/{productId}")
+	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	public ResponseEntity<String> updateCartItem(@RequestHeader("Authorization") String authHeader,
+			@PathVariable Long productId, @RequestParam int quantity) {
+
+		String email = extractEmail(authHeader);
+		cartService.updateCartItem(email, productId, quantity);
+		return ResponseEntity.ok("Cart item updated successfully");
 	}
 
 	// 📦 View user's cart

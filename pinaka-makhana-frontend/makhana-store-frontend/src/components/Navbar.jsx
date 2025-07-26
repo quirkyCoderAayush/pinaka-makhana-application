@@ -111,7 +111,7 @@ function Navbar() {
 
                 {/* Cart Dropdown */}
                 {isCartOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-96 bg-white backdrop-blur-xl rounded-xl shadow-2xl border border-gray-100 z-50 max-h-96 overflow-y-auto">
+                  <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white backdrop-blur-xl rounded-xl shadow-2xl border border-gray-100 z-50 max-h-96 overflow-y-auto max-w-[calc(100vw-2rem)]">
                     <div className="p-4 border-b border-gray-100">
                       <h3 className="font-semibold text-gray-800">Shopping Cart ({cartItems.length})</h3>
                     </div>

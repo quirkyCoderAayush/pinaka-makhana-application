@@ -2,25 +2,42 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { CartContext } from "./context/CartContext";
 import { useAuth } from "./context/AuthContext";
+import { getProductImage } from "../utils/productImageMapper";
 import logo from "../images/logo.png";
 
 function Navbar() {
-  const { cartItems } = useContext(CartContext);
+  const { cartItems, updateCartItem, removeFromCart, loading } = useContext(CartContext);
   const { isAuthenticated, user, logout } = useAuth();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const profileRef = useRef(null);
+  const cartRef = useRef(null);
 
   const handleLogout = () => {
     logout();
   };
 
-  // Close profile dropdown when clicking outside
+  const handleQuantityChange = async (productId, currentQuantity, change) => {
+    const newQuantity = currentQuantity + change;
+    if (newQuantity > 0) {
+      await updateCartItem(productId, newQuantity);
+    }
+  };
+
+  const handleRemoveItem = async (productId) => {
+    await removeFromCart(productId);
+  };
+
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setIsProfileOpen(false);
+      }
+      if (cartRef.current && !cartRef.current.contains(event.target)) {
+        setIsCartOpen(false);
       }
     };
 
@@ -33,9 +50,9 @@ function Navbar() {
   const isActive = (path) => location.pathname === path;
   
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-2xl border-b border-gray-200/50 shadow-2xl">
-      <div className="container mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-2xl border-b border-gray-200/50 shadow-2xl overflow-x-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full">
+        <div className="flex items-center justify-between h-20 min-w-0">
           
           {/* Clean Logo */}
           <Link to="/" className="group flex items-center">
@@ -51,33 +68,160 @@ function Navbar() {
           </Link>
           
           {/* Modern Navigation Links - Desktop */}
-          <div className="hidden lg:flex items-center space-x-1">
+          <div className="hidden lg:flex items-center space-x-1 flex-shrink-0">
             {[
               { name: 'Home', path: '/' },
               { name: 'About', path: '/about' },
               { name: 'Products', path: '/products' },
               ...(isAuthenticated ? [
-                { name: 'Cart', path: '/cart', badge: cartItems.length },
                 { name: 'Orders', path: '/orders' }
               ] : [])
             ].map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                className={`relative px-3 lg:px-6 py-3 rounded-full font-medium transition-all duration-300 ${
                   isActive(item.path)
                     ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
                     : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
                 }`}
               >
                 {item.name}
-                {item.badge > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
-                    {item.badge}
-                  </span>
-                )}
               </Link>
             ))}
+            
+            {/* Cart Dropdown */}
+            {isAuthenticated && (
+              <div className="relative" ref={cartRef}>
+                <button
+                  onClick={() => setIsCartOpen(!isCartOpen)}
+                  className={`relative px-3 lg:px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                    isActive('/cart')
+                      ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
+                      : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                  }`}
+                >
+                  Cart
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </button>
+
+                {/* Cart Dropdown */}
+                {isCartOpen && (
+                  <div className="absolute top-full mt-2 bg-white backdrop-blur-xl rounded-xl shadow-2xl border border-gray-100 z-50 max-h-96 overflow-y-auto
+                    responsive-dropdown
+                    sm:w-80 lg:w-96 sm:max-w-none
+                    sm:right-0 sm:left-auto
+                    transform translate-x-0">
+                    <div className="p-4 border-b border-gray-100">
+                      <h3 className="font-semibold text-gray-800">Shopping Cart ({cartItems.length})</h3>
+                    </div>
+                    
+                    {cartItems.length === 0 ? (
+                      <div className="p-6 text-center">
+                        <p className="text-gray-500 mb-4">Your cart is empty</p>
+                        <Link 
+                          to="/products" 
+                          onClick={() => setIsCartOpen(false)}
+                          className="text-red-600 hover:text-red-700 font-medium"
+                        >
+                          Start Shopping
+                        </Link>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="max-h-64 overflow-y-auto">
+                          {cartItems.map((item, index) => {
+                            const product = item.product || item;
+                            const quantity = item.quantity || 1;
+                            return (
+                              <div key={item.id || index} className="p-4 border-b border-gray-100 last:border-b-0">
+                                <div className="flex items-center space-x-3">
+                                  <img 
+                                    src={getProductImage(product)} 
+                                    alt={product.name}
+                                    className="w-12 h-12 rounded-lg object-cover"
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-sm font-medium text-gray-800 truncate">{product.name}</h4>
+                                    <p className="text-xs text-gray-500">₹{product.price}</p>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    {/* Quantity Controls */}
+                                    <div className="flex items-center border border-gray-200 rounded-lg">
+                                      <button
+                                        onClick={() => handleQuantityChange(product.id, quantity, -1)}
+                                        disabled={loading || quantity <= 1}
+                                        className="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-l-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        -
+                                      </button>
+                                      <span className="w-8 h-7 flex items-center justify-center text-sm font-medium border-l border-r border-gray-200">
+                                        {quantity}
+                                      </span>
+                                      <button
+                                        onClick={() => handleQuantityChange(product.id, quantity, 1)}
+                                        disabled={loading}
+                                        className="w-7 h-7 flex items-center justify-center text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-r-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                      >
+                                        +
+                                      </button>
+                                    </div>
+                                    {/* Remove Button */}
+                                    <button
+                                      onClick={() => handleRemoveItem(product.id)}
+                                      disabled={loading}
+                                      className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                      title="Remove item"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                      </svg>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        
+                        <div className="p-4 border-t border-gray-100">
+                          <div className="flex justify-between items-center mb-3">
+                            <span className="font-medium text-gray-800">Total:</span>
+                            <span className="font-bold text-red-600">
+                              ₹{cartItems.reduce((acc, item) => {
+                                const product = item.product || item;
+                                const quantity = item.quantity || 1;
+                                return acc + (product.price * quantity);
+                              }, 0)}
+                            </span>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Link 
+                              to="/cart"
+                              onClick={() => setIsCartOpen(false)}
+                              className="flex-1 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors"
+                            >
+                              View Cart
+                            </Link>
+                            <Link 
+                              to="/checkout"
+                              onClick={() => setIsCartOpen(false)}
+                              className="flex-1 text-center bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+                            >
+                              Checkout
+                            </Link>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           
           {/* Modern Auth Section */}

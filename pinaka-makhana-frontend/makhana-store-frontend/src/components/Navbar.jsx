@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { CartContext } from "./context/CartContext";
 import { useAuth } from "./context/AuthContext";
 import logo from "../images/logo.png";
+import { getProductImage } from "../utils/productImageMapper";
 
 function Navbar() {
   const { cartItems } = useContext(CartContext);
@@ -60,24 +61,88 @@ function Navbar() {
                 { name: 'Cart', path: '/cart', badge: cartItems.length },
                 { name: 'Orders', path: '/orders' }
               ] : [])
-            ].map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`relative px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                  isActive(item.path)
-                    ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
-                    : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
-                }`}
-              >
-                {item.name}
-                {item.badge > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            ))}
+            ].map((item) => {
+              if (item.name === 'Cart') {
+                return (
+                  <div key={item.path} className="relative group">
+                    <Link
+                      to={item.path}
+                      className={`relative px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                        isActive(item.path)
+                          ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
+                          : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                      }`}
+                    >
+                      {item.name}
+                      {item.badge > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                    {/* Cart Dropdown Preview */}
+                    <div className="absolute right-0 mt-2 w-96 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto pointer-events-none transition-all duration-200 scale-95 group-hover:scale-100 origin-top-right">
+                      <div className="p-4 max-h-96 overflow-y-auto">
+                        <h4 className="font-semibold text-lg text-gray-800 mb-2 flex items-center">
+                          <svg className="w-5 h-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l-2.5 5m0 0v0a1 1 0 001 1h1m0 0h8a1 1 0 001-1v0m0 0V9a1 1 0 00-1-1H8a1 1 0 00-1 1v4.01" /></svg>
+                          Cart Preview
+                        </h4>
+                        {cartItems.length === 0 ? (
+                          <div className="text-center text-gray-500 py-8">
+                            <svg className="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l-2.5 5m0 0v0a1 1 0 001 1h1m0 0h8a1 1 0 001-1v0m0 0V9a1 1 0 00-1-1H8a1 1 0 00-1 1v4.01" /></svg>
+                            <div className="mt-2">Your cart is empty</div>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {cartItems.slice(0, 3).map((item, idx) => {
+                              const product = item.product || item;
+                              const quantity = item.quantity || 1;
+                              return (
+                                <div key={product.id || idx} className="flex items-center space-x-3">
+                                  <img src={getProductImage(product)} alt={product.name} className="w-14 h-14 rounded-lg object-cover border border-gray-100" />
+                                  <div className="flex-1 min-w-0">
+                                    <div className="font-medium text-gray-800 truncate">{product.name}</div>
+                                    <div className="text-xs text-gray-500">Qty: {quantity}</div>
+                                  </div>
+                                  <div className="font-semibold text-red-600">₹{product.price * quantity}</div>
+                                </div>
+                              );
+                            })}
+                            {cartItems.length > 3 && (
+                              <div className="text-xs text-gray-500 text-center mt-2">+{cartItems.length - 3} more items</div>
+                            )}
+                            <div className="border-t border-gray-200 mt-3 pt-3 flex justify-between items-center">
+                              <span className="font-semibold text-gray-700">Subtotal</span>
+                              <span className="font-bold text-lg text-red-600">₹{cartItems.reduce((acc, item) => acc + ((item.product?.price || item.price || 0) * (item.quantity || 1)), 0)}</span>
+                            </div>
+                            <Link to="/cart" className="block w-full mt-3 bg-gradient-to-r from-red-500 to-orange-500 text-white text-center py-2 rounded-lg font-semibold hover:from-red-600 hover:to-orange-600 transition-all">View Full Cart</Link>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+              // Default nav link
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`relative px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                    isActive(item.path)
+                      ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
+                      : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                  }`}
+                >
+                  {item.name}
+                  {item.badge > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
           </div>
           
           {/* Modern Auth Section */}

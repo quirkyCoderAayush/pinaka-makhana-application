@@ -252,7 +252,7 @@ const Products = () => {
   return (
     <>
       {/* Custom CSS for range slider */}
-      <style jsx>{`
+      <style>{`
         .range-slider::-webkit-slider-thumb {
           appearance: none;
           height: 16px;

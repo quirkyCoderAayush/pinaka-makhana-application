@@ -81,13 +81,9 @@ export const CartProvider = ({ children }) => {
   const updateCartItem = async (productId, quantity) => {
     if (!isAuthenticated) return;
     
-    // Backend doesn't have update endpoint, so we remove and add
     try {
       setLoading(true);
-      await ApiService.removeFromCart(productId);
-      if (quantity > 0) {
-        await ApiService.addToCart(productId, quantity);
-      }
+      await ApiService.updateCartItem(productId, quantity);
       await loadCart(); // Reload cart to get updated data
       showSuccess('Cart updated');
     } catch (error) {

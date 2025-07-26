@@ -35,7 +35,7 @@ public class CartServiceImpl implements CartService {
 				.orElseThrow(() -> new RuntimeException("Product not found"));
 
 		CartItem cartItem = cartItemRepository.findByUserAndProduct(user, product).map(existing -> {
-			existing.setQuantity(existing.getQuantity() + quantity);
+			existing.setQuantity(quantity); // Set to new quantity, don't increment
 			return existing;
 		}).orElse(new CartItem(user, product, quantity));
 
@@ -50,6 +50,24 @@ public class CartServiceImpl implements CartService {
 				.orElseThrow(() -> new RuntimeException("Product not found"));
 
 		cartItemRepository.deleteByUserAndProduct(user, product);
+	}
+
+	@Override
+	@Transactional
+	public void updateCartItem(String email, Long productId, int quantity) {
+		User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+		Product product = productRepository.findById(productId)
+				.orElseThrow(() -> new RuntimeException("Product not found"));
+
+		CartItem cartItem = cartItemRepository.findByUserAndProduct(user, product)
+				.orElseThrow(() -> new RuntimeException("Cart item not found"));
+
+		if (quantity <= 0) {
+			cartItemRepository.delete(cartItem);
+		} else {
+			cartItem.setQuantity(quantity);
+			cartItemRepository.save(cartItem);
+		}
 	}
 
 	@Override

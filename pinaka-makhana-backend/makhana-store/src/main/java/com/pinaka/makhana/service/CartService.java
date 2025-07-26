@@ -10,6 +10,8 @@ public interface CartService {
 
 	void removeFromCart(String email, Long productId);
 
+	void updateCartItem(String email, Long productId, int quantity);
+
 	List<CartItem> getUserCart(String email);
 
 }

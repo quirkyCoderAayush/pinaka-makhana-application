@@ -81,6 +81,25 @@ class ApiService {
     return await response.text(); // Backend returns text, not JSON
   }
 
+  async updateCartItem(productId, quantity) {
+    const url = `${this.baseURL}/cart/update/${productId}?quantity=${quantity}`;
+    const token = localStorage.getItem('token');
+    
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to update cart item: ${response.status}`);
+    }
+    
+    return await response.text(); // Backend returns text, not JSON
+  }
+
   // Note: Backend doesn't have update cart endpoint
   // async updateCartItem(productId, quantity) {
   //   return this.request('/cart/update', {

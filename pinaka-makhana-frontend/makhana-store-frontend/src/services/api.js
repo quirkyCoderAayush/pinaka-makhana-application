@@ -81,13 +81,17 @@ class ApiService {
     return await response.text(); // Backend returns text, not JSON
   }
 
-  // Note: Backend doesn't have update cart endpoint
-  // async updateCartItem(productId, quantity) {
-  //   return this.request('/cart/update', {
-  //     method: 'PUT',
-  //     body: JSON.stringify({ productId, quantity }),
-  //   });
-  // }
+  // Update cart item quantity by removing and re-adding
+  async updateCartItemQuantity(productId, newQuantity) {
+    if (newQuantity <= 0) {
+      return this.removeFromCart(productId);
+    }
+    
+    // Remove existing item first
+    await this.removeFromCart(productId);
+    // Add with new quantity
+    return this.addToCart(productId, newQuantity);
+  }
 
   async removeFromCart(productId) {
     const url = `${this.baseURL}/cart/remove/${productId}`;

@@ -97,7 +97,7 @@ public class CouponServiceImpl implements CouponService {
                 return 0.0;
             }
             
-            return coupon.calculateDiscount(orderAmount);
+            return coupon.calculateDiscount(orderAmount, isFirstTimeUser);
         } catch (Exception e) {
             return 0.0; // Return zero discount if coupon not found or invalid
         }

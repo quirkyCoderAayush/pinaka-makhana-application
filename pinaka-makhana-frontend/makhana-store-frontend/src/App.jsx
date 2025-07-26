@@ -15,6 +15,7 @@ import Register from './pages/Register';
 import Orders from './pages/Orders';
 import Account from './pages/Account';
 import Wishlist from './pages/Wishlist';
+import Favorites from './pages/Favorites';
 import Settings from './pages/Settings';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -104,6 +105,13 @@ function App() {
           <>
             <Navbar />
             <Wishlist />
+            <Footer />
+          </>
+        } />
+        <Route path="/favorites" element={
+          <>
+            <Navbar />
+            <Favorites />
             <Footer />
           </>
         } />

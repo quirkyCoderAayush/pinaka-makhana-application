@@ -255,8 +255,8 @@ public class Coupon {
         return true;
     }
 
-    public Double calculateDiscount(Double orderAmount) {
-        if (!canBeUsed(orderAmount, false)) return 0.0;
+    public Double calculateDiscount(Double orderAmount, boolean isFirstTimeUser) {
+        if (!canBeUsed(orderAmount, isFirstTimeUser)) return 0.0;
         
         Double discount = 0.0;
         
@@ -277,6 +277,11 @@ public class Coupon {
         }
         
         return discount;
+    }
+    
+    // Keep the old method for backward compatibility
+    public Double calculateDiscount(Double orderAmount) {
+        return calculateDiscount(orderAmount, false);
     }
 
     public void incrementUsage() {

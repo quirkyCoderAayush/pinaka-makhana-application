@@ -7,7 +7,7 @@ import { getProductImage } from "../utils/productImageMapper";
 import apiService from "../services/api";
 
 const Cart = () => {
-  const { cartItems, removeFromCart, clearCart, loading } = useContext(CartContext);
+  const { cartItems, removeFromCart, updateCartItem, clearCart, loading } = useContext(CartContext);
   const { isAuthenticated, user } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
@@ -40,6 +40,13 @@ const Cart = () => {
     const quantity = item.quantity || 1;
     return acc + (price * quantity);
   }, 0);
+
+  const handleQuantityChange = async (productId, currentQuantity, change) => {
+    const newQuantity = currentQuantity + change;
+    if (newQuantity > 0) {
+      await updateCartItem(productId, newQuantity);
+    }
+  };
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
@@ -104,11 +111,33 @@ const Cart = () => {
                         <div className="flex-1 min-w-0">
                           <h4 className="text-lg font-semibold text-gray-800">{product.name}</h4>
                           <p className="text-gray-600 text-sm">{product.weight || "30g"}</p>
-                          {quantity > 1 && (
-                            <p className="text-gray-500 text-sm">Quantity: {quantity}</p>
-                          )}
+                          <p className="text-gray-500 text-sm">₹{product.price} each</p>
                         </div>
                         <div className="flex items-center space-x-4">
+                          {/* Quantity Controls */}
+                          <div className="flex items-center space-x-3">
+                            <span className="text-sm font-medium text-gray-600">Qty:</span>
+                            <div className="flex items-center border border-gray-300 rounded-lg">
+                              <button
+                                onClick={() => handleQuantityChange(product.id, quantity, -1)}
+                                disabled={loading || quantity <= 1}
+                                className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-l-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                -
+                              </button>
+                              <span className="w-12 h-10 flex items-center justify-center text-sm font-medium border-l border-r border-gray-300 bg-gray-50">
+                                {quantity}
+                              </span>
+                              <button
+                                onClick={() => handleQuantityChange(product.id, quantity, 1)}
+                                disabled={loading}
+                                className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-r-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                          
                           <span className="text-xl font-bold text-red-600">₹{product.price * quantity}</span>
                           <button
                             className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors"

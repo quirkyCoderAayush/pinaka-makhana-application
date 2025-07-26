@@ -5,6 +5,7 @@ import { useToast } from "../components/context/ToastContext";
 import { Link, useNavigate } from "react-router-dom";
 import { getProductImage } from "../utils/productImageMapper";
 import apiService from "../services/api";
+import QuantitySelector from "../components/QuantitySelector";
 
 const Cart = () => {
   const { cartItems, removeFromCart, clearCart, loading, updateCartItem } = useContext(CartContext);
@@ -93,7 +94,7 @@ const Cart = () => {
                     const product = item.product || item;
                     const quantity = item.quantity || 1;
                     return (
-                      <div key={item.id || index} className="p-6 flex items-center space-x-4">
+                      <div key={product.id || index} className="p-6 flex items-center space-x-4">
                         <div className="flex-shrink-0">
                           <img 
                             className="h-20 w-20 rounded-lg object-cover" 
@@ -104,34 +105,22 @@ const Cart = () => {
                         <div className="flex-1 min-w-0">
                           <h4 className="text-lg font-semibold text-gray-800">{product.name}</h4>
                           <p className="text-gray-600 text-sm">{product.weight || "30g"}</p>
-                          {/* Quantity Controls */}
-                          <div className="mt-2 flex items-center space-x-2">
-                            <button
-                              className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-red-600 hover:bg-red-100 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                              onClick={() => updateCartItem(product.id, quantity - 1)}
-                              disabled={loading || quantity <= 1}
-                              aria-label={`Decrease quantity of ${product.name}`}
-                            >
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
-                            </button>
-                            <span className="px-3 py-1 min-w-[2rem] text-center rounded bg-gray-100 text-gray-800 font-semibold text-base shadow-inner">
-                              {quantity}
-                            </span>
-                            <button
-                              className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-green-600 hover:bg-green-100 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                              onClick={() => updateCartItem(product.id, quantity + 1)}
+                          <div className="mt-2">
+                            <QuantitySelector
+                              quantity={quantity}
+                              onQuantityChange={(newQty) => updateCartItem(product.id, newQty)}
+                              min={1}
+                              max={20}
                               disabled={loading}
-                              aria-label={`Increase quantity of ${product.name}`}
-                            >
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                            </button>
+                              size="md"
+                            />
                           </div>
                         </div>
                         <div className="flex items-center space-x-4">
                           <span className="text-xl font-bold text-red-600">₹{product.price * quantity}</span>
                           <button
                             className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition-colors"
-                            onClick={() => removeFromCart(product.id || index)}
+                            onClick={() => removeFromCart(product.id)}
                             title="Remove item"
                             disabled={loading}
                           >

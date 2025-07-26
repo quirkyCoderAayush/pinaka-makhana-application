@@ -50,9 +50,9 @@ function Navbar() {
   const isActive = (path) => location.pathname === path;
   
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-2xl border-b border-gray-200/50 shadow-2xl">
-      <div className="container mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-2xl border-b border-gray-200/50 shadow-2xl overflow-x-hidden">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-full">
+        <div className="flex items-center justify-between h-20 min-w-0">
           
           {/* Clean Logo */}
           <Link to="/" className="group flex items-center">
@@ -68,7 +68,7 @@ function Navbar() {
           </Link>
           
           {/* Modern Navigation Links - Desktop */}
-          <div className="hidden lg:flex items-center space-x-1">
+          <div className="hidden lg:flex items-center space-x-1 flex-shrink-0">
             {[
               { name: 'Home', path: '/' },
               { name: 'About', path: '/about' },
@@ -80,7 +80,7 @@ function Navbar() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                className={`relative px-3 lg:px-6 py-3 rounded-full font-medium transition-all duration-300 ${
                   isActive(item.path)
                     ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
                     : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
@@ -95,7 +95,7 @@ function Navbar() {
               <div className="relative" ref={cartRef}>
                 <button
                   onClick={() => setIsCartOpen(!isCartOpen)}
-                  className={`relative px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                  className={`relative px-3 lg:px-6 py-3 rounded-full font-medium transition-all duration-300 ${
                     isActive('/cart')
                       ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
                       : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
@@ -111,7 +111,11 @@ function Navbar() {
 
                 {/* Cart Dropdown */}
                 {isCartOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-96 bg-white backdrop-blur-xl rounded-xl shadow-2xl border border-gray-100 z-50 max-h-96 overflow-y-auto">
+                  <div className="absolute top-full mt-2 bg-white backdrop-blur-xl rounded-xl shadow-2xl border border-gray-100 z-50 max-h-96 overflow-y-auto
+                    responsive-dropdown
+                    sm:w-80 lg:w-96 sm:max-w-none
+                    sm:right-0 sm:left-auto
+                    transform translate-x-0">
                     <div className="p-4 border-b border-gray-100">
                       <h3 className="font-semibold text-gray-800">Shopping Cart ({cartItems.length})</h3>
                     </div>

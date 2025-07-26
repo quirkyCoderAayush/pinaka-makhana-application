@@ -1,6 +1,6 @@
 // Simple script to test backend connection
 async function testBackendConnection() {
-  const API_BASE_URL = 'http://localhost:8081/api';
+  const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8081/api';
   
   console.log('🔄 Testing backend connection...\n');
   

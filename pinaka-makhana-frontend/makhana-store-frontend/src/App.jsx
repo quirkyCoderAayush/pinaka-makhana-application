@@ -26,7 +26,7 @@ import CouponManagement from './pages/admin/CouponManagement';
 
 function App() {
   return (
-    <div className="font-sans no-horizontal-overflow">
+    <div className="font-sans">
       <ScrollToTop />
       
       <Routes>

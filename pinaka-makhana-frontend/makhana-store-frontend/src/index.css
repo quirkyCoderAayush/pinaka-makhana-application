@@ -24,29 +24,9 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
-  max-width: 100vw;
 }
 
 body {
   overflow-y: scroll;
-  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  max-width: 100vw;
-}
-
-/* Prevent horizontal overflow */
-.no-horizontal-overflow {
-  overflow-x: hidden;
-  max-width: 100vw;
-}
-
-/* Responsive utilities */
-@media (max-width: 640px) {
-  .responsive-dropdown {
-    left: 1rem !important;
-    right: 1rem !important;
-    width: calc(100vw - 2rem) !important;
-    max-width: none !important;
-  }
 }

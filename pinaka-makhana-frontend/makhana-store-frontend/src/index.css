@@ -41,9 +41,28 @@ body {
   max-width: 100vw;
 }
 
+/* Cart dropdown positioning fix */
+.cart-dropdown {
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+  min-height: 100px !important;
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Ensure dropdowns appear above everything */
+.dropdown-container {
+  position: relative !important;
+  z-index: 9999 !important;
+}
+
 /* Responsive utilities */
 @media (max-width: 640px) {
-  .responsive-dropdown {
+  .cart-dropdown {
     left: 1rem !important;
     right: 1rem !important;
     width: calc(100vw - 2rem) !important;

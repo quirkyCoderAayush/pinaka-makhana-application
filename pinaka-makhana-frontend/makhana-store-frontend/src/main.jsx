@@ -8,21 +8,24 @@ import { AuthProvider } from './components/context/AuthContext.jsx'
 import { ToastProvider } from './components/context/ToastContext.jsx'
 import { FavoritesProvider } from './components/context/FavoritesContext.jsx'
 import { AdminProvider } from './components/context/AdminContext.jsx'
+import { NotificationProvider } from './components/context/NotificationContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <ToastProvider>
-        <AuthProvider>
-          <AdminProvider>
-            <FavoritesProvider>
-              <CartProvider>
-                <App />
-              </CartProvider>
-            </FavoritesProvider>
-          </AdminProvider>
-        </AuthProvider>
-      </ToastProvider>
+      <NotificationProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <AdminProvider>
+              <FavoritesProvider>
+                <CartProvider>
+                  <App />
+                </CartProvider>
+              </FavoritesProvider>
+            </AdminProvider>
+          </AuthProvider>
+        </ToastProvider>
+      </NotificationProvider>
     </BrowserRouter>
   </StrictMode>,
 )

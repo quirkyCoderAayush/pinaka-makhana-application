@@ -45,8 +45,10 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       setLoading(true);
+      console.log('Attempting login with credentials:', { email: credentials.email });
       const response = await apiService.login(credentials);
-      
+      console.log('Login response received:', response);
+
       // Backend returns { token, name, role } structure
       const { token, name, role } = response;
       
@@ -77,7 +79,11 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       setLoading(true);
-      
+      console.log('Attempting registration with data:', {
+        name: userData.fullName,
+        email: userData.email
+      });
+
       // Transform frontend data to match backend AuthRequest
       const backendData = {
         name: userData.fullName, // Backend expects 'name', frontend sends 'fullName'
@@ -85,15 +91,16 @@ export const AuthProvider = ({ children }) => {
         password: userData.password,
         isAdmin: false // Default to regular user
       };
-      
+
       const response = await apiService.register(backendData);
-      
+      console.log('Registration response:', response);
+
       // Auto login after successful registration using EMAIL (not username)
       const loginResult = await login({
         email: userData.email, // Backend uses email for login, not username
         password: userData.password
       });
-      
+
       return loginResult;
     } catch (error) {
       console.error('Registration failed:', error);

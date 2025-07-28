@@ -5,6 +5,7 @@ import { useAuth } from './context/AuthContext';
 import { useFavorites } from './context/FavoritesContext';
 import { useCart } from './context/CartContext';
 import { useToast } from './context/ToastContext';
+import { formatPrice } from '../utils/formatPrice';
 
 const ProductComparison = ({ products = [], onClose, onAddProduct }) => {
   const { isAuthenticated } = useAuth();
@@ -86,7 +87,7 @@ const ProductComparison = ({ products = [], onClose, onAddProduct }) => {
 
     switch (feature.type) {
       case 'currency':
-        return <span className="font-semibold text-primary-600">₹{value}</span>;
+        return <span className="font-semibold text-primary-600">₹{formatPrice(value)}</span>;
       
       case 'rating':
         return (

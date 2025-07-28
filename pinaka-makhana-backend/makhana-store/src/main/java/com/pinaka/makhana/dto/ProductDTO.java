@@ -5,10 +5,20 @@ public class ProductDTO {
 	private String name;
 	private String flavor;
 	private String description;
+	private String shortDescription;
 	private Double price;
+	private Double originalPrice;
 	private String imageUrl;
 	private Double rating;
+	private Integer reviewCount;
 	private boolean available;
+	private Integer stockQuantity;
+	private String weight;
+	private String sku;
+	private String category; // Will be converted to enum in service
+	private boolean isPremium;
+	private boolean isFeatured;
+	private boolean isNewArrival;
 
 	public ProductDTO() {
 	}
@@ -22,6 +32,30 @@ public class ProductDTO {
 		this.imageUrl = imageUrl;
 		this.rating = rating;
 		this.available = available;
+	}
+
+	// Enhanced constructor
+	public ProductDTO(String name, String flavor, String description, String shortDescription, Double price,
+			Double originalPrice, String imageUrl, Double rating, Integer reviewCount, boolean available,
+			Integer stockQuantity, String weight, String sku, String category, boolean isPremium,
+			boolean isFeatured, boolean isNewArrival) {
+		this.name = name;
+		this.flavor = flavor;
+		this.description = description;
+		this.shortDescription = shortDescription;
+		this.price = price;
+		this.originalPrice = originalPrice;
+		this.imageUrl = imageUrl;
+		this.rating = rating;
+		this.reviewCount = reviewCount;
+		this.available = available;
+		this.stockQuantity = stockQuantity;
+		this.weight = weight;
+		this.sku = sku;
+		this.category = category;
+		this.isPremium = isPremium;
+		this.isFeatured = isFeatured;
+		this.isNewArrival = isNewArrival;
 	}
 
 	public String getName() {
@@ -80,10 +114,91 @@ public class ProductDTO {
 		this.available = available;
 	}
 
+	// Getters and setters for new fields
+	public String getShortDescription() {
+		return shortDescription;
+	}
+
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
+
+	public Double getOriginalPrice() {
+		return originalPrice;
+	}
+
+	public void setOriginalPrice(Double originalPrice) {
+		this.originalPrice = originalPrice;
+	}
+
+	public Integer getReviewCount() {
+		return reviewCount;
+	}
+
+	public void setReviewCount(Integer reviewCount) {
+		this.reviewCount = reviewCount;
+	}
+
+	public Integer getStockQuantity() {
+		return stockQuantity;
+	}
+
+	public void setStockQuantity(Integer stockQuantity) {
+		this.stockQuantity = stockQuantity;
+	}
+
+	public String getWeight() {
+		return weight;
+	}
+
+	public void setWeight(String weight) {
+		this.weight = weight;
+	}
+
+	public String getSku() {
+		return sku;
+	}
+
+	public void setSku(String sku) {
+		this.sku = sku;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public boolean isPremium() {
+		return isPremium;
+	}
+
+	public void setPremium(boolean isPremium) {
+		this.isPremium = isPremium;
+	}
+
+	public boolean isFeatured() {
+		return isFeatured;
+	}
+
+	public void setFeatured(boolean isFeatured) {
+		this.isFeatured = isFeatured;
+	}
+
+	public boolean isNewArrival() {
+		return isNewArrival;
+	}
+
+	public void setNewArrival(boolean isNewArrival) {
+		this.isNewArrival = isNewArrival;
+	}
+
 	@Override
 	public String toString() {
 		return "ProductDTO [name=" + name + ", flavor=" + flavor + ", description=" + description + ", price=" + price
-				+ ", imageUrl=" + imageUrl + ", rating=" + rating + ", available=" + available + "]";
+				+ ", imageUrl=" + imageUrl + ", rating=" + rating + ", available=" + available + ", stockQuantity=" + stockQuantity + "]";
 	}
 
 	@Override

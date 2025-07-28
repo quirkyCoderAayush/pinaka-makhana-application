@@ -1,27 +1,256 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useContext, useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CartContext } from "./context/CartContext";
 import { useAuth } from "./context/AuthContext";
+import { useFavorites } from "./context/FavoritesContext";
+import { Heart, ShoppingCart, Search, Menu, X } from "lucide-react";
 import logo from "../images/logo.png";
-import { getProductImage } from "../utils/productImageMapper";
+import "../styles/navbar-enhancements.css";
 
 function Navbar() {
   const { cartItems } = useContext(CartContext);
   const { isAuthenticated, user, logout } = useAuth();
+  const { favorites } = useFavorites();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [navbarOpacity, setNavbarOpacity] = useState(1);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [isDarkBackground, setIsDarkBackground] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const profileRef = useRef(null);
+  const searchRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const scrollTimeoutRef = useRef(null);
 
   const handleLogout = () => {
     logout();
   };
 
-  // Close profile dropdown when clicking outside
+  // Handle search functionality
+  const handleSearchToggle = () => {
+    setIsSearchExpanded(!isSearchExpanded);
+    if (!isSearchExpanded) {
+      // Focus the input when expanding
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    } else {
+      // Clear search when collapsing
+      setSearchQuery('');
+    }
+  };
+
+  // Handle keyboard events for search
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && isSearchExpanded) {
+        setIsSearchExpanded(false);
+        setSearchQuery('');
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isSearchExpanded]);
+
+  const handleSearchSubmit = () => {
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchExpanded(false);
+      setSearchQuery('');
+    }
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearchSubmit();
+    } else if (e.key === 'Escape') {
+      setIsSearchExpanded(false);
+      setSearchQuery('');
+    }
+  };
+
+  // Detect page background and set adaptive navbar styling
+  useEffect(() => {
+    const detectPageBackground = () => {
+      const currentPath = location.pathname;
+
+      // Define pages with dark backgrounds that need light navbar
+      const darkBackgroundPages = ['/', '/home'];
+
+      // Define pages with light backgrounds that need dark navbar
+      const lightBackgroundPages = ['/products', '/about', '/contact', '/cart', '/wishlist', '/profile', '/login', '/register'];
+
+      if (darkBackgroundPages.includes(currentPath)) {
+        setIsDarkBackground(true); // Use light navbar for dark page backgrounds
+      } else if (lightBackgroundPages.includes(currentPath)) {
+        setIsDarkBackground(false); // Use dark navbar for light page backgrounds
+      } else {
+        // Default to light navbar for unknown pages
+        setIsDarkBackground(true);
+      }
+    };
+
+    detectPageBackground();
+  }, [location.pathname]);
+
+  // Comprehensive page load positioning and navbar visibility management
+  useEffect(() => {
+    // Robust scroll-to-top function with multiple fallbacks
+    const forceScrollToTop = () => {
+      // Method 1: Standard window.scrollTo with immediate behavior
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+      // Method 2: Direct property assignment for cross-browser compatibility
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+
+      // Method 3: Additional fallback for older browsers
+      if (window.pageYOffset !== 0) {
+        window.pageYOffset = 0;
+      }
+
+      // Method 4: Force scroll using scrollIntoView on body
+      document.body.scrollIntoView({ behavior: 'auto', block: 'start' });
+    };
+
+    // Force navbar to be immediately visible with full opacity
+    const forceNavbarVisible = () => {
+      setIsVisible(true);
+      setNavbarOpacity(1);
+      setIsInitialLoad(true);
+    };
+
+    // Immediate execution
+    forceScrollToTop();
+    forceNavbarVisible();
+
+    // Multiple fallback timers for different scenarios
+    const immediateTimer = setTimeout(() => {
+      forceScrollToTop();
+      forceNavbarVisible();
+    }, 0);
+
+    const shortTimer = setTimeout(() => {
+      forceScrollToTop();
+      forceNavbarVisible();
+    }, 50);
+
+    const mediumTimer = setTimeout(() => {
+      forceScrollToTop();
+      forceNavbarVisible();
+    }, 150);
+
+    const longTimer = setTimeout(() => {
+      forceScrollToTop();
+      forceNavbarVisible();
+      // Allow scroll behavior to activate after initial load
+      setTimeout(() => setIsInitialLoad(false), 500);
+    }, 300);
+
+    return () => {
+      clearTimeout(immediateTimer);
+      clearTimeout(shortTimer);
+      clearTimeout(mediumTimer);
+      clearTimeout(longTimer);
+    };
+  }, [location.pathname]); // Re-run on route changes
+
+  // Additional browser-specific scroll handling for cross-browser compatibility
+  useEffect(() => {
+    const handlePageShow = (event) => {
+      // Handle browser back/forward navigation and page cache
+      if (event.persisted) {
+        // Force scroll to top for cached pages
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        setIsVisible(true);
+        setNavbarOpacity(1);
+        setIsInitialLoad(true);
+        setTimeout(() => setIsInitialLoad(false), 500);
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      // Prepare for page reload
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    };
+
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  // Enhanced scroll behavior with initial load protection
+  useEffect(() => {
+    const handleScroll = () => {
+      // Don't apply scroll behavior during initial load
+      if (isInitialLoad) {
+        return;
+      }
+
+      const currentScrollY = window.scrollY;
+
+      // Clear any existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      // Debounce scroll handling for better performance
+      scrollTimeoutRef.current = setTimeout(() => {
+        if (currentScrollY < 50) {
+          // Full opacity when near top
+          setIsVisible(true);
+          setNavbarOpacity(1);
+        } else if (currentScrollY < 100) {
+          // Gradual fade when approaching threshold
+          setIsVisible(true);
+          const opacity = 1 - ((currentScrollY - 50) / 50) * 0.3; // Fade to 70% opacity
+          setNavbarOpacity(Math.max(opacity, 0.7));
+        } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+          // Hide when scrolling down past threshold
+          setIsVisible(false);
+          setNavbarOpacity(0);
+        } else if (currentScrollY < lastScrollY) {
+          // Show when scrolling up with fade-in effect
+          setIsVisible(true);
+          setNavbarOpacity(1);
+        }
+
+        setLastScrollY(currentScrollY);
+      }, 10); // Small debounce delay
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [lastScrollY, isInitialLoad]);
+
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setIsProfileOpen(false);
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setIsSearchExpanded(false);
+        setSearchQuery('');
       }
     };
 
@@ -32,229 +261,298 @@ function Navbar() {
   }, []);
 
   const isActive = (path) => location.pathname === path;
-  
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-2xl border-b border-gray-200/50 shadow-2xl">
-      <div className="container mx-auto px-6 lg:px-8">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-lg transition-all duration-400 ease-in-out ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      } ${
+        isDarkBackground
+          ? 'bg-white/5 border-b border-white/20'
+          : 'bg-gray-800/60 border-b border-gray-700/30'
+      }`}
+      style={{ opacity: navbarOpacity }}
+    >
+      {/* Subtle gradient overlay for enhanced transparency */}
+      <div className={`absolute inset-0 ${
+        isDarkBackground
+          ? 'bg-gradient-to-r from-white/2 via-white/5 to-white/2'
+          : 'bg-gradient-to-r from-gray-800/3 via-gray-800/5 to-gray-800/3'
+      }`}></div>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="flex items-center justify-between h-20">
-          
-          {/* Clean Logo */}
-          <Link to="/" className="group flex items-center">
-            <img 
-              src={logo} 
-              alt="Pinaka Makhana" 
-              className="h-16 w-auto max-w-[160px] object-contain group-hover:scale-105 transition-transform duration-300 bg-transparent mix-blend-multiply"
-              style={{
-                filter: 'drop-shadow(0 0 0 transparent)',
-                background: 'transparent'
-              }}
-            />
-          </Link>
-          
-          {/* Modern Navigation Links - Desktop */}
-          <div className="hidden lg:flex items-center space-x-1">
-            {[
-              { name: 'Home', path: '/' },
-              { name: 'About', path: '/about' },
-              { name: 'Products', path: '/products' },
-              ...(isAuthenticated ? [
-                { name: 'Cart', path: '/cart', badge: cartItems.length },
-                { name: 'Orders', path: '/orders' }
-              ] : [])
-            ].map((item) => {
-              if (item.name === 'Cart') {
-                return (
-                  <div key={item.path} className="relative group">
-                    <Link
-                      to={item.path}
-                      className={`relative px-6 py-3 rounded-full font-medium transition-all duration-300 ${
-                        isActive(item.path)
-                          ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
-                          : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
-                      }`}
-                    >
-                      {item.name}
-                      {item.badge > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                    {/* Cart Dropdown Preview */}
-                    <div className="absolute right-0 mt-2 w-96 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto pointer-events-none transition-all duration-200 scale-95 group-hover:scale-100 origin-top-right">
-                      <div className="p-4 max-h-96 overflow-y-auto">
-                        <h4 className="font-semibold text-lg text-gray-800 mb-2 flex items-center">
-                          <svg className="w-5 h-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l-2.5 5m0 0v0a1 1 0 001 1h1m0 0h8a1 1 0 001-1v0m0 0V9a1 1 0 00-1-1H8a1 1 0 00-1 1v4.01" /></svg>
-                          Cart Preview
-                        </h4>
-                        {cartItems.length === 0 ? (
-                          <div className="text-center text-gray-500 py-8">
-                            <svg className="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l-2.5 5m0 0v0a1 1 0 001 1h1m0 0h8a1 1 0 001-1v0m0 0V9a1 1 0 00-1-1H8a1 1 0 00-1 1v4.01" /></svg>
-                            <div className="mt-2">Your cart is empty</div>
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            {cartItems.slice(0, 3).map((item, idx) => {
-                              const product = item.product || item;
-                              const quantity = item.quantity || 1;
-                              return (
-                                <div key={product.id || idx} className="flex items-center space-x-3">
-                                  <img src={getProductImage(product)} alt={product.name} className="w-14 h-14 rounded-lg object-cover border border-gray-100" />
-                                  <div className="flex-1 min-w-0">
-                                    <div className="font-medium text-gray-800 truncate">{product.name}</div>
-                                    <div className="text-xs text-gray-500">Qty: {quantity}</div>
-                                  </div>
-                                  <div className="font-semibold text-red-600">₹{product.price * quantity}</div>
-                                </div>
-                              );
-                            })}
-                            {cartItems.length > 3 && (
-                              <div className="text-xs text-gray-500 text-center mt-2">+{cartItems.length - 3} more items</div>
-                            )}
-                            <div className="border-t border-gray-200 mt-3 pt-3 flex justify-between items-center">
-                              <span className="font-semibold text-gray-700">Subtotal</span>
-                              <span className="font-bold text-lg text-red-600">₹{cartItems.reduce((acc, item) => acc + ((item.product?.price || item.price || 0) * (item.quantity || 1)), 0)}</span>
-                            </div>
-                            <Link to="/cart" className="block w-full mt-3 bg-gradient-to-r from-red-500 to-orange-500 text-white text-center py-2 rounded-lg font-semibold hover:from-red-600 hover:to-orange-600 transition-all">View Full Cart</Link>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              }
-              // Default nav link
-              return (
+
+          {/* Enhanced Logo with Visibility Optimization */}
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center group">
+              <img
+                src={logo}
+                alt="Pinaka Makhana"
+                className="h-16 w-auto transition-all duration-300 group-hover:scale-105"
+                style={{
+                  filter: 'brightness(1.1) contrast(1.2) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.2))',
+                  transition: 'all 0.3s ease-in-out'
+                }}
+              />
+            </Link>
+          </div>
+
+          {/* Enhanced Navigation Links - Center Section */}
+          <div className="hidden lg:flex items-center justify-center flex-1">
+            <div className="flex items-center space-x-3">
+              {[
+                { name: 'Home', path: '/' },
+                { name: 'About', path: '/about' },
+                { name: 'Products', path: '/products' },
+                { name: 'Contact Us', path: '/contact' }
+              ].map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`relative px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                  className={`relative px-6 py-3 font-medium transition-all duration-600 ease-in-out group ${
                     isActive(item.path)
-                      ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
-                      : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                      ? 'text-red-500'
+                      : isDarkBackground
+                        ? 'text-white hover:text-red-500'
+                        : 'text-white hover:text-red-500'
                   }`}
+                  style={{
+                    textShadow: isDarkBackground
+                      ? '0 1px 3px rgba(0, 0, 0, 0.3)'
+                      : '0 1px 3px rgba(0, 0, 0, 0.5)'
+                  }}
                 >
-                  {item.name}
-                  {item.badge > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center animate-pulse">
-                      {item.badge}
-                    </span>
-                  )}
+                  <span className="relative z-10">{item.name}</span>
+
+                  {/* Enhanced bidirectional underline animation */}
+                  <div
+                    className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r from-red-500 to-orange-500 shadow-lg nav-underline ${
+                      isActive(item.path)
+                        ? 'w-full opacity-100'
+                        : 'w-0 opacity-0'
+                    }`}
+                    style={{
+                      transformOrigin: 'left',
+                      transition: 'all 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
+                      borderRadius: '2px'
+                    }}
+                  ></div>
                 </Link>
-              );
-            })}
+              ))}
+            </div>
           </div>
           
-          {/* Modern Auth Section */}
+          {/* Right Section - Actions & Auth */}
           <div className="hidden lg:flex items-center space-x-4">
+            {/* Compact Expandable Search */}
+            <div className="relative" ref={searchRef}>
+              <div className={`flex items-center transition-all duration-400 ease-in-out ${
+                isSearchExpanded ? 'w-80' : 'w-auto'
+              }`}>
+                {!isSearchExpanded ? (
+                  <button
+                    onClick={handleSearchToggle}
+                    className={`p-3 transition-colors duration-300 ${
+                      isDarkBackground
+                        ? 'text-white hover:text-red-300'
+                        : 'text-white hover:text-red-300'
+                    }`}
+                    aria-label="Open search"
+                    style={{
+                      filter: isDarkBackground
+                        ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+                        : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+                    }}
+                  >
+                    <Search className="h-6 w-6" />
+                  </button>
+                ) : (
+                  <div className="relative w-full">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Search className="h-5 w-5 text-red-500" />
+                    </div>
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={handleSearchKeyDown}
+                      className="w-full pl-12 pr-12 py-3 bg-white/95 backdrop-blur-xl border-2 border-red-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 placeholder-gray-500 shadow-lg"
+                      placeholder="Search for makhana products..."
+                      autoComplete="off"
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center space-x-1 pr-2">
+                      {searchQuery && (
+                        <button
+                          onClick={() => setSearchQuery('')}
+                          className="p-1 hover:bg-red-100 rounded-full transition-colors duration-200"
+                          aria-label="Clear search"
+                        >
+                          <X className="h-4 w-4 text-gray-400 hover:text-red-600" />
+                        </button>
+                      )}
+                      <button
+                        onClick={handleSearchToggle}
+                        className="p-1 hover:bg-red-100 rounded-full transition-colors duration-200"
+                        aria-label="Close search"
+                      >
+                        <X className="h-4 w-4 text-gray-400 hover:text-red-600" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* Adaptive Heart Icon for Wishlist */}
+            {isAuthenticated && (
+              <Link
+                to="/wishlist"
+                className={`relative p-3 transition-colors duration-300 ${
+                  isDarkBackground
+                    ? 'text-white hover:text-red-300'
+                    : 'text-white hover:text-red-300'
+                }`}
+                aria-label="Wishlist"
+                style={{
+                  filter: isDarkBackground
+                    ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+                    : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+                }}
+              >
+                <Heart className="h-6 w-6 hover:fill-red-300 transition-all duration-300" />
+                {favorites && favorites.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg animate-pulse">
+                    {favorites.length}
+                  </span>
+                )}
+              </Link>
+            )}
+
+            {/* Adaptive Cart Icon */}
+            {isAuthenticated && (
+              <Link
+                to="/cart"
+                className={`relative p-3 transition-colors duration-300 ${
+                  isDarkBackground
+                    ? 'text-white hover:text-orange-300'
+                    : 'text-white hover:text-orange-300'
+                }`}
+                aria-label="Shopping Cart"
+                style={{
+                  filter: isDarkBackground
+                    ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+                    : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+                }}
+              >
+                <ShoppingCart className="h-6 w-6" />
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg animate-pulse">
+                    {cartItems.length}
+                  </span>
+                )}
+              </Link>
+            )}
+            {/* Modern Minimalist Profile Section */}
             {isAuthenticated ? (
               <div className="relative" ref={profileRef}>
-                {/* Profile Dropdown Trigger */}
+                {/* Minimalist Profile Dropdown Trigger */}
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center space-x-3 bg-gray-100 hover:bg-gray-200 backdrop-blur-lg rounded-full px-4 py-2 border border-gray-200 hover:border-gray-300 transition-all duration-300"
+                  className="flex items-center space-x-3 transition-all duration-300 hover:opacity-80"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <span className="text-white font-bold text-sm">
                       {(user?.fullName || user?.username || 'U').charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <span className="text-gray-800 font-medium text-sm">
+                  <div className="hidden sm:block">
+                    <span
+                      className={`font-medium text-sm ${
+                        isDarkBackground ? 'text-white' : 'text-white'
+                      }`}
+                      style={{
+                        textShadow: isDarkBackground
+                          ? '0 1px 2px rgba(0, 0, 0, 0.3)'
+                          : '0 1px 2px rgba(0, 0, 0, 0.5)'
+                      }}
+                    >
                       {user?.fullName?.split(' ')[0] || user?.username || 'User'}
                     </span>
-                    <svg className={`w-4 h-4 text-gray-600 transform transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
                   </div>
+                  <svg
+                    className={`w-4 h-4 transform transition-transform duration-300 ${
+                      isProfileOpen ? 'rotate-180' : ''
+                    } ${isDarkBackground ? 'text-white' : 'text-white'}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    style={{
+                      filter: isDarkBackground
+                        ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+                        : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+                    }}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
 
-                {/* Profile Dropdown Menu */}
+                {/* Enhanced Dropdown Menu */}
                 {isProfileOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-white backdrop-blur-xl rounded-xl shadow-2xl border border-gray-100 py-2 z-50">
-                    {/* User Info Header */}
-                    <div className="px-4 py-3 border-b border-gray-100">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">
+                  <div className="absolute right-0 top-full mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50">
+                    {/* Enhanced User Info Header */}
+                    <div className="px-6 py-4 border-b border-gray-100">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                          <span className="text-white font-bold text-lg">
                             {(user?.fullName || user?.username || 'U').charAt(0).toUpperCase()}
                           </span>
                         </div>
-                        <div>
-                          <p className="font-semibold text-gray-800">{user?.fullName || user?.username || 'User'}</p>
-                          <p className="text-xs text-gray-600">{user?.email || 'user@example.com'}</p>
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-900 text-base">{user?.fullName || user?.username || 'User'}</p>
+                          <p className="text-sm text-gray-500 mt-1">{user?.email || 'user@example.com'}</p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Menu Items */}
+                    {/* Enhanced Menu Items */}
                     <div className="py-2">
                       <Link
                         to="/profile"
                         onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                        className="flex items-center space-x-3 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                         <span>My Account</span>
                       </Link>
-                      
+
                       <Link
                         to="/orders"
                         onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                        className="flex items-center space-x-3 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                         <span>My Orders</span>
                       </Link>
-                      
+
                       <Link
-                        to="/cart"
+                        to="/wishlist"
                         onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l-2.5 5m0 0v0a1 1 0 001 1h1m0 0h8a1 1 0 001-1v0m0 0V9a1 1 0 00-1-1H8a1 1 0 00-1 1v4.01" />
-                          </svg>
-                          <span>My Cart</span>
-                        </div>
-                        {cartItems.length > 0 && (
-                          <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
-                            {cartItems.length}
-                          </span>
-                        )}
-                      </Link>
-                      
-                      <Link
-                        to="/favorites"
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                        className="flex items-center space-x-3 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
-                        <span>Favorites</span>
-                      </Link>
-                      
-                      <Link
-                        to="/wishlist"
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
                         <span>Wishlist</span>
                       </Link>
-                      
+
                       <Link
                         to="/settings"
                         onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
+                        className="flex items-center space-x-3 px-6 py-3 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -264,119 +562,178 @@ function Navbar() {
                       </Link>
                     </div>
 
-                    {/* Logout Section */}
-                    <div className="border-t border-gray-100 pt-2">
+                    {/* Enhanced Logout Section */}
+                    <div className="border-t border-gray-100 pt-2 mt-2">
                       <button
                         onClick={() => {
                           handleLogout();
                           setIsProfileOpen(false);
                         }}
-                        className="flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors w-full text-left"
+                        className="flex items-center space-x-3 px-6 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 w-full text-left"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
-                        <span>Logout</span>
+                        <span>Sign Out</span>
                       </button>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
-                <Link 
-                  to="/login" 
-                  className="text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full hover:bg-red-50 transition-all duration-300"
+              <div className="flex items-center space-x-4">
+                <Link
+                  to="/login"
+                  className={`font-medium px-4 py-2 transition-colors duration-300 ${
+                    isDarkBackground
+                      ? 'text-white hover:text-red-300'
+                      : 'text-white hover:text-red-300'
+                  }`}
+                  style={{
+                    textShadow: isDarkBackground
+                      ? '0 1px 2px rgba(0, 0, 0, 0.3)'
+                      : '0 1px 2px rgba(0, 0, 0, 0.5)'
+                  }}
                 >
                   Login
                 </Link>
-                <Link 
-                  to="/register" 
-                  className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-6 py-3 rounded-full font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                <Link
+                  to="/register"
+                  className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 >
-                  Get Started
+                  Sign Up
                 </Link>
               </div>
             )}
           </div>
           
-          {/* Modern Mobile Menu Button */}
+          {/* Adaptive Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden bg-gray-100 backdrop-blur-lg p-3 rounded-2xl border border-gray-200 hover:bg-gray-200 transition-all duration-300"
+            className={`lg:hidden p-3 transition-colors duration-300 ${
+              isDarkBackground
+                ? 'text-white hover:text-red-300'
+                : 'text-white hover:text-red-300'
+            }`}
+            style={{
+              filter: isDarkBackground
+                ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+                : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+            }}
           >
-            <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-            </svg>
+            {isMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
         
-        {/* Modern Mobile Menu */}
+        {/* Adaptive Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-2xl border-t border-gray-200 shadow-2xl">
-            <div className="px-6 py-8 space-y-4">
-              {[
-                { name: 'Home', path: '/' },
-                { name: 'About', path: '/about' },
-                { name: 'Products', path: '/products' },
-                ...(isAuthenticated ? [
-                  { name: 'Cart', path: '/cart', badge: cartItems.length },
-                  { name: 'Orders', path: '/orders' }
-                ] : [])
-              ].map((item) => (
+          <div className={`lg:hidden absolute top-full left-0 right-0 backdrop-blur-lg shadow-xl ${
+            isDarkBackground
+              ? 'bg-white/90 border-t border-white/20'
+              : 'bg-gray-800/85 border-t border-gray-700/30'
+          }`}>
+            <div className="px-4 py-4 space-y-4">
+              {/* Enhanced Mobile Search */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-red-500" />
+                </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && searchQuery.trim()) {
+                      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+                      setIsMenuOpen(false);
+                    }
+                  }}
+                  className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 placeholder-gray-500 shadow-sm"
+                  placeholder="Search for makhana products..."
+                />
+              </div>
+
+              {/* Enhanced Mobile Navigation Links */}
+              <div className="space-y-2">
+                {[
+                  { name: 'Home', path: '/' },
+                  { name: 'About', path: '/about' },
+                  { name: 'Products', path: '/products' },
+                  { name: 'Contact Us', path: '/contact' },
+                  ...(isAuthenticated ? [
+                    { name: 'Cart', path: '/cart', badge: cartItems.length, icon: ShoppingCart },
+                    { name: 'Wishlist', path: '/wishlist', badge: favorites?.length, icon: Heart }
+                  ] : [])
+                ].map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-2xl font-medium transition-all duration-300 ${
+                  className={`relative flex items-center justify-between px-4 py-3 font-medium transition-all duration-600 ease-in-out group ${
                     isActive(item.path)
-                      ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg'
-                      : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
+                      ? 'text-red-500'
+                      : isDarkBackground
+                        ? 'text-gray-700 hover:text-red-500'
+                        : 'text-white hover:text-red-500'
                   }`}
                 >
-                  <span>{item.name}</span>
+                  <div className="flex items-center space-x-3">
+                    {item.icon && <item.icon className="h-5 w-5" />}
+                    <span>{item.name}</span>
+                  </div>
                   {item.badge > 0 && (
-                    <span className="bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                    <span className="bg-white text-red-600 text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-md">
                       {item.badge}
                     </span>
                   )}
                 </Link>
               ))}
-              
+              </div>
+
               {/* Mobile Auth */}
               <div className="pt-4 border-t border-gray-200">
                 {isAuthenticated ? (
                   <div className="space-y-3">
-                    <div className="flex items-center space-x-3 text-gray-800">
-                      <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold">
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center">
+                        <span className="text-white font-medium text-sm">
                           {(user?.fullName || user?.username || 'U').charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      <span className="font-medium">{user?.fullName || user?.username}</span>
+                      <div>
+                        <span className="font-medium text-gray-800 block text-sm">{user?.fullName || user?.username}</span>
+                        <span className="text-xs text-gray-600">Welcome back!</span>
+                      </div>
                     </div>
-                    <button 
+                    <button
                       onClick={handleLogout}
-                      className="w-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 px-4 py-3 rounded-2xl font-medium transition-all duration-300 border border-red-200"
+                      className="w-full bg-red-50 hover:bg-red-100 text-red-700 px-4 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2"
                     >
-                      Logout
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      <span>Logout</span>
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    <Link 
-                      to="/login" 
+                  <div className="space-y-2">
+                    <Link
+                      to="/login"
                       onClick={() => setIsMenuOpen(false)}
-                      className="block text-center text-gray-700 hover:text-red-600 font-medium px-4 py-3 rounded-2xl hover:bg-red-50 transition-all duration-300"
+                      className="block text-center text-gray-700 hover:text-red-600 font-medium px-4 py-3 rounded-lg hover:bg-red-50 transition-colors duration-200"
                     >
                       Login
                     </Link>
-                    <Link 
-                      to="/register" 
+                    <Link
+                      to="/register"
                       onClick={() => setIsMenuOpen(false)}
-                      className="block text-center bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-6 py-3 rounded-2xl font-bold shadow-xl transition-all duration-300"
+                      className="block text-center bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg font-medium transition-colors duration-200"
                     >
-                      Get Started
+                      Sign Up
                     </Link>
                   </div>
                 )}
@@ -386,8 +743,7 @@ function Navbar() {
         )}
       </div>
     </nav>
-
-);
+  );
 }
 
 export default Navbar;

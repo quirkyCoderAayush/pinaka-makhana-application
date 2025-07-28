@@ -1,0 +1,429 @@
+/* Navbar Enhancement Styles */
+
+/* Ensure page loads at the top */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  scroll-behavior: smooth;
+}
+
+/* Force page to start at top on load */
+.page-container {
+  scroll-behavior: auto;
+}
+
+/* Initial page load positioning */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Ensure navbar is visible on page load */
+.navbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+/* Enhanced bidirectional underline animation for navigation links */
+.nav-underline {
+  position: relative;
+  transform-origin: left;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Parent link hover state for proper bidirectional animation */
+.group:hover .nav-underline {
+  width: 100% !important;
+  opacity: 1 !important;
+  transform-origin: left;
+  transform: scaleX(1);
+}
+
+/* On mouse leave: shrink from RIGHT to LEFT */
+.group:not(:hover) .nav-underline:not(.active) {
+  width: 0 !important;
+  opacity: 0 !important;
+  transform-origin: right;
+  transform: scaleX(0);
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Active state (current page) */
+.nav-underline.active {
+  width: 100% !important;
+  opacity: 1 !important;
+  transform: scaleX(1);
+}
+
+/* Fallback for browsers that don't support the above */
+@supports not (transform-origin: left) {
+  .nav-underline {
+    transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .group:hover .nav-underline {
+    width: 100% !important;
+    opacity: 1 !important;
+  }
+
+  .group:not(:hover) .nav-underline:not(.active) {
+    width: 0 !important;
+    opacity: 0 !important;
+  }
+}
+
+/* Enhanced transparency glass morphism effects */
+.navbar-glass-light {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-glass-dark {
+  background: rgba(31, 41, 55, 0.6);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(107, 114, 128, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Transparent navbar styling */
+.navbar-transparent {
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
+  box-shadow: none;
+}
+
+/* Adaptive text visibility for light navbar (dark page backgrounds) */
+.navbar-light .nav-text {
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-weight: 600;
+}
+
+.navbar-light .nav-text:hover {
+  color: #ef4444;
+  text-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-light .nav-text.active {
+  color: #ef4444;
+  text-shadow: 0 2px 8px rgba(239, 68, 68, 0.6);
+}
+
+/* Adaptive text visibility for dark navbar (light page backgrounds) */
+.navbar-dark .nav-text {
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font-weight: 600;
+}
+
+.navbar-dark .nav-text:hover {
+  color: #ef4444;
+  text-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-dark .nav-text.active {
+  color: #ef4444;
+  text-shadow: 0 2px 8px rgba(239, 68, 68, 0.6);
+}
+
+/* Adaptive icon visibility for light navbar */
+.navbar-light .nav-icon {
+  color: #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.navbar-light .nav-icon:hover {
+  color: #fca5a5;
+  filter: drop-shadow(0 2px 8px rgba(239, 68, 68, 0.4));
+}
+
+/* Adaptive icon visibility for dark navbar */
+.navbar-dark .nav-icon {
+  color: #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.navbar-dark .nav-icon:hover {
+  color: #fca5a5;
+  filter: drop-shadow(0 2px 8px rgba(239, 68, 68, 0.4));
+}
+
+/* Enhanced logo visibility */
+.navbar-logo {
+  filter: brightness(1.1) contrast(1.2) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.2));
+  transition: all 0.3s ease-in-out;
+}
+
+.navbar-logo:hover {
+  filter: brightness(1.15) contrast(1.25) drop-shadow(0 3px 12px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 16px rgba(255, 255, 255, 0.3));
+  transform: scale(1.05);
+}
+
+/* Profile avatar enhancement */
+.profile-avatar {
+  transition: all 0.3s ease;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+}
+
+/* Dropdown menu enhancements */
+.profile-dropdown {
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+/* Mobile menu transparency */
+.mobile-menu-transparent {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(229, 231, 235, 0.3);
+}
+
+/* Smooth transitions for all interactive elements */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus states for accessibility */
+.nav-focus:focus-visible {
+  outline: 2px solid #dc2626;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .navbar-transparent .nav-text {
+    color: #000;
+    text-shadow: none;
+  }
+  
+  .navbar-transparent .nav-icon {
+    color: #000;
+    filter: none;
+  }
+  
+  .nav-link-underline::after {
+    background: #000;
+  }
+}
+
+/* Enhanced reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .nav-underline {
+    transition: none !important;
+  }
+
+  .nav-link-underline::after {
+    transition: none !important;
+  }
+
+  .profile-avatar {
+    transition: none !important;
+  }
+
+  .smooth-transition {
+    transition: none !important;
+  }
+
+  .navbar-logo {
+    transition: none !important;
+  }
+
+  /* Instant underline changes for reduced motion */
+  .group:hover .nav-underline {
+    transition: none !important;
+  }
+
+  .group:not(:hover) .nav-underline:not(.active) {
+    transition: none !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .navbar-container {
+    display: none;
+  }
+}
+
+/* Ensure content starts below navbar */
+.main-content {
+  padding-top: 5rem; /* h-20 = 5rem */
+}
+
+/* Comprehensive page load scroll position management */
+.scroll-to-top {
+  scroll-behavior: auto !important;
+}
+
+/* Force page to start at top with cross-browser support */
+html, body {
+  scroll-behavior: auto !important;
+  overflow-x: hidden;
+  scroll-padding-top: 0;
+}
+
+/* Prevent scroll restoration on page load */
+html {
+  scroll-restoration: manual;
+}
+
+/* Initial load styles */
+.page-loaded {
+  scroll-behavior: smooth;
+}
+
+/* Force navbar visibility on all load scenarios */
+.navbar-force-visible {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Cross-browser scroll position reset */
+@media screen {
+  html, body {
+    scroll-top: 0;
+    scrollTop: 0;
+  }
+}
+
+/* Webkit-specific scroll handling */
+@supports (-webkit-appearance: none) {
+  html, body {
+    -webkit-scroll-behavior: auto !important;
+  }
+}
+
+/* Firefox-specific scroll handling */
+@-moz-document url-prefix() {
+  html, body {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Edge/IE specific scroll handling */
+@supports (-ms-ime-align: auto) {
+  html, body {
+    -ms-scroll-behavior: auto !important;
+  }
+}
+
+/* Navbar visibility on load */
+@keyframes fadeInNavbar {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.navbar-fade-in {
+  animation: fadeInNavbar 0.3s ease-out;
+}
+
+/* Search input enhancements */
+.search-input-transparent {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+/* Badge enhancements */
+.notification-badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Mobile responsiveness with enhanced touch support */
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 4rem; /* Slightly less on mobile */
+  }
+
+  /* Responsive logo sizing */
+  .navbar-logo {
+    height: 3.5rem; /* h-14 equivalent for mobile */
+  }
+
+  /* Enhanced mobile glass effect */
+  .mobile-menu-glass {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Mobile-specific underline animations */
+  .nav-underline {
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Touch-friendly hover states */
+  .group:active .nav-underline,
+  .group:focus .nav-underline {
+    width: 100% !important;
+    opacity: 1 !important;
+    transform-origin: left;
+    transform: scaleX(1);
+  }
+
+  /* Enhanced scroll position management for mobile */
+  html, body {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Tablet responsiveness */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .navbar-container {
+    padding: 0 1rem;
+  }
+}
+
+/* Large screen optimizations */
+@media (min-width: 1024px) {
+  .navbar-container {
+    padding: 0 2rem;
+  }
+
+  /* Enhanced logo sizing for desktop */
+  .navbar-logo {
+    height: 4rem; /* h-16 equivalent for desktop */
+  }
+
+  /* Enhanced underline animation for larger screens */
+  .nav-link-underline::after {
+    height: 4px;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+  }
+}

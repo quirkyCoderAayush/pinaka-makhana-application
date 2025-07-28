@@ -1,11 +1,12 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import AdminRoute from './components/AdminRoute'
 import Home from './pages/Home'
 import About from './pages/About'
+import Contact from './pages/Contact'
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
@@ -15,7 +16,6 @@ import Register from './pages/Register';
 import Orders from './pages/Orders';
 import Account from './pages/Account';
 import Wishlist from './pages/Wishlist';
-import Favorites from './pages/Favorites';
 import Settings from './pages/Settings';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -42,6 +42,13 @@ function App() {
           <>
             <Navbar />
             <About />
+            <Footer />
+          </>
+        } />
+        <Route path="/contact" element={
+          <>
+            <Navbar />
+            <Contact />
             <Footer />
           </>
         } />
@@ -108,13 +115,7 @@ function App() {
             <Footer />
           </>
         } />
-        <Route path="/favorites" element={
-          <>
-            <Navbar />
-            <Favorites />
-            <Footer />
-          </>
-        } />
+        <Route path="/favorites" element={<Navigate to="/wishlist" replace />} />
         <Route path="/settings" element={
           <>
             <Navbar />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { formatPrice } from '../utils/formatPrice';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CartContext } from '../components/context/CartContext';
 import { useAuth } from '../components/context/AuthContext';
@@ -204,25 +205,38 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
-          <button onClick={() => navigate('/')} className="hover:text-red-600">Home</button>
-          <span>/</span>
-          <button onClick={() => navigate('/products')} className="hover:text-red-600">Products</button>
-          <span>/</span>
-          <span className="text-gray-800">{product.name}</span>
+        {/* Enhanced Breadcrumb */}
+        <nav className="flex items-center space-x-2 text-sm mb-8">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg border border-white/20">
+            <div className="flex items-center space-x-2">
+              <button onClick={() => navigate('/')} className="text-gray-600 hover:text-red-600 transition-colors duration-300 flex items-center space-x-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span>Home</span>
+              </button>
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+              <button onClick={() => navigate('/products')} className="text-gray-600 hover:text-red-600 transition-colors duration-300">Products</button>
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+              <span className="text-gray-800 font-medium">{product.name}</span>
+            </div>
+          </div>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Images */}
-          <div className="space-y-4">
-            <div className="aspect-square overflow-hidden rounded-2xl bg-white shadow-lg">
+          {/* Enhanced Product Images */}
+          <div className="space-y-6">
+            <div className="aspect-square overflow-hidden rounded-3xl bg-white/80 backdrop-blur-xl shadow-2xl border border-white/20 p-8">
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
+                className="w-full h-full object-contain hover:scale-110 transition-transform duration-500"
               />
             </div>
             
@@ -264,7 +278,7 @@ const ProductDetail = () => {
             {/* Pricing */}
             <div className="border-t border-gray-200 pt-6">
               <div className="flex items-center space-x-4 mb-6">
-                <span className="text-4xl font-bold text-red-600">₹{product.price}</span>
+                <span className="text-4xl font-bold text-red-600">₹{formatPrice(product.price)}</span>
                 <span className="text-sm text-gray-500">({product.weight})</span>
               </div>
 
@@ -276,6 +290,7 @@ const ProductDetail = () => {
                     quantity={quantity}
                     onQuantityChange={setQuantity}
                     size="md"
+                    variant="default"
                   />
                 </div>
               </div>

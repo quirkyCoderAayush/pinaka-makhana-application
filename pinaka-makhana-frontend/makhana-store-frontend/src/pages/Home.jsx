@@ -1,15 +1,20 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion, useScroll, useTransform, useInView, useAnimation } from "framer-motion";
 import { CartContext } from "../components/context/CartContext";
 import QuantitySelector from "../components/QuantitySelector";
 import FavoriteButton from "../components/FavoriteButton";
+import ModernProductCard from "../components/ModernProductCard";
 import ApiService from "../services/api";
 import { useIntersectionObserver, usePerformanceOptimization } from "../hooks/useSmoothScroll";
+import { useReducedMotion, getAnimationVariants } from "../hooks/useReducedMotion";
 import makhanaImage from "../images/makhana.png";
 import pack1 from "../images/pack1.jpg";
 import pack2 from "../images/pack2.jpg";
 import pack3 from "../images/pack3.jpg";
 import pack4 from "../images/pack4.png";
+import { formatPrice } from "../utils/formatPrice";
+import "../styles/home-animations.css";
 
 const productData = [
   {
@@ -43,16 +48,71 @@ const productData = [
 ];
 
 const Home = () => {
-  const { addToCart, loading } = useContext(CartContext);
+  // Accessibility: Check for reduced motion preference
+  const prefersReducedMotion = useReducedMotion();
+
+  // Get animation variants based on motion preferences
+  const animationVariants = getAnimationVariants(prefersReducedMotion);
+  const { fadeInUp, staggerContainer, slideInLeft, slideInRight, scaleIn } = animationVariants;
+  const { addToCart, loading: cartLoading } = useContext(CartContext);
   const navigate = useNavigate();
-  const [products, setProducts] = useState(productData); // Use local products as fallback
-  const [quantities, setQuantities] = useState({}); // Track quantity for each product
+  const [products, setProducts] = useState(productData);
+  const [quantities, setQuantities] = useState({});
   const [displayLimit, setDisplayLimit] = useState(4);
   const [showingAll, setShowingAll] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeProductId, setActiveProductId] = useState(null);
+
+  // Refs for scroll animations
+  const heroRef = useRef(null);
+  const productsRef = useRef(null);
+
+  // Scroll-based animations
+  const { scrollYProgress } = useScroll();
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+
+  // In-view animations
+  const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
+  const productsInView = useInView(productsRef, { once: true, margin: "-100px" });
+
+  // Animation controls
+  const heroControls = useAnimation();
+  const productsControls = useAnimation();
 
   // Initialize smooth scrolling and performance optimizations
   useIntersectionObserver();
   usePerformanceOptimization();
+
+  // Trigger animations when sections come into view
+  useEffect(() => {
+    if (heroInView) {
+      heroControls.start("visible");
+    } else {
+      // Ensure content is visible even if animation hasn't triggered
+      heroControls.start("visible");
+    }
+  }, [heroInView, heroControls]);
+
+  useEffect(() => {
+    if (productsInView) {
+      productsControls.start("visible");
+    } else {
+      // Ensure content is visible even if animation hasn't triggered
+      productsControls.start("visible");
+    }
+  }, [productsInView, productsControls]);
+
+  // Fallback to ensure content is always visible after a delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      heroControls.start("visible");
+      productsControls.start("visible");
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [heroControls, productsControls]);
 
   // Load products from backend
   useEffect(() => {
@@ -83,8 +143,20 @@ const Home = () => {
     }));
   };
 
+  const handleToggleFavorite = (product) => {
+    setFavorites(prev => {
+      if (prev.includes(product.id)) {
+        return prev.filter(id => id !== product.id);
+      } else {
+        return [...prev, product.id];
+      }
+    });
+  };
+
   const handleAddToCart = async (product) => {
     const quantity = quantities[product.id] || 1;
+    setIsLoading(true);
+    setActiveProductId(product.id);
     
     // Add the specified quantity to cart
     for (let i = 0; i < quantity; i++) {
@@ -96,6 +168,9 @@ const Home = () => {
       ...prev,
       [product.id]: 1
     }));
+    
+    setIsLoading(false);
+    setActiveProductId(null);
   };
 
   const handleShowMore = () => {
@@ -111,182 +186,729 @@ const Home = () => {
   const displayedProducts = products.slice(0, displayLimit);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <motion.div
+      className="min-h-screen bg-gray-50 home-content"
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+    >
       {/* Hero Section */}
-      <section id="hero" className="hero-section relative min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black overflow-hidden flex items-center pt-20">
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-red-500 rounded-full mix-blend-multiply animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-72 h-72 bg-orange-500 rounded-full mix-blend-multiply animate-pulse delay-1000"></div>
-          <div className="absolute bottom-20 left-40 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply animate-pulse delay-2000"></div>
-        </div>
-        
-        <div className="container mx-auto px-8 py-20 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            
+      <motion.section
+        ref={heroRef}
+        id="hero"
+        className="hero-section relative min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center pt-20 overflow-hidden"
+        style={{ y: heroY, opacity: heroOpacity }}
+      >
+        {/* Enhanced Animated Background Pattern */}
+        <motion.div
+          className="absolute inset-0 opacity-10 w-full"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.1 }}
+          transition={{ duration: 2, ease: "easeOut" }}
+        >
+          <motion.div
+            className="absolute top-20 left-20 w-72 h-72 bg-red-500 rounded-full mix-blend-multiply"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3],
+              rotate: [0, 180, 360]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute top-40 right-20 w-72 h-72 bg-orange-500 rounded-full mix-blend-multiply"
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.4, 0.7, 0.4],
+              rotate: [360, 180, 0]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
+          <motion.div
+            className="absolute bottom-20 left-40 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.5, 0.2],
+              rotate: [0, -180, -360]
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+        </motion.div>
+
+        <div className="container mx-auto px-8 py-20 relative z-10 w-full">
+          <motion.div
+            className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+            variants={staggerContainer}
+            initial="visible"
+            animate="visible"
+          >
+
             {/* Left Content */}
-            <div className="text-white space-y-8">
-              <div className="space-y-6">
+            <motion.div
+              className="text-white space-y-8 home-content"
+              variants={slideInLeft}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+            >
+              <motion.div
+                className="space-y-6"
+                variants={staggerContainer}
+              >
                 {/* Modern Badge */}
-                <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-red-500 to-orange-500 px-6 py-3 rounded-full text-sm font-medium">
-                  <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                  <span>Premium Superfood</span>
-                </div>
-                
-                {/* Main Heading */}
-                <h1 className="text-6xl lg:text-8xl font-black leading-none">
-                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300">
-                    PINAKA
-                  </span>
-                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 animate-pulse">
-                    MAKHANA
-                  </span>
-                </h1>
-                
-                {/* Subheading */}
-                <p className="text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed">
-                  The Future of 
-                  <span className="text-red-400 font-medium"> Healthy Snacking</span>
-                </p>
-                
-                {/* Description */}
-                <p className="text-lg text-gray-400 leading-relaxed max-w-md">
-                  Experience premium roasted fox nuts that redefine taste and nutrition. 
-                  Zero guilt, maximum flavor.
-                </p>
-              </div>
-              
-              {/* Modern CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link 
-                  to="/products" 
-                  className="group relative bg-gradient-to-r from-red-500 to-orange-500 text-white px-10 py-4 rounded-full font-bold text-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+                <motion.div
+                  className="inline-flex items-center space-x-2 bg-gradient-to-r from-red-500 to-orange-500 px-6 py-3 rounded-full text-sm font-medium"
+                  variants={fadeInUp}
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0 10px 30px rgba(239, 68, 68, 0.3)"
+                  }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <span className="relative z-10">Explore Collection</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-orange-600 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
-                </Link>
-                
-                <button className="border-2 border-white text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-black transition-all duration-300 hover:scale-105">
+                  <motion.span
+                    className="w-2 h-2 bg-white rounded-full"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [1, 0.7, 1]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity
+                    }}
+                  />
+                  <span>Premium Superfood</span>
+                </motion.div>
+
+                {/* Main Heading with Enhanced Animations */}
+                <motion.h1
+                  className="text-6xl lg:text-8xl font-black leading-none"
+                  variants={fadeInUp}
+                >
+                  <motion.span
+                    className="block text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300"
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5, duration: 0.8 }}
+                  >
+                    PINAKA
+                  </motion.span>
+                  <motion.span
+                    className="block text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400"
+                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                      scale: 1,
+                      backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                    }}
+                    transition={{
+                      delay: 0.8,
+                      duration: 0.8,
+                      backgroundPosition: {
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "linear"
+                      }
+                    }}
+                    style={{
+                      backgroundSize: "200% 200%"
+                    }}
+                  >
+                    MAKHANA
+                  </motion.span>
+                </motion.h1>
+
+                {/* Subheading */}
+                <motion.p
+                  className="text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed"
+                  variants={fadeInUp}
+                >
+                  The Future of
+                  <motion.span
+                    className="text-red-400 font-medium"
+                    animate={{
+                      color: ["#f87171", "#fb923c", "#fbbf24", "#f87171"]
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    {" "}Healthy Snacking
+                  </motion.span>
+                </motion.p>
+
+                {/* Description */}
+                <motion.p
+                  className="text-lg text-gray-400 leading-relaxed max-w-md"
+                  variants={fadeInUp}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2, duration: 0.8 }}
+                >
+                  Experience premium roasted fox nuts that redefine taste and nutrition.
+                  Zero guilt, maximum flavor.
+                </motion.p>
+              </motion.div>
+
+              {/* Enhanced CTA Buttons */}
+              <motion.div
+                className="flex flex-col sm:flex-row gap-4"
+                variants={fadeInUp}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.5, duration: 0.8 }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <Link
+                    to="/products"
+                    className="group relative bg-gradient-to-r from-red-500 to-orange-500 text-white px-10 py-4 rounded-full font-bold text-lg overflow-hidden transition-all duration-300 hover:shadow-2xl inline-block"
+                  >
+                    <motion.span
+                      className="relative z-10"
+                      animate={{
+                        textShadow: [
+                          "0 0 0px rgba(255,255,255,0)",
+                          "0 0 10px rgba(255,255,255,0.3)",
+                          "0 0 0px rgba(255,255,255,0)"
+                        ]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      Explore Collection
+                    </motion.span>
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-red-600 to-orange-600"
+                      initial={{ scaleX: 0 }}
+                      whileHover={{ scaleX: 1 }}
+                      transition={{ duration: 0.3, originX: 0 }}
+                    />
+                  </Link>
+                </motion.div>
+
+                <motion.button
+                  className="border-2 border-white text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-black transition-all duration-300"
+                  whileHover={{
+                    scale: 1.05,
+                    backgroundColor: "rgba(255,255,255,1)",
+                    color: "rgba(0,0,0,1)",
+                    boxShadow: "0 10px 30px rgba(255,255,255,0.3)"
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   Watch Story
-                </button>
-              </div>
-              
-              {/* Stats */}
-              <div className="flex space-x-12 pt-8">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-red-400">100%</div>
+                </motion.button>
+              </motion.div>
+
+              {/* Enhanced Stats with Animations */}
+              <motion.div
+                className="flex space-x-12 pt-8"
+                variants={staggerContainer}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.8, duration: 0.8 }}
+              >
+                <motion.div
+                  className="text-center"
+                  variants={fadeInUp}
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <motion.div
+                    className="text-4xl font-bold text-red-400"
+                    animate={{
+                      scale: [1, 1.1, 1],
+                      textShadow: [
+                        "0 0 0px rgba(248, 113, 113, 0)",
+                        "0 0 20px rgba(248, 113, 113, 0.5)",
+                        "0 0 0px rgba(248, 113, 113, 0)"
+                      ]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
+                    100%
+                  </motion.div>
                   <div className="text-sm text-gray-400 uppercase tracking-wider">Natural</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-orange-400">0</div>
+                </motion.div>
+                <motion.div
+                  className="text-center"
+                  variants={fadeInUp}
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <motion.div
+                    className="text-4xl font-bold text-orange-400"
+                    animate={{
+                      scale: [1, 1.1, 1],
+                      textShadow: [
+                        "0 0 0px rgba(251, 146, 60, 0)",
+                        "0 0 20px rgba(251, 146, 60, 0.5)",
+                        "0 0 0px rgba(251, 146, 60, 0)"
+                      ]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+                  >
+                    0
+                  </motion.div>
                   <div className="text-sm text-gray-400 uppercase tracking-wider">Chemicals</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-yellow-400">High</div>
+                </motion.div>
+                <motion.div
+                  className="text-center"
+                  variants={fadeInUp}
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <motion.div
+                    className="text-4xl font-bold text-yellow-400"
+                    animate={{
+                      scale: [1, 1.1, 1],
+                      textShadow: [
+                        "0 0 0px rgba(251, 191, 36, 0)",
+                        "0 0 20px rgba(251, 191, 36, 0.5)",
+                        "0 0 0px rgba(251, 191, 36, 0)"
+                      ]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity, delay: 2 }}
+                  >
+                    High
+                  </motion.div>
                   <div className="text-sm text-gray-400 uppercase tracking-wider">Protein</div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Right Visual */}
-            <div className="relative">
+                </motion.div>
+              </motion.div>
+            </motion.div>
+
+            {/* Enhanced Right Visual */}
+            <motion.div
+              className="relative home-content"
+              variants={slideInRight}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+            >
               {/* Main Product Container */}
-              <div className="relative group">
-                {/* Multi-layer Glowing Background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-3xl blur-3xl opacity-40 group-hover:opacity-60 transition-all duration-700"></div>
-                <div className="absolute inset-0 bg-gradient-to-br from-red-400 to-orange-400 rounded-3xl blur-2xl opacity-20 group-hover:opacity-30 transition-all duration-700"></div>
-                
-                {/* Product Image Container with Enhanced Lighting */}
-                <div className="relative bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 rounded-3xl p-4 transform group-hover:scale-105 transition-all duration-500 shadow-2xl">
-                  {/* Inner glow */}
-                  <div className="absolute inset-4 bg-gradient-to-r from-red-500/30 via-orange-500/30 to-yellow-500/30 rounded-2xl blur-sm"></div>
-                  
-                  {/* Image with multiple effects */}
-                  <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-100">
-                    {/* Your Local Makhana Image */}
-                    <img 
-                      src={makhanaImage} 
+              <motion.div
+                className="relative group"
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                {/* Enhanced Multi-layer Glowing Background */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-3xl blur-3xl opacity-40"
+                  animate={{
+                    opacity: [0.4, 0.6, 0.4],
+                    scale: [1, 1.05, 1]
+                  }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-br from-red-400 to-orange-400 rounded-3xl blur-2xl opacity-20"
+                  animate={{
+                    opacity: [0.2, 0.4, 0.2],
+                    rotate: [0, 5, 0]
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+
+                {/* Enhanced Product Image Container */}
+                <motion.div
+                  className="relative bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 rounded-3xl p-4 shadow-2xl"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  {/* Enhanced Inner glow */}
+                  <motion.div
+                    className="absolute inset-4 bg-gradient-to-r from-red-500/30 via-orange-500/30 to-yellow-500/30 rounded-2xl blur-sm"
+                    animate={{
+                      opacity: [0.3, 0.6, 0.3],
+                      scale: [1, 1.02, 1]
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+
+                  {/* Enhanced Image Container */}
+                  <motion.div
+                    className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-100"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                  >
+                    {/* Enhanced Makhana Image */}
+                    <motion.img
+                      src={makhanaImage}
                       alt="Pinaka Premium Makhana"
-                      className="relative z-10 w-full h-96 object-contain transition-all duration-500 group-hover:scale-110 p-4"
+                      className="relative z-10 w-full h-96 object-contain p-4"
                       style={{
                         filter: 'brightness(1.2) contrast(1.1) saturate(1.3) drop-shadow(0 20px 40px rgba(0,0,0,0.3))',
                         mixBlendMode: 'normal'
                       }}
+                      animate={{
+                        y: [0, -10, 0],
+                        rotate: [0, 2, 0]
+                      }}
+                      transition={{
+                        duration: 6,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      whileHover={{
+                        scale: 1.1,
+                        rotate: 5,
+                        filter: 'brightness(1.3) contrast(1.2) saturate(1.4) drop-shadow(0 25px 50px rgba(0,0,0,0.4))'
+                      }}
                     />
-                    
+
                     {/* Enhanced highlighting overlays */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-white/20 pointer-events-none"></div>
                     <div className="absolute inset-0 bg-gradient-to-br from-red-500/15 via-transparent to-orange-500/15 pointer-events-none"></div>
                     <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-yellow-400/10 to-transparent pointer-events-none"></div>
-                    
-                    {/* Spotlight effect */}
-                    <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-white/20 rounded-full blur-3xl pointer-events-none"></div>
-                  </div>
-                </div>
-                
-                {/* Enhanced Floating Cards with Better Highlighting */}
-                <div className="absolute -top-8 -left-8 bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl animate-bounce border-2 border-red-200 hover:border-red-400 transition-all duration-300">
+
+                    {/* Enhanced Spotlight effect */}
+                    <motion.div
+                      className="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-white/20 rounded-full blur-3xl pointer-events-none"
+                      animate={{
+                        opacity: [0.2, 0.4, 0.2],
+                        scale: [1, 1.1, 1]
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    />
+                  </motion.div>
+                </motion.div>
+
+                {/* Enhanced Floating Cards with Sophisticated Animations */}
+                <motion.div
+                  className="absolute -top-8 -left-8 bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-2 border-red-200"
+                  animate={{
+                    y: [0, -10, 0],
+                    rotate: [0, 2, 0],
+                    borderColor: ["rgb(254 202 202)", "rgb(252 165 165)", "rgb(254 202 202)"]
+                  }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  whileHover={{
+                    scale: 1.1,
+                    borderColor: "rgb(248 113 113)",
+                    boxShadow: "0 25px 50px rgba(239, 68, 68, 0.3)"
+                  }}
+                  initial={{ opacity: 0, scale: 0.8, y: -50 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: 2, duration: 0.8 }}
+                >
                   <div className="text-center">
-                    <div className="text-3xl font-black bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">₹199</div>
+                    <motion.div
+                      className="text-3xl font-black bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent"
+                      animate={{
+                        backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "linear"
+                      }}
+                      style={{ backgroundSize: "200% 200%" }}
+                    >
+                      ₹199
+                    </motion.div>
                     <div className="text-xs text-gray-700 font-semibold uppercase tracking-wider">Premium Quality</div>
                   </div>
-                  {/* Small glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-400/20 to-orange-400/20 rounded-2xl blur-lg -z-10"></div>
-                </div>
-                
-                <div className="absolute -bottom-8 -right-8 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-5 shadow-2xl animate-pulse hover:scale-110 transition-all duration-300">
+                  {/* Enhanced glow effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-red-400/20 to-orange-400/20 rounded-2xl blur-lg -z-10"
+                    animate={{
+                      opacity: [0.2, 0.4, 0.2],
+                      scale: [1, 1.1, 1]
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                </motion.div>
+
+                <motion.div
+                  className="absolute -bottom-8 -right-8 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-5 shadow-2xl"
+                  animate={{
+                    y: [0, 10, 0],
+                    rotate: [0, -2, 0],
+                    scale: [1, 1.05, 1]
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 1
+                  }}
+                  whileHover={{
+                    scale: 1.15,
+                    boxShadow: "0 25px 50px rgba(34, 197, 94, 0.4)"
+                  }}
+                  initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: 2.5, duration: 0.8 }}
+                >
                   <div className="flex items-center space-x-3">
-                    <div className="w-4 h-4 bg-white rounded-full animate-pulse shadow-lg"></div>
+                    <motion.div
+                      className="w-4 h-4 bg-white rounded-full shadow-lg"
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [1, 0.7, 1]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity
+                      }}
+                    />
                     <div className="font-bold text-sm uppercase tracking-wider">Farm Fresh</div>
                   </div>
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-400/30 to-emerald-400/30 rounded-2xl blur-lg -z-10"></div>
-                </div>
-                
-                {/* Additional highlighting element */}
-                <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-full p-3 shadow-xl animate-pulse">
+                  {/* Enhanced Glow effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-green-400/30 to-emerald-400/30 rounded-2xl blur-lg -z-10"
+                    animate={{
+                      opacity: [0.3, 0.5, 0.3],
+                      scale: [1, 1.1, 1]
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                </motion.div>
+
+                {/* Enhanced Additional highlighting element */}
+                <motion.div
+                  className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-full p-3 shadow-xl"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 5, 0],
+                    boxShadow: [
+                      "0 10px 25px rgba(251, 191, 36, 0.3)",
+                      "0 15px 35px rgba(251, 191, 36, 0.5)",
+                      "0 10px 25px rgba(251, 191, 36, 0.3)"
+                    ]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{ delay: 3, duration: 0.8 }}
+                >
                   <div className="text-xs font-bold">100% Natural</div>
-                </div>
-              </div>
-              
-              {/* Enhanced Floating Elements */}
-              <div className="absolute top-1/4 -right-12 animate-float">
+                </motion.div>
+              </motion.div>
+
+              {/* Enhanced Floating Background Elements */}
+              <motion.div
+                className="absolute top-1/4 -right-12"
+                animate={{
+                  y: [0, -20, 0],
+                  x: [0, 10, 0],
+                  rotate: [0, 180, 360]
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
                 <div className="w-20 h-20 bg-gradient-to-r from-red-400 to-orange-400 rounded-full opacity-30 blur-sm"></div>
-              </div>
-              <div className="absolute bottom-1/4 -left-12 animate-float delay-1000">
+              </motion.div>
+              <motion.div
+                className="absolute bottom-1/4 -left-12"
+                animate={{
+                  y: [0, 15, 0],
+                  x: [0, -8, 0],
+                  rotate: [0, -180, -360]
+                }}
+                transition={{
+                  duration: 10,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1
+                }}
+              >
                 <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-red-400 rounded-full opacity-40 blur-sm"></div>
-              </div>
-              <div className="absolute top-1/2 right-4 animate-float delay-2000">
+              </motion.div>
+              <motion.div
+                className="absolute top-1/2 right-4"
+                animate={{
+                  y: [0, -12, 0],
+                  scale: [1, 1.2, 1],
+                  rotate: [0, 90, 180]
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 2
+                }}
+              >
                 <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full opacity-25 blur-sm"></div>
-              </div>
-            </div>
-            
-          </div>
+              </motion.div>
+            </motion.div>
+
+          </motion.div>
         </div>
-        
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
+
+        {/* Enhanced Scroll Indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white"
+          animate={{
+            y: [0, -10, 0],
+            opacity: [0.7, 1, 0.7]
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 0.7, y: 0 }}
+          transition={{ delay: 3.5, duration: 1 }}
+        >
           <div className="flex flex-col items-center space-y-2">
             <span className="text-sm uppercase tracking-wider">Scroll</span>
             <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
-              <div className="w-1 h-3 bg-white rounded-full animate-pulse mt-2"></div>
+              <motion.div
+                className="w-1 h-3 bg-white rounded-full mt-2"
+                animate={{
+                  y: [0, 10, 0],
+                  opacity: [1, 0.3, 1]
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
             </div>
           </div>
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
-      {/* Products Section */}
-      <section id="products" className="products-section py-16 px-8 relative overflow-hidden">
-        {/* Beautiful Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 opacity-60"></div>
-        
-        {/* Scattered Makhana-like Shapes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Large floating shapes */}
-          <div className="absolute top-20 left-10 w-16 h-16 bg-gradient-to-br from-orange-200 to-red-200 rounded-full opacity-20 animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-12 h-12 bg-gradient-to-br from-yellow-200 to-orange-200 rounded-full opacity-25 animate-pulse delay-1000"></div>
-          <div className="absolute bottom-40 left-20 w-20 h-20 bg-gradient-to-br from-red-200 to-pink-200 rounded-full opacity-15 animate-pulse delay-2000"></div>
-          <div className="absolute bottom-20 right-10 w-14 h-14 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full opacity-30 animate-pulse delay-500"></div>
+      {/* Enhanced Products Section */}
+      <motion.section
+        ref={productsRef}
+        id="products"
+        className="products-section py-16 px-8 relative overflow-hidden"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
+        {/* Enhanced Background Pattern */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 opacity-60"
+          animate={{
+            backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"]
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          style={{ backgroundSize: "400% 400%" }}
+        />
+
+        {/* Enhanced Scattered Makhana-like Shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none w-full">
+          {/* Large floating shapes with enhanced animations */}
+          <motion.div
+            className="absolute top-20 left-10 w-16 h-16 bg-gradient-to-br from-orange-200 to-red-200 rounded-full opacity-20"
+            animate={{
+              y: [0, -20, 0],
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.4, 0.2]
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute top-40 right-20 w-12 h-12 bg-gradient-to-br from-yellow-200 to-orange-200 rounded-full opacity-25"
+            animate={{
+              y: [0, 15, 0],
+              x: [0, -10, 0],
+              scale: [1, 1.1, 1],
+              opacity: [0.25, 0.5, 0.25]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
+          <motion.div
+            className="absolute bottom-40 left-20 w-20 h-20 bg-gradient-to-br from-red-200 to-pink-200 rounded-full opacity-15"
+            animate={{
+              y: [0, -25, 0],
+              rotate: [0, 180, 360],
+              scale: [1, 1.3, 1],
+              opacity: [0.15, 0.3, 0.15]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+          <motion.div
+            className="absolute bottom-20 right-10 w-14 h-14 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full opacity-30"
+            animate={{
+              y: [0, -18, 0],
+              x: [0, 8, 0],
+              scale: [1, 1.15, 1],
+              opacity: [0.3, 0.6, 0.3]
+            }}
+            transition={{
+              duration: 7,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5
+            }}
+          />
           
           {/* Medium scattered shapes */}
           <div className="absolute top-60 left-1/4 w-8 h-8 bg-gradient-to-br from-red-300 to-orange-300 rounded-full opacity-20 animate-bounce"></div>
@@ -302,82 +924,146 @@ const Home = () => {
           <div className="absolute top-1/3 right-1/6 w-12 h-12 border-2 border-orange-200 rounded-full opacity-20 animate-spin" style={{animationDuration: '20s'}}></div>
           <div className="absolute bottom-1/3 left-1/3 w-8 h-8 border border-red-200 rotate-45 opacity-25"></div>
         </div>
-        
-        <div className="container mx-auto relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent mb-4">
+
+        <div className="container mx-auto relative z-10 home-content">
+          <motion.div
+            className="text-center mb-16"
+            variants={staggerContainer}
+            initial="visible"
+            animate="visible"
+          >
+            <motion.h2
+              className="text-5xl font-bold bg-gradient-to-r from-red-600 via-orange-600 to-yellow-600 bg-clip-text text-transparent mb-4"
+              variants={fadeInUp}
+              animate={{
+                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+              }}
+              transition={{
+                backgroundPosition: {
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "linear"
+                }
+              }}
+              style={{ backgroundSize: "200% 200%" }}
+            >
               Pinaka Makhana Collection
-            </h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            </motion.h2>
+            <motion.p
+              className="text-gray-600 text-lg max-w-2xl mx-auto"
+              variants={fadeInUp}
+            >
               Discover our premium range of roasted makhana - healthy, delicious, and crafted with love for your well-being
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            </motion.p>
+          </motion.div>
+
+          {/* Enhanced Product Grid with Staggered Animations */}
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-full"
+            variants={staggerContainer}
+            initial="visible"
+            animate="visible"
+          >
             {displayedProducts.map((product, index) => (
-              <div key={product.id} className={`fade-in bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative`} style={{ transitionDelay: `${index * 0.1}s` }}>
-                <Link to={`/product/${product.id}`} className="block aspect-square overflow-hidden cursor-pointer">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              <motion.div
+                key={product.id}
+                className="w-full flex"
+                variants={scaleIn}
+                whileHover={{
+                  y: -10,
+                  scale: 1.02,
+                  transition: { type: "spring", stiffness: 300 }
+                }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <ModernProductCard
+                  product={product}
+                  onAddToCart={(product) => handleAddToCart(product)}
+                  loading={isLoading && activeProductId === product.id}
+                  className="w-full flex flex-col transform transition-all duration-300 hover:z-10"
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Enhanced Show More Products Button */}
+          {products.length > 4 && (
+            <motion.div
+              className="text-center mt-12"
+              initial={{ opacity: 0, y: 30 }}
+              animate={productsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ delay: 1, duration: 0.8 }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <Link
+                  to="/products"
+                  className="group relative inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-500 via-red-600 to-orange-600 hover:from-red-600 hover:via-red-700 hover:to-orange-700 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden"
+                  style={{
+                    boxShadow: '0 15px 35px -5px rgba(239, 68, 68, 0.4), 0 0 0 1px rgba(239, 68, 68, 0.1)'
+                  }}
+                >
+                  {/* Enhanced Button Shimmer Effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12"
+                    animate={{ x: ["-100%", "200%"] }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatDelay: 3,
+                      ease: "easeInOut"
+                    }}
+                  />
+
+                  <span className="relative z-10 mr-3">Explore All Products</span>
+                  <motion.svg
+                    className="relative z-10 w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </motion.svg>
+
+                  {/* Enhanced Floating particles effect */}
+                  <motion.div
+                    className="absolute top-1/2 left-1/2 w-2 h-2 bg-white/30 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.3, 0.8, 0.3]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
                   />
                 </Link>
-                {/* Favorite Button */}
-                <div className="absolute top-3 right-3">
-                  <FavoriteButton product={product} size="sm" />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-800 mb-1">{product.name}</h3>
-                  <p className="text-gray-600 text-sm mb-3">{product.weight}</p>
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-lg font-bold text-red-600">₹{product.price}</span>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs text-gray-600">Qty:</span>
-                      <QuantitySelector
-                        quantity={quantities[product.id] || 1}
-                        onQuantityChange={(qty) => handleQuantityChange(product.id, qty)}
-                        size="sm"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button 
-                      onClick={() => handleAddToCart(product)}
-                      disabled={loading}
-                      className="flex-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-colors text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {loading ? 'Adding...' : 'Add to Cart'}
-                    </button>
-                    <button 
-                      onClick={() => navigate(`/product/${product.id}`)}
-                      className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded hover:bg-gray-200 transition-colors text-xs font-medium"
-                    >
-                      Details
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Show More/Less Button */}
-          {products.length > 3 && (
-            <div className="text-center mt-8">
-              <Link 
-                to="/products"
-                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-300"
+              </motion.div>
+
+              {/* Enhanced info text */}
+              <motion.p
+                className="mt-4 text-gray-600 text-sm"
+                initial={{ opacity: 0 }}
+                animate={productsInView ? { opacity: 1 } : { opacity: 0 }}
+                transition={{ delay: 1.5, duration: 0.8 }}
               >
-                Show More Products
-                <svg className="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-            </div>
+                Discover our complete collection of premium makhana varieties
+              </motion.p>
+            </motion.div>
           )}
         </div>
-      </section>
-    </div>
+      </motion.section>
+    </motion.div>
   );
 };
 

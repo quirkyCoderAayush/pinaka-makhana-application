@@ -57,6 +57,65 @@ const UserManagement = () => {
     }
   };
 
+  // User action handlers
+  const viewUserDetails = async (user) => {
+    try {
+      const stats = await apiService.getUserStatistics(user.id);
+      const orderStatusText = Object.entries(stats.orderStatusBreakdown || {})
+        .map(([status, count]) => `${status}: ${count}`)
+        .join(', ') || 'No orders';
+
+      alert(`User Details:\n\nName: ${user.name}\nEmail: ${user.email}\nPhone: ${user.phone}\nAddress: ${user.address}\nCity: ${user.city}, ${user.state} ${user.zipCode}\nCountry: ${user.country}\nRole: ${user.role}\nStatus: ${user.status}\nTotal Orders: ${stats.totalOrders}\nTotal Spent: ₹${stats.totalSpent.toFixed(2)}\nAverage Order Value: ₹${stats.averageOrderValue.toFixed(2)}\nJoin Date: ${formatDate(stats.joinDate)}\nLast Order: ${formatDate(stats.lastOrderDate)}\nOrder Status Breakdown: ${orderStatusText}`);
+    } catch (error) {
+      console.error('Failed to get user details:', error);
+      alert(`User Details:\n\nName: ${user.name}\nEmail: ${user.email}\nPhone: ${user.phone}\nRole: ${user.role}\nTotal Orders: ${user.totalOrders}\nTotal Spent: ₹${user.totalSpent.toFixed(2)}\nStatus: ${user.status}`);
+    }
+  };
+
+  const toggleUserStatus = async (user) => {
+    const newStatus = user.status === 'active' ? false : true;
+    const action = newStatus ? 'activate' : 'deactivate';
+
+    if (window.confirm(`Are you sure you want to ${action} ${user.name}?`)) {
+      try {
+        await apiService.updateUserStatus(user.id, newStatus);
+        showSuccess(`User ${action}d successfully`);
+        loadUsers(); // Reload users
+      } catch (error) {
+        console.error('Failed to update user status:', error);
+        showError(`Failed to ${action} user`);
+      }
+    }
+  };
+
+  const promoteToAdmin = async (user) => {
+    if (window.confirm(`Are you sure you want to make ${user.name} an admin? This will give them full administrative privileges.`)) {
+      try {
+        await apiService.updateUserRole(user.id, 'ROLE_ADMIN');
+        showSuccess(`${user.name} has been promoted to admin`);
+        loadUsers(); // Reload users
+      } catch (error) {
+        console.error('Failed to promote user:', error);
+        showError('Failed to promote user to admin');
+      }
+    }
+  };
+
+  const demoteFromAdmin = async (user) => {
+    if (window.confirm(`Are you sure you want to remove admin privileges from ${user.name}?`)) {
+      try {
+        await apiService.updateUserRole(user.id, 'ROLE_USER');
+        showSuccess(`${user.name} has been demoted to regular user`);
+        loadUsers(); // Reload users
+      } catch (error) {
+        console.error('Failed to demote user:', error);
+        showError('Failed to demote user');
+      }
+    }
+  };
+
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -189,7 +248,8 @@ const UserManagement = () => {
                           <svg className="w-4 h-4 text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                           </svg>
-                          {user.totalOrders || 0}
+                          <span className="font-medium">{user.totalOrders || 0}</span>
+                          <span className="ml-1 text-gray-400">orders</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -197,19 +257,67 @@ const UserManagement = () => {
                           <svg className="w-4 h-4 text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                           </svg>
-                          ₹{(user.totalSpent || 0).toFixed(2)}
+                          <span className="font-medium">₹{(user.totalSpent || 0).toFixed(2)}</span>
                         </div>
+                        {user.totalOrders > 0 && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            Avg: ₹{((user.totalSpent || 0) / user.totalOrders).toFixed(2)} per order
+                          </div>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(user.lastOrderDate)}
+                        <div>
+                          <div className="font-medium">
+                            {formatDate(user.lastOrderDate)}
+                          </div>
+                          {user.lastOrderDate && (
+                            <div className="text-xs text-gray-400">
+                              {(() => {
+                                const daysDiff = Math.floor((new Date() - new Date(user.lastOrderDate)) / (1000 * 60 * 60 * 24));
+                                if (daysDiff === 0) return 'Today';
+                                if (daysDiff === 1) return 'Yesterday';
+                                if (daysDiff < 7) return `${daysDiff} days ago`;
+                                if (daysDiff < 30) return `${Math.floor(daysDiff / 7)} weeks ago`;
+                                return `${Math.floor(daysDiff / 30)} months ago`;
+                              })()}
+                            </div>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button className="text-blue-600 hover:text-blue-900 mr-3">
-                          View Details
-                        </button>
-                        <button className="text-red-600 hover:text-red-900">
-                          Disable
-                        </button>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <button
+                            onClick={() => viewUserDetails(user)}
+                            className="text-blue-600 hover:text-blue-900 font-medium text-left"
+                          >
+                            View Details
+                          </button>
+                          <button
+                            onClick={() => toggleUserStatus(user)}
+                            className={`font-medium text-left ${
+                              user.status === 'active'
+                                ? 'text-red-600 hover:text-red-900'
+                                : 'text-green-600 hover:text-green-900'
+                            }`}
+                          >
+                            {user.status === 'active' ? 'Deactivate' : 'Activate'}
+                          </button>
+                          {user.role === 'ROLE_ADMIN' ? (
+                            <button
+                              onClick={() => demoteFromAdmin(user)}
+                              className="text-orange-600 hover:text-orange-900 font-medium text-left"
+                            >
+                              Remove Admin
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => promoteToAdmin(user)}
+                              className="text-purple-600 hover:text-purple-900 font-medium text-left"
+                            >
+                              Make Admin
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

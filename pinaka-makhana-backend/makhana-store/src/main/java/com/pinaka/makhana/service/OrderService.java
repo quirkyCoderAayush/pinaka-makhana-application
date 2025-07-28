@@ -10,4 +10,11 @@ public interface OrderService {
 
 	List<Order> getOrdersByUser(String email);
 
+	// Admin methods
+	List<Order> getAllOrders();
+
+	Order getOrderById(Long orderId);
+
+	Order updateOrderStatus(Long orderId, String status);
+
 }

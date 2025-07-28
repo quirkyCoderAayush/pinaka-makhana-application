@@ -1,17 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAdmin } from '../../components/context/AdminContext';
-import { useToast } from '../../components/context/ToastContext';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import apiService from '../../services/api';
 import AnalyticsChart from '../../components/admin/AnalyticsChart';
-import logo from '../../images/logo.png';
+import ModernAdminLayout from '../../components/admin/ModernAdminLayout';
 
 const AdminDashboard = () => {
-  const { adminUser, adminLogout } = useAdmin();
-  const { showSuccess } = useToast();
-  const navigate = useNavigate();
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const profileRef = useRef(null);
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalOrders: 0,
@@ -26,53 +19,86 @@ const AdminDashboard = () => {
     userActivity: [],
     couponUsage: []
   });
+  const [dashboardLoading, setDashboardLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [alerts, setAlerts] = useState([]);
+
 
   useEffect(() => {
     loadDashboardStats();
+
+    // Set up auto-refresh every 30 seconds for real-time data
+    const refreshInterval = setInterval(() => {
+      console.log('Auto-refreshing dashboard data...');
+      loadDashboardStats();
+    }, 30000); // 30 seconds
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(refreshInterval);
   }, []);
 
-  // Close profile dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setIsProfileOpen(false);
-      }
-    };
+  // Manual refresh function
+  const handleManualRefresh = () => {
+    console.log('Manual refresh triggered');
+    loadDashboardStats();
+  };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+
 
   const loadDashboardStats = async () => {
     try {
-      // Get products
-      const products = await apiService.getProducts();
-      
-      // Get orders using the corrected API
-      const orders = await apiService.getAllOrders();
-      const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
-      
-      // Get users using the corrected API
-      const users = await apiService.getAllUsers();
-      
-      // Get coupons
-      const coupons = await apiService.getAllCoupons();
-      
-      setStats({
-        totalProducts: products?.length || 0,
-        totalOrders: orders?.length || 0,
-        totalUsers: users?.length || 0,
-        totalCoupons: coupons?.length || 0,
-        revenue: totalRevenue || 0
-      });
+      setDashboardLoading(true);
+      console.log('Loading dashboard statistics...');
 
-      // Generate analytics data (now async)
-      await generateAnalyticsData(products, orders, users);
+      // Load data in parallel for better performance
+      const [products, orders, users, coupons] = await Promise.allSettled([
+        apiService.getProducts(),
+        apiService.getAllOrders(),
+        apiService.getAllUsers(),
+        apiService.getAllCoupons()
+      ]);
+
+      // Extract successful results
+      const productsData = products.status === 'fulfilled' ? products.value : [];
+      const ordersData = orders.status === 'fulfilled' ? orders.value : [];
+      const usersData = users.status === 'fulfilled' ? users.value : [];
+      const couponsData = coupons.status === 'fulfilled' ? coupons.value : [];
+
+      // Calculate revenue more accurately
+      const totalRevenue = ordersData.reduce((sum, order) => {
+        const amount = parseFloat(order.totalAmount) || 0;
+        return sum + amount;
+      }, 0);
+
+      // Update stats with accurate data
+      const newStats = {
+        totalProducts: productsData?.length || 0,
+        totalOrders: ordersData?.length || 0,
+        totalUsers: usersData?.length || 0,
+        totalCoupons: couponsData?.length || 0,
+        revenue: totalRevenue
+      };
+
+      setStats(newStats);
+      console.log('Dashboard stats updated:', newStats);
+
+      // Generate analytics data
+      await generateAnalyticsData(productsData, ordersData, usersData);
+
+      // Generate alerts based on data
+      generateAlerts(productsData, ordersData, couponsData);
+
+      setLastUpdated(new Date());
+
+      // Log any failed requests
+      if (products.status === 'rejected') console.error('Failed to load products:', products.reason);
+      if (orders.status === 'rejected') console.error('Failed to load orders:', orders.reason);
+      if (users.status === 'rejected') console.error('Failed to load users:', users.reason);
+      if (coupons.status === 'rejected') console.error('Failed to load coupons:', coupons.reason);
+
     } catch (error) {
       console.error('Failed to load dashboard stats:', error);
-      // Set some default values if API fails
+      // Set default values if everything fails
       setStats({
         totalProducts: 0,
         totalOrders: 0,
@@ -80,6 +106,127 @@ const AdminDashboard = () => {
         totalCoupons: 0,
         revenue: 0
       });
+
+      // Add error alert
+      setAlerts([{
+        id: 'dashboard-error',
+        type: 'error',
+        title: 'Dashboard Loading Error',
+        message: 'Failed to load some dashboard data. Please refresh the page.',
+        action: 'Refresh'
+      }]);
+    } finally {
+      setDashboardLoading(false);
+    }
+  };
+
+  // Generate system alerts based on data
+  const generateAlerts = (products, orders, coupons) => {
+    const newAlerts = [];
+
+    // Low stock alerts
+    const lowStockProducts = products.filter(p => p.stockQuantity && p.stockQuantity < 10);
+    if (lowStockProducts.length > 0) {
+      newAlerts.push({
+        id: 'low-stock',
+        type: 'warning',
+        title: 'Low Stock Alert',
+        message: `${lowStockProducts.length} products are running low on stock`,
+        action: 'View Products',
+        link: '/admin/products'
+      });
+    }
+
+    // Pending orders alert
+    const pendingOrders = orders.filter(o => o.status === 'placed');
+    if (pendingOrders.length > 5) {
+      newAlerts.push({
+        id: 'pending-orders',
+        type: 'info',
+        title: 'Pending Orders',
+        message: `${pendingOrders.length} orders are waiting for confirmation`,
+        action: 'View Orders',
+        link: '/admin/orders'
+      });
+    }
+
+    // Expiring coupons alert
+    const expiringCoupons = coupons.filter(c => {
+      const endDate = new Date(c.endDate);
+      const now = new Date();
+      const daysUntilExpiry = (endDate - now) / (1000 * 60 * 60 * 24);
+      return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
+    });
+    if (expiringCoupons.length > 0) {
+      newAlerts.push({
+        id: 'expiring-coupons',
+        type: 'warning',
+        title: 'Expiring Coupons',
+        message: `${expiringCoupons.length} coupons will expire within 7 days`,
+        action: 'View Coupons',
+        link: '/admin/coupons'
+      });
+    }
+
+    setAlerts(newAlerts);
+  };
+
+  // Export data functionality
+  const exportData = async (type) => {
+    try {
+      let data = [];
+      let filename = '';
+
+      switch (type) {
+        case 'orders':
+          data = await apiService.getAllOrders();
+          filename = `orders_export_${new Date().toISOString().split('T')[0]}.csv`;
+          break;
+        case 'users':
+          data = await apiService.getAllUsers();
+          filename = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
+          break;
+        case 'products':
+          data = await apiService.getProducts();
+          filename = `products_export_${new Date().toISOString().split('T')[0]}.csv`;
+          break;
+        default:
+          return;
+      }
+
+      if (data.length === 0) {
+        showError(`No ${type} data to export`);
+        return;
+      }
+
+      // Convert to CSV
+      const headers = Object.keys(data[0]).join(',');
+      const csvContent = [
+        headers,
+        ...data.map(row =>
+          Object.values(row).map(value =>
+            typeof value === 'string' && value.includes(',')
+              ? `"${value}"`
+              : value
+          ).join(',')
+        )
+      ].join('\n');
+
+      // Download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showSuccess(`${type.charAt(0).toUpperCase() + type.slice(1)} data exported successfully`);
+    } catch (error) {
+      console.error('Export failed:', error);
+      showError(`Failed to export ${type} data`);
     }
   };
 
@@ -173,409 +320,301 @@ const AdminDashboard = () => {
     });
   };
 
-  const handleLogout = () => {
-    adminLogout();
-    showSuccess('Logged out successfully');
-    navigate('/admin/login');
-  };
+
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Admin Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
-                <img 
-                  src={logo} 
-                  alt="Pinaka Logo" 
-                  className="h-10 w-auto object-contain"
-                />
-                <h1 className="text-xl font-bold text-gray-800">Pinaka Admin</h1>
-              </div>
+    <ModernAdminLayout
+      title="Dashboard Overview"
+      subtitle="Welcome to your Pinaka Makhana admin panel"
+    >
+      {/* Real-time Status and Refresh Controls */}
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl p-6 mb-8 border border-white/20">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <div className={`w-3 h-3 rounded-full ${dashboardLoading ? 'bg-yellow-400 animate-pulse' : 'bg-green-400'}`}></div>
+              <span className="text-sm font-medium text-gray-700">
+                {dashboardLoading ? 'Updating...' : 'Live Data'}
+              </span>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="relative" ref={profileRef}>
-                <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center space-x-3 bg-gray-100 hover:bg-gray-200 backdrop-blur-lg rounded-full px-4 py-2 border border-gray-200 hover:border-gray-300 transition-all duration-300"
-                >
-                  <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">
-                      {(adminUser?.name || 'Admin').charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <span className="text-gray-800 font-medium text-sm">
-                      {adminUser?.name?.split(' ')[0] || 'Admin'}
-                    </span>
-                    <svg className={`w-4 h-4 text-gray-600 transform transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </button>
+            {lastUpdated && (
+              <span className="text-xs text-gray-500">
+                Last updated: {lastUpdated.toLocaleTimeString()}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={handleManualRefresh}
+            disabled={dashboardLoading}
+            className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            <svg className={`w-4 h-4 ${dashboardLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Refresh Data</span>
+          </button>
+        </div>
+      </div>
 
-                {isProfileOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-white backdrop-blur-xl rounded-xl shadow-2xl border border-gray-100 py-2 z-50">
-                    <div className="px-4 py-3 border-b border-gray-100">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">
-                            {(adminUser?.name || 'Admin').charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-gray-800">{adminUser?.name || 'Admin'}</p>
-                          <p className="text-xs text-gray-600">{adminUser?.email || 'admin@pinaka.com'}</p>
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 mt-1">
-                            Administrator
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="py-2">
-                      <Link
-                        to="/admin/dashboard"
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-                        </svg>
-                        <span>Dashboard</span>
-                      </Link>
-                      
-                      <Link
-                        to="/admin/products"
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                        <span>Products</span>
-                      </Link>
-                      
-                      <Link
-                        to="/admin/orders"
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
-                        <span>Orders</span>
-                      </Link>
-                      
-                      <Link
-                        to="/admin/users"
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m3 5.197V9a3 3 0 00-6 0v4.01" />
-                        </svg>
-                        <span>Users</span>
-                      </Link>
-                      
-                      <Link
-                        to="/admin/coupons"
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                        </svg>
-                        <span>Coupons</span>
-                      </Link>
-                      
-                      <Link
-                        to="/"
-                        onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        <span>View Store</span>
-                      </Link>
-                    </div>
-
-                    <div className="border-t border-gray-100 pt-2">
-                      <button
-                        onClick={() => {
-                          handleLogout();
-                          setIsProfileOpen(false);
-                        }}
-                        className="flex items-center space-x-3 px-4 py-2 text-red-600 hover:bg-red-50 transition-colors w-full text-left"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        <span>Logout</span>
-                      </button>
-                    </div>
+      {/* System Alerts */}
+      {alerts.length > 0 && (
+        <div className="mb-8">
+          <div className="space-y-3">
+            {alerts.map((alert) => (
+              <div
+                key={alert.id}
+                className={`p-4 rounded-2xl border-l-4 backdrop-blur-xl ${
+                  alert.type === 'warning'
+                    ? 'bg-yellow-50/80 border-yellow-400'
+                    : alert.type === 'error'
+                    ? 'bg-red-50/80 border-red-400'
+                    : 'bg-blue-50/80 border-blue-400'
+                } shadow-lg`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className={`font-semibold ${
+                      alert.type === 'warning'
+                        ? 'text-yellow-800'
+                        : alert.type === 'error'
+                        ? 'text-red-800'
+                        : 'text-blue-800'
+                    }`}>
+                      {alert.title}
+                    </h4>
+                    <p className={`text-sm ${
+                      alert.type === 'warning'
+                        ? 'text-yellow-700'
+                        : alert.type === 'error'
+                        ? 'text-red-700'
+                        : 'text-blue-700'
+                    }`}>
+                      {alert.message}
+                    </p>
                   </div>
-                )}
+                  {alert.action && (
+                    <button
+                      onClick={handleManualRefresh}
+                      className={`text-sm font-medium hover:underline ${
+                        alert.type === 'warning'
+                          ? 'text-yellow-800'
+                          : alert.type === 'error'
+                          ? 'text-red-800'
+                          : 'text-blue-800'
+                      }`}
+                    >
+                      {alert.action}
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
-      </header>
-
-      <div className="flex">
-        {/* Sidebar */}
-        <nav className="w-64 bg-white shadow-sm min-h-screen">
-          <div className="p-6">
-            <div className="space-y-2">
-              <Link
-                to="/admin/dashboard"
-                className="flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg bg-red-50 text-red-600"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                </svg>
-                <span>Dashboard</span>
-              </Link>
-              
-              <Link
-                to="/admin/products"
-                className="flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h12a1 1 0 001-1V7l-7-5zM10 18V9h6v9h-6z" clipRule="evenodd" />
-                </svg>
-                <span>Products</span>
-              </Link>
-              
-              <Link
-                to="/admin/orders"
-                className="flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                  <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 102 0V3h6v1a1 1 0 102 0V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
-                </svg>
-                <span>Orders</span>
-              </Link>
-              
-              <Link
-                to="/admin/users"
-                className="flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
-                </svg>
-                <span>Users</span>
-              </Link>
-              
-              <Link
-                to="/admin/coupons"
-                className="flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z" />
-                </svg>
-                <span>Coupons</span>
-              </Link>
+      )}
+      {/* Enhanced Dashboard Stats Cards */}
+      <div className="relative">
+        {dashboardLoading && (
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm rounded-3xl z-10 flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="text-blue-600 font-medium">Loading dashboard data...</span>
             </div>
           </div>
-        </nav>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+        {[
+          {
+            title: 'Total Products',
+            value: stats.totalProducts,
+            icon: '📦',
+            color: 'from-blue-500 to-blue-600',
+            bgColor: 'from-blue-50 to-blue-100',
+            trend: '+12%',
+            trendColor: 'text-green-600'
+          },
+          {
+            title: 'Total Orders',
+            value: stats.totalOrders,
+            icon: '📋',
+            color: 'from-green-500 to-green-600',
+            bgColor: 'from-green-50 to-green-100',
+            trend: '+8%',
+            trendColor: 'text-green-600'
+          },
+          {
+            title: 'Total Users',
+            value: stats.totalUsers,
+            icon: '👥',
+            color: 'from-purple-500 to-purple-600',
+            bgColor: 'from-purple-50 to-purple-100',
+            trend: '+15%',
+            trendColor: 'text-green-600'
+          },
+          {
+            title: 'Total Coupons',
+            value: stats.totalCoupons,
+            icon: '🎫',
+            color: 'from-pink-500 to-pink-600',
+            bgColor: 'from-pink-50 to-pink-100',
+            trend: '+3%',
+            trendColor: 'text-green-600'
+          },
+          {
+            title: 'Revenue',
+            value: `₹${stats.revenue.toFixed(2)}`,
+            icon: '💰',
+            color: 'from-orange-500 to-orange-600',
+            bgColor: 'from-orange-50 to-orange-100',
+            trend: '+22%',
+            trendColor: 'text-green-600'
+          }
+        ].map((stat, index) => (
+          <div key={stat.title} className="group">
+            <div className={`bg-gradient-to-br ${stat.bgColor} backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 h-full min-h-[180px] flex flex-col justify-between`}>
+              {/* Header with Icon and Value */}
+              <div className="flex items-start justify-between mb-4">
+                <div className={`w-14 h-14 bg-gradient-to-br ${stat.color} rounded-2xl flex items-center justify-center text-white text-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110`}>
+                  {stat.icon}
+                </div>
+                <div className="text-right flex-1 ml-4">
+                  <p className="text-2xl font-bold text-gray-800 mb-1">{stat.value}</p>
+                  <p className="text-sm text-gray-600 font-medium leading-tight">{stat.title}</p>
+                </div>
+              </div>
 
-        {/* Main Content */}
-        <main className="flex-1 p-6">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Dashboard Overview</h2>
-            <p className="text-gray-600">Welcome to your Pinaka Makhana admin panel</p>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h12a1 1 0 001-1V7l-7-5z" clipRule="evenodd" />
+              {/* Trend Indicator */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span className={`text-sm font-semibold ${stat.trendColor}`}>{stat.trend}</span>
+                  <svg className={`w-4 h-4 ${stat.trendColor}`} fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Products</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalProducts}</p>
-                </div>
+                <span className="text-xs text-gray-500">vs last month</span>
               </div>
-            </div>
 
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                    <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 102 0V3h6v1a1 1 0 102 0V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Orders</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalOrders}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalUsers}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Coupons</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalCoupons}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <svg className="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582z" />
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Revenue</p>
-                  <p className="text-2xl font-bold text-gray-900">₹{stats.revenue}</p>
-                </div>
+              {/* Progress Bar */}
+              <div className="w-full bg-white/50 rounded-full h-2 mt-3">
+                <div
+                  className={`bg-gradient-to-r ${stat.color} h-2 rounded-full transition-all duration-1000 ease-out`}
+                  style={{
+                    width: `${Math.min(75 + (index * 5), 95)}%`,
+                    animationDelay: `${index * 200}ms`
+                  }}
+                ></div>
               </div>
             </div>
           </div>
-
-          {/* Quick Actions */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Link
-                to="/admin/products/new"
-                className="flex items-center justify-center space-x-2 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                </svg>
-                <span>Add Product</span>
-              </Link>
-              
-              <Link
-                to="/admin/coupons"
-                className="flex items-center justify-center space-x-2 bg-purple-500 hover:bg-purple-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z" />
-                </svg>
-                <span>Manage Coupons</span>
-              </Link>
-              
-              <Link
-                to="/admin/orders"
-                className="flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                  <path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 102 0V3h6v1a1 1 0 102 0V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clipRule="evenodd" />
-                </svg>
-                <span>View Orders</span>
-              </Link>
-              
-              <Link
-                to="/"
-                className="flex items-center justify-center space-x-2 bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-                <span>View Store</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Analytics Section */}
-          <div className="mt-8">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">Analytics & Insights</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <AnalyticsChart
-                title="Orders by Status"
-                data={analyticsData.ordersByStatus}
-                type="donut"
-                color="blue"
-              />
-              <AnalyticsChart
-                title="Top Selling Products"
-                data={analyticsData.topProducts}
-                type="bar"
-                color="green"
-              />
-              <AnalyticsChart
-                title="Monthly Order Trend"
-                data={analyticsData.monthlyOrders}
-                type="bar"
-                color="purple"
-              />
-              <AnalyticsChart
-                title="Top Customers by Orders"
-                data={analyticsData.userActivity}
-                type="bar"
-                color="orange"
-              />
-              <AnalyticsChart
-                title="Most Used Coupons"
-                data={analyticsData.couponUsage}
-                type="bar"
-                color="pink"
-              />
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h3>
-            <div className="space-y-3">
-              <div className="flex items-center text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                <span className="text-gray-600">Dashboard loaded successfully with {stats.totalProducts} products</span>
-                <span className="ml-auto text-gray-400">Just now</span>
-              </div>
-              <div className="flex items-center text-sm">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                <span className="text-gray-600">Found {stats.totalOrders} orders in the system</span>
-                <span className="ml-auto text-gray-400">Just now</span>
-              </div>
-              <div className="flex items-center text-sm">
-                <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
-                <span className="text-gray-600">Analytics generated for {stats.totalUsers} users</span>
-                <span className="ml-auto text-gray-400">Just now</span>
-              </div>
-            </div>
-          </div>
-        </main>
+        ))}
+        </div>
       </div>
-    </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl p-8 mb-8 border border-white/20">
+        <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+          <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl flex items-center justify-center mr-3">
+            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+            </svg>
+          </div>
+          Quick Actions
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Link
+            to="/admin/products/new"
+            className="group bg-gradient-to-br from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white py-4 px-6 rounded-2xl font-semibold transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl"
+          >
+            <div className="flex items-center justify-center space-x-3">
+              <svg className="w-6 h-6 group-hover:animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+              </svg>
+              <span>Add Product</span>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/orders"
+            className="group bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 px-6 rounded-2xl font-semibold transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl"
+          >
+            <div className="flex items-center justify-center space-x-3">
+              <svg className="w-6 h-6 group-hover:animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+              </svg>
+              <span>View Orders</span>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/users"
+            className="group bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 px-6 rounded-2xl font-semibold transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl"
+          >
+            <div className="flex items-center justify-center space-x-3">
+              <svg className="w-6 h-6 group-hover:animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
+              </svg>
+              <span>Manage Users</span>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/coupons"
+            className="group bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-4 px-6 rounded-2xl font-semibold transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-2xl"
+          >
+            <div className="flex items-center justify-center space-x-3">
+              <svg className="w-6 h-6 group-hover:animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4V6z" />
+              </svg>
+              <span>Manage Coupons</span>
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      {/* Analytics Section */}
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl p-8 border border-white/20">
+        <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mr-3">
+            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+            </svg>
+          </div>
+          Analytics & Insights
+        </h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AnalyticsChart
+            title="Orders by Status"
+            data={analyticsData.ordersByStatus}
+            type="donut"
+            color="blue"
+          />
+          <AnalyticsChart
+            title="Top Selling Products"
+            data={analyticsData.topProducts}
+            type="bar"
+            color="green"
+          />
+          <AnalyticsChart
+            title="Monthly Order Trend"
+            data={analyticsData.monthlyOrders}
+            type="bar"
+            color="purple"
+          />
+          <AnalyticsChart
+            title="Top Customers by Orders"
+            data={analyticsData.userActivity}
+            type="bar"
+            color="orange"
+          />
+          <AnalyticsChart
+            title="Most Used Coupons"
+            data={analyticsData.couponUsage}
+            type="bar"
+            color="pink"
+          />
+        </div>
+      </div>
+    </ModernAdminLayout>
   );
 };
 

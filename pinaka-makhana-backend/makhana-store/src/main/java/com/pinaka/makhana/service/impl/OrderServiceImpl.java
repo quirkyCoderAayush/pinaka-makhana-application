@@ -86,4 +86,36 @@ public class OrderServiceImpl implements OrderService {
 
 		return orderRepository.findByUser(user);
 	}
+
+	// Admin methods implementation
+	@Override
+	public List<Order> getAllOrders() {
+		log.info("🔍 Admin: Fetching all orders");
+		List<Order> orders = orderRepository.findAll();
+		log.info("✅ Found {} orders", orders.size());
+		return orders;
+	}
+
+	@Override
+	public Order getOrderById(Long orderId) {
+		log.info("🔍 Admin: Fetching order by ID: {}", orderId);
+		return orderRepository.findById(orderId).orElse(null);
+	}
+
+	@Override
+	public Order updateOrderStatus(Long orderId, String status) {
+		log.info("🔄 Admin: Updating order {} status to: {}", orderId, status);
+
+		Order order = orderRepository.findById(orderId).orElse(null);
+		if (order != null) {
+			order.setStatus(status);
+			Order savedOrder = orderRepository.save(order);
+			log.info("✅ Order status updated successfully");
+			return savedOrder;
+		}
+
+		log.warn("❌ Order not found: {}", orderId);
+		return null;
+	}
+
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { formatPrice } from '../utils/formatPrice';
 import { useAuth } from '../components/context/AuthContext';
 import { useToast } from '../components/context/ToastContext';
 import { CartContext } from '../components/context/CartContext';
@@ -335,7 +336,7 @@ const Orders = () => {
                                   <div className="flex-1 min-w-0">
                                     <h5 className="text-sm font-semibold text-gray-900">{productName}</h5>
                                     <p className="text-sm text-gray-600 mt-1">
-                                      Quantity: {quantity} × ₹{unitPrice.toFixed(2)}
+                                      Quantity: {quantity} × ₹{formatPrice(unitPrice)}
                                     </p>
                                     <div className="flex items-center space-x-2 mt-2">
                                       <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
@@ -347,7 +348,7 @@ const Orders = () => {
                                     </div>
                                   </div>
                                   <div className="text-right">
-                                    <p className="text-lg font-bold text-gray-900">₹{price.toFixed(2)}</p>
+                                    <p className="text-lg font-bold text-gray-900">₹{formatPrice(price)}</p>
                                   </div>
                                 </div>
                               );
@@ -369,7 +370,7 @@ const Orders = () => {
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
                               <span className="text-gray-600">Subtotal:</span>
-                              <span className="font-medium">₹{order.totalAmount}</span>
+                              <span className="font-medium">₹{formatPrice(order.totalAmount)}</span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-gray-600">Delivery:</span>

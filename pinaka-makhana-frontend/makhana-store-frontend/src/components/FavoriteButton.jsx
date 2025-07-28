@@ -1,12 +1,13 @@
 import React from 'react';
 import { useFavorites } from './context/FavoritesContext';
 import { useToast } from './context/ToastContext';
+import { Heart } from 'lucide-react';
 
 const FavoriteButton = ({ product, size = 'md', className = '' }) => {
   const { toggleFavorite, isFavorite } = useFavorites();
   const { showSuccess } = useToast();
-  
-  const isProductFavorite = isFavorite(product.id);
+
+  const isProductInWishlist = isFavorite(product.id);
   
   const sizeClasses = {
     sm: 'w-5 h-5',
@@ -20,49 +21,55 @@ const FavoriteButton = ({ product, size = 'md', className = '' }) => {
     lg: 'p-3'
   };
 
-  const handleToggleFavorite = (e) => {
+  const handleToggleWishlist = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
+    // Ensure the event doesn't bubble up to parent elements
+    e.nativeEvent?.stopImmediatePropagation?.();
+
     toggleFavorite(product);
-    
-    if (isProductFavorite) {
-      showSuccess(`${product.name} removed from favorites`);
+
+    if (isProductInWishlist) {
+      showSuccess(`${product.name} removed from wishlist`);
     } else {
-      showSuccess(`${product.name} added to favorites`);
+      showSuccess(`${product.name} added to wishlist`);
     }
   };
 
   return (
     <button
-      onClick={handleToggleFavorite}
+      onClick={handleToggleWishlist}
       className={`
-        ${buttonSizeClasses[size]} 
-        rounded-full 
-        transition-all 
-        duration-300 
-        hover:scale-110 
-        ${isProductFavorite 
-          ? 'bg-red-50 text-red-500 hover:bg-red-100' 
-          : 'bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500'
+        ${buttonSizeClasses[size]}
+        rounded-full
+        transition-all
+        duration-300
+        hover:scale-110
+        shadow-lg
+        relative
+        z-30
+        touch-manipulation
+        ${isProductInWishlist
+          ? 'bg-red-500 text-white hover:bg-red-600 shadow-red-500/25'
+          : 'bg-white/90 backdrop-blur-xl text-gray-400 hover:bg-red-50 hover:text-red-500 border border-gray-200/50'
         }
         ${className}
       `}
-      title={isProductFavorite ? 'Remove from favorites' : 'Add to favorites'}
+      title={isProductInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+      style={{
+        zIndex: 30,
+        touchAction: 'manipulation',
+        WebkitTouchCallout: 'none',
+        WebkitUserSelect: 'none'
+      }}
     >
-      <svg 
+      <Heart
         className={`${sizeClasses[size]} transition-all duration-300`}
-        fill={isProductFavorite ? 'currentColor' : 'none'}
-        stroke="currentColor" 
-        viewBox="0 0 24 24"
-      >
-        <path 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          strokeWidth={2} 
-          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
-        />
-      </svg>
+        fill={isProductInWishlist ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth={2}
+      />
     </button>
   );
 };

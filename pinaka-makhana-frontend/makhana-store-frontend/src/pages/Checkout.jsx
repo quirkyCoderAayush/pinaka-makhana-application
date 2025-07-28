@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
+import { formatPrice } from '../utils/formatPrice';
 import { CartContext } from '../components/context/CartContext';
 import { useAuth } from '../components/context/AuthContext';
 import { useToast } from '../components/context/ToastContext';
@@ -98,7 +99,7 @@ const Checkout = () => {
         
         setCouponDiscount(discount);
         setCouponApplied(true);
-        showSuccess(`Coupon applied! You saved ₹${discount}`);
+        showSuccess(`Coupon applied! You saved ₹${formatPrice(discount)}`);
       } else {
         showError('Invalid coupon or cannot be applied to this order');
         setCouponApplied(false);
@@ -351,7 +352,7 @@ const Checkout = () => {
                   disabled={isProcessing}
                   className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isProcessing ? 'Processing Order...' : `Place Order - ₹${total}`}
+                  {isProcessing ? 'Processing Order...' : `Place Order - ₹${formatPrice(total)}`}
                 </button>
               </form>
             </div>
@@ -377,7 +378,7 @@ const Checkout = () => {
                         <h4 className="text-sm font-medium text-gray-800">{product.name}</h4>
                         <p className="text-xs text-gray-600">Qty: {quantity}</p>
                       </div>
-                      <span className="text-sm font-medium">₹{product.price * quantity}</span>
+                      <span className="text-sm font-medium">₹{formatPrice(product.price * quantity)}</span>
                     </div>
                   );
                 })}
@@ -449,12 +450,12 @@ const Checkout = () => {
               <div className="border-t border-gray-200 pt-4">
                 <div className="flex justify-between text-gray-600 mb-2">
                   <span>Subtotal ({cartItems.length} items)</span>
-                  <span>₹{subtotal}</span>
+                  <span>₹{formatPrice(subtotal)}</span>
                 </div>
                 {couponApplied && (
                   <div className="flex justify-between text-green-600 mb-2">
                     <span>Coupon Discount</span>
-                    <span>-₹{couponDiscount}</span>
+                    <span>-₹{formatPrice(couponDiscount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-gray-600 mb-2">
@@ -463,7 +464,7 @@ const Checkout = () => {
                 </div>
                 <div className="flex justify-between text-xl font-bold text-gray-800">
                   <span>Total</span>
-                  <span className="text-red-600">₹{total}</span>
+                  <span className="text-red-600">₹{formatPrice(total)}</span>
                 </div>
               </div>
             </div>

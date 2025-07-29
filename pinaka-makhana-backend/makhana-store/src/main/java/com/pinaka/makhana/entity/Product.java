@@ -98,13 +98,13 @@ public class Product {
 		this.updatedAt = LocalDateTime.now();
 	}
 
-	// All-args constructor
+	// Simplified constructor (removed problematic fields)
 	public Product(Long id, String name, String flavor, String description, String shortDescription,
-			Double price, Double originalPrice, String imageUrl, List<String> additionalImages,
+			Double price, Double originalPrice, String imageUrl,
 			Double rating, Integer reviewCount, boolean available, Integer stockQuantity, String weight,
-			String sku, ProductCategory category, List<String> tags, boolean isPremium, boolean isFeatured,
+			String sku, ProductCategory category, boolean isPremium, boolean isFeatured,
 			boolean isNewArrival, Double calories, Double protein, Double carbohydrates, Double fat,
-			Double fiber, String metaTitle, String metaDescription, List<String> variants,
+			Double fiber, String metaTitle, String metaDescription,
 			Integer minOrderQuantity, Double shippingWeight, String dimensions) {
 		this();
 		this.id = id;
@@ -115,7 +115,7 @@ public class Product {
 		this.price = price;
 		this.originalPrice = originalPrice;
 		this.imageUrl = imageUrl;
-		this.additionalImages = additionalImages;
+		// this.additionalImages = additionalImages; // Temporarily disabled
 		this.rating = rating;
 		this.reviewCount = reviewCount;
 		this.available = available;
@@ -123,7 +123,7 @@ public class Product {
 		this.weight = weight;
 		this.sku = sku;
 		this.category = category;
-		this.tags = tags;
+		// this.tags = tags; // Temporarily disabled
 		this.isPremium = isPremium;
 		this.isFeatured = isFeatured;
 		this.isNewArrival = isNewArrival;
@@ -134,7 +134,7 @@ public class Product {
 		this.fiber = fiber;
 		this.metaTitle = metaTitle;
 		this.metaDescription = metaDescription;
-		this.variants = variants;
+		// this.variants = variants; // Temporarily disabled
 		this.minOrderQuantity = minOrderQuantity;
 		this.shippingWeight = shippingWeight;
 		this.dimensions = dimensions;
@@ -400,14 +400,14 @@ public class Product {
 		return updatedAt;
 	}
 
-	public List<String> getVariants() {
-		return variants;
-	}
+	// public List<String> getVariants() {
+	//	return variants;
+	// }
 
-	public void setVariants(List<String> variants) {
-		this.variants = variants;
-		this.updatedAt = LocalDateTime.now();
-	}
+	// public void setVariants(List<String> variants) {
+	//	this.variants = variants;
+	//	this.updatedAt = LocalDateTime.now();
+	// }
 
 	public Integer getMinOrderQuantity() {
 		return minOrderQuantity;

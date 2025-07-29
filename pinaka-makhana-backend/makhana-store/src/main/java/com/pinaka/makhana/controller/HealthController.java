@@ -18,11 +18,13 @@ public class HealthController {
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
+        System.out.println("🏥 Health check endpoint called at: " + LocalDateTime.now());
         Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
         response.put("timestamp", LocalDateTime.now());
         response.put("service", "Pinaka Makhana Backend");
         response.put("version", "1.0.0");
+        response.put("port", System.getProperty("server.port", "10000"));
         return ResponseEntity.ok(response);
     }
 

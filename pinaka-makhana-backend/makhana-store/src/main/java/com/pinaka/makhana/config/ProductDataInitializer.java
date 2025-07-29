@@ -29,7 +29,9 @@ public class ProductDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        initializeProductsIfEmpty();
+        // Temporarily disable product initialization to fix 500 error
+        logger.info("🚀 ProductDataInitializer: Skipping product initialization to fix backend 500 error");
+        // initializeProductsIfEmpty();
     }
 
     private void initializeProductsIfEmpty() {

@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: pinaka-makhana-backend
+    env: java
+    buildCommand: mvn clean package -DskipTests
+    startCommand: java -jar target/makhana-store-0.0.1-SNAPSHOT.jar
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: SERVER_PORT
+        value: 10000
+      - key: HIBERNATE_DDL_AUTO
+        value: update
+      - key: APP_UPLOAD_DIR
+        value: /tmp/uploads/images/

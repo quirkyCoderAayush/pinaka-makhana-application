@@ -79,8 +79,7 @@ public class AdminUserInitializer implements CommandLineRunner {
             adminUser.setState("Bihar");
             adminUser.setZipCode("851101");
             adminUser.setCountry("India");
-            adminUser.setCreatedAt(LocalDateTime.now());
-            adminUser.setUpdatedAt(LocalDateTime.now());
+            // Don't set createdAt/updatedAt manually - let @PrePersist handle it
 
             User savedAdmin = userRepository.save(adminUser);
             

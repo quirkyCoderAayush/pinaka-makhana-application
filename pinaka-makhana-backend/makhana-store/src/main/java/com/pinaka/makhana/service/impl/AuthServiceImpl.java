@@ -56,6 +56,7 @@ public class AuthServiceImpl implements AuthService {
 			user.setPassword(passwordEncoder.encode(request.getPassword()));
 			user.setRole(role);
 			user.setActive(true);
+			// Don't set createdAt/updatedAt manually - let @PrePersist handle it
 
 			User savedUser = userRepository.save(user);
 			logger.info("User registered successfully with ID: {} and email: {}", savedUser.getId(), savedUser.getEmail());

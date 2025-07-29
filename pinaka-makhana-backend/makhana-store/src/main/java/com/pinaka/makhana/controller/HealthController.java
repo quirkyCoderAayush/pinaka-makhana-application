@@ -30,9 +30,17 @@ public class HealthController {
 
     @GetMapping("/")
     public ResponseEntity<Map<String, String>> root() {
+        System.out.println("🏠 Root endpoint called at: " + LocalDateTime.now());
         Map<String, String> response = new HashMap<>();
         response.put("message", "Pinaka Makhana API is running!");
         response.put("status", "healthy");
+        response.put("timestamp", LocalDateTime.now().toString());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        System.out.println("🏓 Ping endpoint called at: " + LocalDateTime.now());
+        return ResponseEntity.ok("pong");
     }
 }

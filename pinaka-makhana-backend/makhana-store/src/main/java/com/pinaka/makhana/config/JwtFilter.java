@@ -46,7 +46,8 @@ public class JwtFilter extends GenericFilter {
 				|| path.startsWith("/api/auth")
 				|| path.startsWith("/api/coupons")
 				|| path.equals("/api/health")
-				|| path.equals("/api/")) {
+				|| path.equals("/api/")
+				|| path.equals("/api/ping")) {
 			chain.doFilter(request, response);
 			return;
 		}

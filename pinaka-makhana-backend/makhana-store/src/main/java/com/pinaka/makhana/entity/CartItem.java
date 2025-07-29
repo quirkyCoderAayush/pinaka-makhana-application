@@ -10,8 +10,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-@Entity
-@Table(name = "cart_items")
+// @Entity
+// @Table(name = "cart_items")
 public class CartItem {
 
 	@Id

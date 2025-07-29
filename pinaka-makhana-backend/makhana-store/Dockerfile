@@ -1,5 +1,8 @@
 # Pinaka Makhana Backend - Dockerfile for Render Deployment
-FROM maven:3.9.4-openjdk-17 AS build
+FROM eclipse-temurin:17-jdk AS build
+
+# Install Maven
+RUN apt-get update && apt-get install -y maven
 
 # Set working directory
 WORKDIR /app
@@ -15,7 +18,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:17-jre-alpine
 
 # Set working directory
 WORKDIR /app

@@ -33,6 +33,16 @@ public class JwtUtil {
 				.signWith(key, SignatureAlgorithm.HS512).compact();
 	}
 
+	public String generateToken(String email, String role, String name) {
+		return Jwts.builder()
+				.setSubject(email)
+				.claim("role", role)
+				.claim("name", name)
+				.setIssuedAt(new Date())
+				.setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
+				.signWith(key, SignatureAlgorithm.HS512).compact();
+	}
+
 	public String extractEmail(String token) {
 		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
 	}

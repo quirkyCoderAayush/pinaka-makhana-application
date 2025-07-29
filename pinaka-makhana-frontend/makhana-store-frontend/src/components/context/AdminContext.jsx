@@ -20,6 +20,16 @@ export const AdminProvider = ({ children }) => {
     checkAdminStatus();
   }, []);
 
+  // Also check when user logs in through regular login
+  useEffect(() => {
+    const handleUserLogin = () => {
+      checkAdminStatus();
+    };
+
+    window.addEventListener('userLoggedIn', handleUserLogin);
+    return () => window.removeEventListener('userLoggedIn', handleUserLogin);
+  }, []);
+
   const checkAdminStatus = async () => {
     try {
       const token = localStorage.getItem('token');

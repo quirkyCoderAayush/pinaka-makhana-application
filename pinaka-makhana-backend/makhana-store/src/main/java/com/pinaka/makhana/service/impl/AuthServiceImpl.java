@@ -61,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
 			User savedUser = userRepository.save(user);
 			logger.info("User registered successfully with ID: {} and email: {}", savedUser.getId(), savedUser.getEmail());
 
-			String token = jwtUtil.generateToken(savedUser.getEmail());
+			String token = jwtUtil.generateToken(savedUser.getEmail(), savedUser.getRole(), savedUser.getName());
 
 			return new AuthResponse(token, savedUser.getName(), savedUser.getRole());
 		} catch (Exception e) {
@@ -96,7 +96,7 @@ public class AuthServiceImpl implements AuthService {
 			}
 
 			logger.info("User logged in successfully: {}", user.getEmail());
-			String token = jwtUtil.generateToken(user.getEmail());
+			String token = jwtUtil.generateToken(user.getEmail(), user.getRole(), user.getName());
 
 			return new AuthResponse(token, user.getName(), user.getRole());
 		} catch (IllegalArgumentException e) {

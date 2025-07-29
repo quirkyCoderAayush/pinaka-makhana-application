@@ -66,7 +66,10 @@ export const AuthProvider = ({ children }) => {
       
       setUser(userData);
       setIsAuthenticated(true);
-      
+
+      // Trigger admin context to check if this user is admin
+      window.dispatchEvent(new Event('userLoggedIn'));
+
       return { success: true, user: userData };
     } catch (error) {
       console.error('Login failed:', error);

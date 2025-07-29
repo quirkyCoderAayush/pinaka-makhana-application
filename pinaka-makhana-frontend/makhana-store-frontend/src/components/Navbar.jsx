@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CartContext } from "./context/CartContext";
 import { useAuth } from "./context/AuthContext";
 import { useFavorites } from "./context/FavoritesContext";
+import { useAdmin } from "./context/AdminContext";
 import { Heart, ShoppingCart, Search, Menu, X } from "lucide-react";
 import logo from "../images/logo.png";
 import "../styles/navbar-enhancements.css";
@@ -11,6 +12,7 @@ function Navbar() {
   const { cartItems } = useContext(CartContext);
   const { isAuthenticated, user, logout } = useAuth();
   const { favorites } = useFavorites();
+  const { isAdmin } = useAdmin();
   const location = useLocation();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -304,7 +306,8 @@ function Navbar() {
                 { name: 'Home', path: '/' },
                 { name: 'About', path: '/about' },
                 { name: 'Products', path: '/products' },
-                { name: 'Contact Us', path: '/contact' }
+                { name: 'Contact Us', path: '/contact' },
+                ...(isAdmin ? [{ name: 'Admin Panel', path: '/admin/dashboard' }] : [])
               ].map((item) => (
                 <Link
                   key={item.path}
@@ -667,7 +670,8 @@ function Navbar() {
                   ...(isAuthenticated ? [
                     { name: 'Cart', path: '/cart', badge: cartItems.length, icon: ShoppingCart },
                     { name: 'Wishlist', path: '/wishlist', badge: favorites?.length, icon: Heart }
-                  ] : [])
+                  ] : []),
+                  ...(isAdmin ? [{ name: 'Admin Panel', path: '/admin/dashboard' }] : [])
                 ].map((item) => (
                 <Link
                   key={item.path}

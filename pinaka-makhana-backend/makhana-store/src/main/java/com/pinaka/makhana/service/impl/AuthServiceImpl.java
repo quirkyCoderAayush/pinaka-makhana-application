@@ -50,12 +50,12 @@ public class AuthServiceImpl implements AuthService {
 			String role = request.getIsAdmin() ? "ROLE_ADMIN" : "ROLE_USER";
 			logger.debug("Assigning role: {} to user: {}", role, request.getEmail());
 
-			User user = User.builder()
-					.name(request.getName().trim())
-					.email(request.getEmail().toLowerCase().trim())
-					.password(passwordEncoder.encode(request.getPassword()))
-					.role(role)
-					.build();
+			User user = new User();
+			user.setName(request.getName().trim());
+			user.setEmail(request.getEmail().toLowerCase().trim());
+			user.setPassword(passwordEncoder.encode(request.getPassword()));
+			user.setRole(role);
+			user.setActive(true);
 
 			User savedUser = userRepository.save(user);
 			logger.info("User registered successfully with ID: {} and email: {}", savedUser.getId(), savedUser.getEmail());

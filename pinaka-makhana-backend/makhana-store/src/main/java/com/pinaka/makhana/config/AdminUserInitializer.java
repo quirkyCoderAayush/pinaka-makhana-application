@@ -67,21 +67,20 @@ public class AdminUserInitializer implements CommandLineRunner {
             }
 
             // Create admin user
-            User adminUser = User.builder()
-                    .name(DEFAULT_ADMIN_NAME)
-                    .email(DEFAULT_ADMIN_EMAIL)
-                    .password(passwordEncoder.encode(DEFAULT_ADMIN_PASSWORD))
-                    .role(ADMIN_ROLE)
-                    .active(true)
-                    .phone("6207881797")
-                    .address("Pinaka Foods Store, Lohianagar")
-                    .city("Begusarai")
-                    .state("Bihar")
-                    .zipCode("851101")
-                    .country("India")
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
+            User adminUser = new User();
+            adminUser.setName(DEFAULT_ADMIN_NAME);
+            adminUser.setEmail(DEFAULT_ADMIN_EMAIL);
+            adminUser.setPassword(passwordEncoder.encode(DEFAULT_ADMIN_PASSWORD));
+            adminUser.setRole(ADMIN_ROLE);
+            adminUser.setActive(true);
+            adminUser.setPhone("6207881797");
+            adminUser.setAddress("Pinaka Foods Store, Lohianagar");
+            adminUser.setCity("Begusarai");
+            adminUser.setState("Bihar");
+            adminUser.setZipCode("851101");
+            adminUser.setCountry("India");
+            adminUser.setCreatedAt(LocalDateTime.now());
+            adminUser.setUpdatedAt(LocalDateTime.now());
 
             User savedAdmin = userRepository.save(adminUser);
             

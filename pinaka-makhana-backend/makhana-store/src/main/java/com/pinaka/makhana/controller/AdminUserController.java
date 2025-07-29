@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pinaka.makhana.entity.User;
 import com.pinaka.makhana.service.AdminUserService;
 
-@RestController
-@RequestMapping("/api/admin/users")
-@CrossOrigin(origins = "*")
+// @RestController
+// @RequestMapping("/api/admin/users")
+// @CrossOrigin(origins = "*")
 public class AdminUserController {
 
     private final AdminUserService adminUserService;

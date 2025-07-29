@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.pinaka.makhana.entity.Order;
 import com.pinaka.makhana.entity.User;
 
-@Repository
+// @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
 	List<Order> findByUser(User user);

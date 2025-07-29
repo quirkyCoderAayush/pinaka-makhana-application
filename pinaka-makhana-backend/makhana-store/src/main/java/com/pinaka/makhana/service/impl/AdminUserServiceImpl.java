@@ -19,8 +19,8 @@ import com.pinaka.makhana.repository.OrderRepository;
 import com.pinaka.makhana.repository.UserRepository;
 import com.pinaka.makhana.service.AdminUserService;
 
-@Service
-@Transactional
+// @Service
+// @Transactional
 public class AdminUserServiceImpl implements AdminUserService {
 
     private static final Logger log = LoggerFactory.getLogger(AdminUserServiceImpl.class);

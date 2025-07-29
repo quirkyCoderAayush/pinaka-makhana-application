@@ -10,7 +10,7 @@ import com.pinaka.makhana.entity.CartItem;
 import com.pinaka.makhana.entity.Product;
 import com.pinaka.makhana.entity.User;
 
-@Repository
+// @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
 	List<CartItem> findByUser(User user);

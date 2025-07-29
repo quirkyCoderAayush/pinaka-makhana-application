@@ -19,7 +19,7 @@ import com.pinaka.makhana.repository.OrderRepository;
 import com.pinaka.makhana.repository.UserRepository;
 import com.pinaka.makhana.service.OrderService;
 
-@Service
+// @Service
 public class OrderServiceImpl implements OrderService {
 
 	private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);

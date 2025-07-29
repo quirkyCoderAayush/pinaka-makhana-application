@@ -38,9 +38,9 @@ public class Product {
 	@Column(name = "image_url")
 	private String imageUrl;
 	
-	@ElementCollection
-	@Column(name = "additional_image")
-	private List<String> additionalImages; // Gallery images
+	// @ElementCollection
+	// @Column(name = "additional_image")
+	// private List<String> additionalImages; // Gallery images - Temporarily disabled
 	
 	private Double rating;
 	private Integer reviewCount;
@@ -55,9 +55,9 @@ public class Product {
 	@Enumerated(EnumType.STRING)
 	private ProductCategory category;
 	
-	@ElementCollection
-	@Column(name = "tag")
-	private List<String> tags; // For search and filtering
+	// @ElementCollection
+	// @Column(name = "tag")
+	// private List<String> tags; // For search and filtering - Temporarily disabled
 	
 	private boolean isPremium = false;
 	private boolean isFeatured = false;
@@ -81,9 +81,9 @@ public class Product {
 	private LocalDateTime updatedAt;
 	
 	// Product variants (size, flavor, etc.)
-	@ElementCollection
-	@Column(name = "variant")
-	private List<String> variants;
+	// @ElementCollection
+	// @Column(name = "variant")
+	// private List<String> variants; // Temporarily disabled
 	
 	// Minimum order quantity
 	private Integer minOrderQuantity = 1;
@@ -231,14 +231,14 @@ public class Product {
 		this.updatedAt = LocalDateTime.now();
 	}
 
-	public List<String> getAdditionalImages() {
-		return additionalImages;
-	}
+	// public List<String> getAdditionalImages() {
+	//	return additionalImages;
+	// }
 
-	public void setAdditionalImages(List<String> additionalImages) {
-		this.additionalImages = additionalImages;
-		this.updatedAt = LocalDateTime.now();
-	}
+	// public void setAdditionalImages(List<String> additionalImages) {
+	//	this.additionalImages = additionalImages;
+	//	this.updatedAt = LocalDateTime.now();
+	// }
 
 	public Double getRating() {
 		return rating;
@@ -300,14 +300,14 @@ public class Product {
 		this.updatedAt = LocalDateTime.now();
 	}
 
-	public List<String> getTags() {
-		return tags;
-	}
+	// public List<String> getTags() {
+	//	return tags;
+	// }
 
-	public void setTags(List<String> tags) {
-		this.tags = tags;
-		this.updatedAt = LocalDateTime.now();
-	}
+	// public void setTags(List<String> tags) {
+	//	this.tags = tags;
+	//	this.updatedAt = LocalDateTime.now();
+	// }
 
 	public boolean isPremium() {
 		return isPremium;

@@ -29,7 +29,9 @@ public class ProductDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        initializeProductsIfEmpty();
+        // Temporarily disabled for initial deployment
+        // initializeProductsIfEmpty();
+        System.out.println("🚀 ProductDataInitializer: Skipping product initialization for initial deployment");
     }
 
     private void initializeProductsIfEmpty() {

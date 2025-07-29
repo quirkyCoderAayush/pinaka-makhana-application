@@ -3,40 +3,42 @@
 This guide will help you deploy your Pinaka Makhana application for free using:
 - **Frontend**: Vercel (Free tier)
 - **Backend**: Render (Free tier)
-- **Database**: PlanetScale (Free tier - MySQL compatible)
+- **Database**: Aiven MySQL (Free tier - 1GB storage)
 
 ## 📋 Prerequisites
 
 1. GitHub account with your repository
 2. Vercel account (free)
 3. Render account (free)
-4. PlanetScale account (free)
+4. Aiven account (free)
 
 ---
 
-## 🗄️ STEP 1: Setup Free Database (PlanetScale)
+## 🗄️ STEP 1: Setup Free Database (Aiven MySQL)
 
-### 1.1 Create PlanetScale Account
-1. Go to [PlanetScale](https://planetscale.com/)
-2. Sign up with GitHub (free tier: 1 database, 1GB storage, 1 billion reads/month)
-3. Create a new database named `pinaka-db`
+### 1.1 Create Aiven Account
+1. Go to [Aiven](https://aiven.io/)
+2. Sign up with GitHub or email (free tier: 1GB storage, MySQL 8.0)
+3. Click "Create Service" → "MySQL"
+4. Select "Free Plan" and choose a cloud region
+5. Name your service `pinaka-db`
 
 ### 1.2 Get Database Connection Details
-1. In PlanetScale dashboard, go to your `pinaka-db`
-2. Click "Connect" → "Create password"
-3. Select "Java" as connection type
-4. Copy the connection details:
+1. In Aiven console, go to your MySQL service
+2. Wait for service to start (2-3 minutes)
+3. Go to "Overview" tab and copy connection details:
    ```
-   Host: aws.connect.psdb.cloud
-   Username: [your-username]
-   Password: [your-password]
-   Database: pinaka-db
+   Host: [service-name]-[project].aivencloud.com
+   Port: [port-number]
+   Username: avnadmin
+   Password: [generated-password]
+   Database: defaultdb
    ```
 
 ### 1.3 Database URL Format
 Your DATABASE_URL will be:
 ```
-jdbc:mysql://aws.connect.psdb.cloud/pinaka-db?sslMode=VERIFY_IDENTITY
+jdbc:mysql://[service-name]-[project].aivencloud.com:[port]/defaultdb?sslMode=REQUIRE
 ```
 
 ---
@@ -48,9 +50,9 @@ You'll need these environment variables in Render:
 
 ```bash
 # Database Configuration
-DATABASE_URL=jdbc:mysql://aws.connect.psdb.cloud/pinaka-db?sslMode=VERIFY_IDENTITY
-DATABASE_USERNAME=your-planetscale-username
-DATABASE_PASSWORD=your-planetscale-password
+DATABASE_URL=jdbc:mysql://[service-name]-[project].aivencloud.com:[port]/defaultdb?sslMode=REQUIRE
+DATABASE_USERNAME=avnadmin
+DATABASE_PASSWORD=your-aiven-password
 
 # Server Configuration
 SERVER_PORT=10000

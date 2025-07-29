@@ -53,10 +53,10 @@ echo.
 
 echo 📋 Deployment Instructions:
 echo.
-echo 🗄️  STEP 1: Setup PlanetScale Database
-echo    1. Go to https://planetscale.com/ and create account
-echo    2. Create database named 'pinaka-db'
-echo    3. Get connection details (Host, Username, Password)
+echo 🗄️  STEP 1: Setup Aiven MySQL Database
+echo    1. Go to https://aiven.io/ and create account
+echo    2. Create MySQL service named 'pinaka-db'
+echo    3. Wait for service to start and get connection details
 echo.
 
 echo ⚙️  STEP 2: Deploy Backend to Render
@@ -67,9 +67,9 @@ echo    4. Root Directory: pinaka-makhana-backend/makhana-store
 echo    5. Build Command: mvn clean package -DskipTests
 echo    6. Start Command: java -jar target/makhana-store-0.0.1-SNAPSHOT.jar
 echo    7. Add environment variables:
-echo       - DATABASE_URL=jdbc:mysql://aws.connect.psdb.cloud/pinaka-db?sslMode=VERIFY_IDENTITY
-echo       - DATABASE_USERNAME=[your-planetscale-username]
-echo       - DATABASE_PASSWORD=[your-planetscale-password]
+echo       - DATABASE_URL=jdbc:mysql://[service-name]-[project].aivencloud.com:[port]/defaultdb?sslMode=REQUIRE
+echo       - DATABASE_USERNAME=avnadmin
+echo       - DATABASE_PASSWORD=[your-aiven-password]
 echo       - JWT_SECRET=[generate-strong-256-bit-secret]
 echo       - SERVER_PORT=10000
 echo       - HIBERNATE_DDL_AUTO=update

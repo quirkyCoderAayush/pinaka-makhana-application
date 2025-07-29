@@ -20,17 +20,18 @@
 
 ---
 
-## 🗄️ Database Setup (PlanetScale)
+## 🗄️ Database Setup (Aiven MySQL)
 
 ### Steps to Complete:
-1. [ ] Create PlanetScale account at https://planetscale.com/
-2. [ ] Create database named `pinaka-db`
-3. [ ] Generate connection credentials
+1. [ ] Create Aiven account at https://aiven.io/
+2. [ ] Create MySQL service named `pinaka-db`
+3. [ ] Wait for service to start (2-3 minutes)
 4. [ ] Note down connection details:
-   - [ ] Host: `aws.connect.psdb.cloud`
-   - [ ] Username: `_____________`
+   - [ ] Host: `_____________-____________.aivencloud.com`
+   - [ ] Port: `_____________`
+   - [ ] Username: `avnadmin`
    - [ ] Password: `_____________`
-   - [ ] Database: `pinaka-db`
+   - [ ] Database: `defaultdb`
 
 ---
 
@@ -48,9 +49,9 @@
    - [ ] Plan: Free
 
 ### Environment Variables to Add:
-- [ ] `DATABASE_URL` = `jdbc:mysql://aws.connect.psdb.cloud/pinaka-db?sslMode=VERIFY_IDENTITY`
-- [ ] `DATABASE_USERNAME` = `[your-planetscale-username]`
-- [ ] `DATABASE_PASSWORD` = `[your-planetscale-password]`
+- [ ] `DATABASE_URL` = `jdbc:mysql://[service-name]-[project].aivencloud.com:[port]/defaultdb?sslMode=REQUIRE`
+- [ ] `DATABASE_USERNAME` = `avnadmin`
+- [ ] `DATABASE_PASSWORD` = `[your-aiven-password]`
 - [ ] `JWT_SECRET` = `[generate-strong-256-bit-secret]`
 - [ ] `SERVER_PORT` = `10000`
 - [ ] `HIBERNATE_DDL_AUTO` = `update`

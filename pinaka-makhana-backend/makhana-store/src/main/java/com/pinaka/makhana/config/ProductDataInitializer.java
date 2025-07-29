@@ -107,7 +107,7 @@ public class ProductDataInitializer implements CommandLineRunner {
         
         product.setMetaTitle("Pinaka Peri Peri Makhana - Spicy Healthy Snack | 100g");
         product.setMetaDescription("Buy premium Peri Peri Makhana online. Healthy, spicy, and crunchy fox nuts perfect for snacking. Free delivery across India.");
-        product.setVariants(Arrays.asList("100g", "200g", "500g"));
+        // product.setVariants(Arrays.asList("100g", "200g", "500g"));
         product.setMinOrderQuantity(1);
         product.setShippingWeight(0.12);
         product.setDimensions("15x10x5");
@@ -149,7 +149,7 @@ public class ProductDataInitializer implements CommandLineRunner {
         
         product.setMetaTitle("Pinaka Cheese Makhana - Creamy Healthy Snack | 100g");
         product.setMetaDescription("Delicious cheese flavored makhana made from premium fox nuts. Perfect healthy snack for kids and adults. Order online now!");
-        product.setVariants(Arrays.asList("100g", "200g", "500g"));
+        // product.setVariants(Arrays.asList("100g", "200g", "500g"));
         product.setMinOrderQuantity(1);
         product.setShippingWeight(0.12);
         product.setDimensions("15x10x5");
@@ -191,7 +191,7 @@ public class ProductDataInitializer implements CommandLineRunner {
         
         product.setMetaTitle("Pinaka Puddina Makhana - Mint Flavored Healthy Snack | 100g");
         product.setMetaDescription("Fresh mint flavored makhana made from premium fox nuts. Refreshing and healthy snack perfect for any time. Buy online!");
-        product.setVariants(Arrays.asList("100g", "200g", "500g"));
+        // product.setVariants(Arrays.asList("100g", "200g", "500g"));
         product.setMinOrderQuantity(1);
         product.setShippingWeight(0.12);
         product.setDimensions("15x10x5");
@@ -233,7 +233,7 @@ public class ProductDataInitializer implements CommandLineRunner {
         
         product.setMetaTitle("Pinaka Classic Salted Makhana - Premium Fox Nuts | 100g");
         product.setMetaDescription("Premium quality classic salted makhana. Healthy, crunchy, and delicious fox nuts perfect for guilt-free snacking. Order now!");
-        product.setVariants(Arrays.asList("100g", "200g", "500g", "1kg"));
+        // product.setVariants(Arrays.asList("100g", "200g", "500g", "1kg"));
         product.setMinOrderQuantity(1);
         product.setShippingWeight(0.12);
         product.setDimensions("15x10x5");

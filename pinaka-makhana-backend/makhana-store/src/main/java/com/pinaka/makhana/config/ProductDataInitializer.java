@@ -29,9 +29,7 @@ public class ProductDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Temporarily disabled for initial deployment
-        // initializeProductsIfEmpty();
-        System.out.println("🚀 ProductDataInitializer: Skipping product initialization for initial deployment");
+        initializeProductsIfEmpty();
     }
 
     private void initializeProductsIfEmpty() {
@@ -84,10 +82,10 @@ public class ProductDataInitializer implements CommandLineRunner {
         product.setPrice(299.0);
         product.setOriginalPrice(349.0);
         product.setImageUrl("https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=500");
-        product.setAdditionalImages(Arrays.asList(
-            "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=500",
-            "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500"
-        ));
+        // product.setAdditionalImages(Arrays.asList(
+        //     "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=500",
+        //     "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500"
+        // ));
         product.setRating(4.5);
         product.setReviewCount(127);
         product.setAvailable(true);
@@ -95,7 +93,7 @@ public class ProductDataInitializer implements CommandLineRunner {
         product.setWeight("100g");
         product.setSku("PM-PP-100");
         product.setCategory(ProductCategory.FLAVORED_MAKHANA);
-        product.setTags(Arrays.asList("spicy", "peri peri", "healthy", "crunchy", "premium"));
+        // product.setTags(Arrays.asList("spicy", "peri peri", "healthy", "crunchy", "premium"));
         product.setPremium(true);
         product.setFeatured(true);
         product.setNewArrival(false);
@@ -126,10 +124,10 @@ public class ProductDataInitializer implements CommandLineRunner {
         product.setPrice(279.0);
         product.setOriginalPrice(329.0);
         product.setImageUrl("https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500");
-        product.setAdditionalImages(Arrays.asList(
-            "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500",
-            "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=500"
-        ));
+        // product.setAdditionalImages(Arrays.asList(
+        //     "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500",
+        //     "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=500"
+        // ));
         product.setRating(4.3);
         product.setReviewCount(89);
         product.setAvailable(true);
@@ -137,7 +135,7 @@ public class ProductDataInitializer implements CommandLineRunner {
         product.setWeight("100g");
         product.setSku("PM-CH-100");
         product.setCategory(ProductCategory.FLAVORED_MAKHANA);
-        product.setTags(Arrays.asList("cheese", "creamy", "healthy", "premium", "kids-favorite"));
+        // product.setTags(Arrays.asList("cheese", "creamy", "healthy", "premium", "kids-favorite"));
         product.setPremium(true);
         product.setFeatured(false);
         product.setNewArrival(true);
@@ -168,10 +166,10 @@ public class ProductDataInitializer implements CommandLineRunner {
         product.setPrice(289.0);
         product.setOriginalPrice(339.0);
         product.setImageUrl("https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500");
-        product.setAdditionalImages(Arrays.asList(
-            "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500",
-            "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500"
-        ));
+        // product.setAdditionalImages(Arrays.asList(
+        //     "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500",
+        //     "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500"
+        // ));
         product.setRating(4.4);
         product.setReviewCount(76);
         product.setAvailable(true);
@@ -179,7 +177,7 @@ public class ProductDataInitializer implements CommandLineRunner {
         product.setWeight("100g");
         product.setSku("PM-PD-100");
         product.setCategory(ProductCategory.FLAVORED_MAKHANA);
-        product.setTags(Arrays.asList("mint", "puddina", "refreshing", "healthy", "natural"));
+        // product.setTags(Arrays.asList("mint", "puddina", "refreshing", "healthy", "natural"));
         product.setPremium(false);
         product.setFeatured(true);
         product.setNewArrival(true);
@@ -210,10 +208,10 @@ public class ProductDataInitializer implements CommandLineRunner {
         product.setPrice(249.0);
         product.setOriginalPrice(299.0);
         product.setImageUrl("https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=500");
-        product.setAdditionalImages(Arrays.asList(
-            "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=500",
-            "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500"
-        ));
+        // product.setAdditionalImages(Arrays.asList(
+        //     "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=500",
+        //     "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500"
+        // ));
         product.setRating(4.6);
         product.setReviewCount(203);
         product.setAvailable(true);
@@ -221,7 +219,7 @@ public class ProductDataInitializer implements CommandLineRunner {
         product.setWeight("100g");
         product.setSku("PM-CS-100");
         product.setCategory(ProductCategory.ROASTED_MAKHANA);
-        product.setTags(Arrays.asList("classic", "salted", "healthy", "natural", "bestseller"));
+        // product.setTags(Arrays.asList("classic", "salted", "healthy", "natural", "bestseller"));
         product.setPremium(false);
         product.setFeatured(true);
         product.setNewArrival(false);

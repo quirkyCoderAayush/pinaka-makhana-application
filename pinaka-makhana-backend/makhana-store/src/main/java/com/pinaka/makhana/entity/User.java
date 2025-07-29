@@ -10,9 +10,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,20 +46,8 @@ public class User {
 	// Account metadata
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
+	@Builder.Default
 	private boolean active = true;
-
-	// Default constructor (required by JPA)
-	public User() {
-	}
-
-	// All-args constructor
-	public User(Long id, String name, String email, String password, String role) {
-		this.id = id;
-		this.name = name;
-		this.email = email;
-		this.password = password;
-		this.role = role;
-	}
 
 	// Lifecycle methods
 	@PrePersist

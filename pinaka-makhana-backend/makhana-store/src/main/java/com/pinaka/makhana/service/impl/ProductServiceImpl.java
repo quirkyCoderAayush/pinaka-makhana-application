@@ -2,6 +2,8 @@ package com.pinaka.makhana.service.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.pinaka.makhana.dto.ProductDTO;
@@ -11,6 +13,8 @@ import com.pinaka.makhana.service.ProductService;
 
 @Service
 public class ProductServiceImpl implements ProductService {
+
+	private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
 	private final ProductRepository productRepository;
 
@@ -30,6 +34,9 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public Product createProduct(ProductDTO dto) {
+		logger.info("🔄 Creating new product: {}", dto.getName());
+		logger.debug("📝 Product DTO: {}", dto);
+
 		// Validate required fields
 		validateProductDTO(dto);
 
@@ -37,7 +44,20 @@ public class ProductServiceImpl implements ProductService {
 		Product product = new Product();
 		mapDTOToProduct(dto, product);
 
-		return productRepository.save(product);
+		// Log image URL length before saving
+		if (product.getImageUrl() != null) {
+			logger.info("🖼️ Image URL length: {} characters", product.getImageUrl().length());
+			logger.debug("🔗 Image URL: {}", product.getImageUrl());
+		}
+
+		try {
+			Product savedProduct = productRepository.save(product);
+			logger.info("✅ Product created successfully with ID: {}", savedProduct.getId());
+			return savedProduct;
+		} catch (Exception e) {
+			logger.error("❌ Failed to create product: {}", e.getMessage(), e);
+			throw e;
+		}
 	}
 
 	// Helper method to validate ProductDTO

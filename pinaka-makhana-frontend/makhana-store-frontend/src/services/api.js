@@ -19,13 +19,9 @@ class ApiService {
     };
 
     try {
-      console.log(`Making ${config.method || 'GET'} request to: ${url}`);
-      console.log('Request headers:', config.headers);
-
       const response = await fetch(url, config);
 
       if (!response.ok) {
-        console.error(`Request failed with status: ${response.status}`);
         const errorData = await response.json().catch(() => ({
           message: `HTTP ${response.status}: ${response.statusText}`
         }));
@@ -34,7 +30,6 @@ class ApiService {
 
       return await response.json();
     } catch (error) {
-      console.error('API request failed:', error);
       throw error;
     }
   }
@@ -56,7 +51,8 @@ class ApiService {
 
   // Product APIs
   async getProducts() {
-    return this.request('/products');
+    const products = await this.request('/products');
+    return products;
   }
 
   async getProduct(id) {
@@ -165,15 +161,18 @@ class ApiService {
 
   async addProduct(productData) {
     try {
-      console.log('Adding product with data:', productData);
+
+
       const result = await this.request('/products', {
         method: 'POST',
         body: JSON.stringify(productData),
       });
-      console.log('Product added successfully:', result);
+
+
+
       return result;
     } catch (error) {
-      console.error('Failed to add product:', error);
+
       if (error.message.includes('403') || error.message.includes('Forbidden')) {
         throw new Error('Access denied. Please ensure you are logged in as an admin.');
       }
@@ -182,10 +181,28 @@ class ApiService {
   }
 
   async updateProduct(productId, productData) {
-    return this.request(`/products/${productId}`, {
-      method: 'PUT',
-      body: JSON.stringify(productData),
-    });
+    try {
+      console.log('🔄 API: Updating product with ID:', productId);
+      console.log('📝 API: Update data:', productData);
+      console.log('🖼️ API: Image URL being sent:', productData.imageUrl);
+      console.log('📏 API: Image URL length:', productData.imageUrl ? productData.imageUrl.length : 'null');
+
+      const result = await this.request(`/products/${productId}`, {
+        method: 'PUT',
+        body: JSON.stringify(productData),
+      });
+
+      console.log('✅ API: Product updated successfully:', result);
+      console.log('🔗 API: Returned image URL:', result.imageUrl);
+
+      return result;
+    } catch (error) {
+      console.error('❌ API: Failed to update product:', error);
+      if (error.message.includes('403') || error.message.includes('Forbidden')) {
+        throw new Error('Access denied. Please ensure you are logged in as an admin.');
+      }
+      throw error;
+    }
   }
 
   async deleteProduct(productId) {

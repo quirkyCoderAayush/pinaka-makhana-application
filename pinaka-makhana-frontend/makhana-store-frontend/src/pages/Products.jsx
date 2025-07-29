@@ -127,15 +127,12 @@ const Products = () => {
       const backendProducts = await apiService.getProducts();
       
       if (backendProducts && backendProducts.length > 0) {
-        // Map backend products with local images
-        const productsWithImages = backendProducts.map((product, index) => {
-          const localImages = [pack1, pack2, pack3, pack4];
-          return {
-            ...product,
-            imageUrl: localImages[index] || pack1 // Use local images as fallback
-          };
+        // Use backend products with their uploaded images (don't override!)
+        console.log('🔄 Products: Using backend products with uploaded images');
+        backendProducts.forEach(product => {
+          console.log(`🔍 Products: Product ID ${product.id}: imageUrl='${product.imageUrl}'`);
         });
-        setProducts(productsWithImages);
+        setProducts(backendProducts);
       } else {
         setProducts([]);
         setError('No products found from backend.');
@@ -668,10 +665,7 @@ const Products = () => {
                     className="w-full"
                   >
                     <ModernProductCard
-                      product={{
-                        ...product,
-                        image: product.imageUrl || product.image
-                      }}
+                      product={product}
                       onAddToCart={(product) => handleAddToCart(product)}
                       onToggleFavorite={(product) => handleToggleFavorite(product)}
                       isFavorite={favorites.includes(product.id)}

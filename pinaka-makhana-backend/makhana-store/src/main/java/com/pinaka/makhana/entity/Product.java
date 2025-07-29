@@ -8,6 +8,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.Lob;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -32,7 +33,9 @@ public class Product {
 	private Double price;
 	
 	private Double originalPrice; // For displaying discounts
-	
+
+	@Lob
+	@Column(name = "image_url")
 	private String imageUrl;
 	
 	@ElementCollection
@@ -66,7 +69,10 @@ public class Product {
 	private Double fiber; // per 100g
 	
 	// SEO fields
+	@Column(name = "meta_title", length = 500)
 	private String metaTitle;
+	@Lob
+	@Column(name = "meta_description")
 	private String metaDescription;
 	
 	private LocalDateTime createdAt;

@@ -5,6 +5,7 @@ import { ShoppingCart, Eye, Star, BarChart2, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import QuantitySelector from './QuantitySelector';
 import FavoriteButton from './FavoriteButton';
+import { getProductImage } from '../utils/productImageMapper';
 
 const ModernProductCard = ({
   product,
@@ -83,7 +84,11 @@ const ModernProductCard = ({
 
           {/* Image with Enhanced Hover Effects */}
           <motion.img
-            src={product.image || product.imageUrl}
+            src={(() => {
+              const imageUrl = getProductImage(product);
+              console.log(`🖼️ ModernProductCard: Product ID ${product.id} using image:`, imageUrl);
+              return imageUrl;
+            })()}
             alt={product.name}
             className="w-full h-full object-contain transition-all duration-500 group-hover:scale-110"
             onLoad={() => setImageLoaded(true)}

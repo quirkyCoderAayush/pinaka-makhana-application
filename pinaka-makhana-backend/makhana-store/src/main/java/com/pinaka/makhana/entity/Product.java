@@ -39,6 +39,7 @@ public class Product {
 	private String imageUrl;
 	
 	@ElementCollection
+	@Column(name = "additional_image")
 	private List<String> additionalImages; // Gallery images
 	
 	private Double rating;
@@ -55,6 +56,7 @@ public class Product {
 	private ProductCategory category;
 	
 	@ElementCollection
+	@Column(name = "tag")
 	private List<String> tags; // For search and filtering
 	
 	private boolean isPremium = false;
@@ -80,6 +82,7 @@ public class Product {
 	
 	// Product variants (size, flavor, etc.)
 	@ElementCollection
+	@Column(name = "variant")
 	private List<String> variants;
 	
 	// Minimum order quantity

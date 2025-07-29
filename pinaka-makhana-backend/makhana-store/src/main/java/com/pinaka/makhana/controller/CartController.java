@@ -19,9 +19,9 @@ import com.pinaka.makhana.entity.CartItem;
 import com.pinaka.makhana.service.CartService;
 import com.pinaka.makhana.util.JwtUtil;
 
-// @RestController
-// @RequestMapping("/api/cart")
-// @CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/api/cart")
+@CrossOrigin(origins = "*")
 public class CartController {
 
 	private final CartService cartService;

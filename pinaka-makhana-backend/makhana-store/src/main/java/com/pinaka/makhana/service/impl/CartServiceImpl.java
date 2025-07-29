@@ -13,7 +13,7 @@ import com.pinaka.makhana.repository.ProductRepository;
 import com.pinaka.makhana.repository.UserRepository;
 import com.pinaka.makhana.service.CartService;
 
-// @Service
+@Service
 public class CartServiceImpl implements CartService {
 
 	private final CartItemRepository cartItemRepository;

@@ -19,9 +19,9 @@ import com.pinaka.makhana.entity.Order;
 import com.pinaka.makhana.service.OrderService;
 import com.pinaka.makhana.util.JwtUtil;
 
-// @RestController
-// @RequestMapping("/api/orders")
-// @CrossOrigin(origins = "*")
+@RestController
+@RequestMapping("/api/orders")
+@CrossOrigin(origins = "*")
 public class OrderController {
 
 	private final OrderService orderService;

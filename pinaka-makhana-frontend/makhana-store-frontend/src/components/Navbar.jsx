@@ -1,4 +1,5 @@
 import { useContext, useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CartContext } from "./context/CartContext";
 import { useAuth } from "./context/AuthContext";
@@ -7,6 +8,7 @@ import { useAdmin } from "./context/AdminContext";
 import { Heart, ShoppingCart, Search, Menu, X, User, Package } from "lucide-react";
 import logo from "../images/logo.png";
 import "../styles/navbar-enhancements.css";
+import "../styles/mobile-menu-debug.css";
 
 function Navbar() {
   const { cartItems } = useContext(CartContext);
@@ -33,20 +35,35 @@ function Navbar() {
     logout();
   };
 
-  // Mobile menu handlers
+  // Mobile menu handlers with comprehensive debugging
   const handleMenuToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsMenuOpen(prev => !prev);
+    console.log('🔍 HAMBURGER CLICKED - Current state:', isMenuOpen);
+    console.log('🔍 Event details:', e.type, e.target);
+    const newState = !isMenuOpen;
+    setIsMenuOpen(newState);
+    console.log('🔍 HAMBURGER - Setting new state to:', newState);
+
+    // Force DOM update verification
+    setTimeout(() => {
+      const menuElement = document.querySelector('.mobile-menu-overlay');
+      console.log('🔍 Menu element after state change:', menuElement);
+      if (menuElement) {
+        console.log('🔍 Menu element styles:', window.getComputedStyle(menuElement));
+      }
+    }, 100);
   };
 
   const handleSearchClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('🔍 SEARCH CLICKED - Opening menu');
     setIsMenuOpen(true);
   };
 
   const handleMenuClose = () => {
+    console.log('🔍 MENU CLOSE - Closing menu');
     setIsMenuOpen(false);
   };
 
@@ -778,6 +795,20 @@ function Navbar() {
           </button>
         </div>
         
+        {/* Debug State Indicator */}
+        <div style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          background: 'red',
+          color: 'white',
+          padding: '5px',
+          zIndex: 10000,
+          fontSize: '12px'
+        }}>
+          Menu State: {isMenuOpen ? 'OPEN' : 'CLOSED'}
+        </div>
+
         {/* Adaptive Mobile Menu - Robust Implementation */}
         {isMenuOpen && (
           <div
@@ -788,14 +819,16 @@ function Navbar() {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(255, 255, 255, 0.98)',
+              backgroundColor: 'rgba(255, 0, 0, 0.9)', // Red background for debugging
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',
               zIndex: 9999,
               overflowY: 'auto',
-              display: 'block'
+              display: 'block',
+              border: '5px solid yellow' // Yellow border for debugging
             }}
             onClick={(e) => {
+              console.log('🔍 Menu overlay clicked');
               // Close menu if clicking on backdrop
               if (e.target === e.currentTarget) {
                 handleMenuClose();
@@ -938,6 +971,99 @@ function Navbar() {
             </div>
           </div>
         )}
+
+        {/* Alternative Portal-based Mobile Menu */}
+        {isMenuOpen && createPortal(
+          <div
+            id="portal-mobile-menu"
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 255, 0, 0.9)', // Green background for debugging
+              zIndex: 99999,
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '80px 20px 20px 20px'
+            }}
+            onClick={(e) => {
+              if (e.target.id === 'portal-mobile-menu') {
+                handleMenuClose();
+              }
+            }}
+          >
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '10px',
+              padding: '20px',
+              maxHeight: '80vh',
+              overflowY: 'auto'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h2 style={{ margin: 0, color: '#333' }}>PORTAL MENU (DEBUG)</h2>
+                <button
+                  onClick={handleMenuClose}
+                  style={{
+                    background: 'red',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    padding: '10px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ✕ Close
+                </button>
+              </div>
+
+              {/* Navigation Links */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <Link to="/" onClick={handleMenuClose} style={{ padding: '15px', backgroundColor: '#f0f0f0', textDecoration: 'none', color: '#333', borderRadius: '5px' }}>
+                  🏠 Home
+                </Link>
+                <Link to="/about" onClick={handleMenuClose} style={{ padding: '15px', backgroundColor: '#f0f0f0', textDecoration: 'none', color: '#333', borderRadius: '5px' }}>
+                  ℹ️ About
+                </Link>
+                <Link to="/products" onClick={handleMenuClose} style={{ padding: '15px', backgroundColor: '#f0f0f0', textDecoration: 'none', color: '#333', borderRadius: '5px' }}>
+                  🛍️ Products
+                </Link>
+                <Link to="/contact" onClick={handleMenuClose} style={{ padding: '15px', backgroundColor: '#f0f0f0', textDecoration: 'none', color: '#333', borderRadius: '5px' }}>
+                  📞 Contact
+                </Link>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+
+        {/* Vanilla CSS Alternative Mobile Menu */}
+        <div className={`mobile-menu-debug ${isMenuOpen ? '' : 'hidden'}`}>
+          <div className="mobile-menu-content">
+            <div className="mobile-menu-header">
+              <h2 className="mobile-menu-title">VANILLA CSS MENU (DEBUG)</h2>
+              <button className="mobile-menu-close" onClick={handleMenuClose}>
+                ✕ Close
+              </button>
+            </div>
+
+            <div className="mobile-menu-links">
+              <Link to="/" className="mobile-menu-link" onClick={handleMenuClose}>
+                🏠 Home
+              </Link>
+              <Link to="/about" className="mobile-menu-link" onClick={handleMenuClose}>
+                ℹ️ About
+              </Link>
+              <Link to="/products" className="mobile-menu-link" onClick={handleMenuClose}>
+                🛍️ Products
+              </Link>
+              <Link to="/contact" className="mobile-menu-link" onClick={handleMenuClose}>
+                📞 Contact
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </nav>
     </>

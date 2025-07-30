@@ -2,6 +2,8 @@ package com.pinaka.makhana.service.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,8 @@ import com.pinaka.makhana.service.CartService;
 
 @Service
 public class CartServiceImpl implements CartService {
+
+	private static final Logger logger = LoggerFactory.getLogger(CartServiceImpl.class);
 
 	private final CartItemRepository cartItemRepository;
 	private final UserRepository userRepository;
@@ -30,16 +34,20 @@ public class CartServiceImpl implements CartService {
 	@Override
 	@Transactional
 	public void addToCart(String email, Long productId, int quantity) {
+		logger.info("🛒 Adding to cart - Email: {}, ProductId: {}, Quantity: {}", email, productId, quantity);
+
 		User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 		Product product = productRepository.findById(productId)
 				.orElseThrow(() -> new RuntimeException("Product not found"));
 
 		CartItem cartItem = cartItemRepository.findByUserAndProduct(user, product).map(existing -> {
-			existing.setQuantity(quantity); // Set to new quantity, don't increment
+			logger.info("📝 Existing cart item found - Old quantity: {}, New quantity: {}", existing.getQuantity(), quantity);
+			existing.setQuantity(quantity); // Set to new quantity (replace behavior)
 			return existing;
 		}).orElse(new CartItem(user, product, quantity));
 
-		cartItemRepository.save(cartItem);
+		CartItem savedItem = cartItemRepository.save(cartItem);
+		logger.info("✅ Cart item saved - ID: {}, Quantity: {}", savedItem.getId(), savedItem.getQuantity());
 	}
 
 	@Override
@@ -72,8 +80,16 @@ public class CartServiceImpl implements CartService {
 
 	@Override
 	public List<CartItem> getUserCart(String email) {
+		logger.info("📦 Getting cart for user: {}", email);
 		User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-		return cartItemRepository.findByUser(user);
+		List<CartItem> cartItems = cartItemRepository.findByUser(user);
+		logger.info("📊 Found {} cart items for user {}", cartItems.size(), email);
+
+		for (CartItem item : cartItems) {
+			logger.info("🔍 Cart item - Product: {}, Quantity: {}", item.getProduct().getName(), item.getQuantity());
+		}
+
+		return cartItems;
 	}
 
 }

@@ -138,6 +138,16 @@ const Cart = () => {
                   {cartItems.map((item, index) => {
                     const product = item.product || item;
                     const quantity = item.quantity || 1;
+
+                    // Debug logging
+                    console.log('🔍 Cart item debug:', {
+                      itemId: item.id,
+                      productName: product.name,
+                      rawQuantity: item.quantity,
+                      finalQuantity: quantity,
+                      fullItem: item
+                    });
+
                     return (
                       <div
                         key={product.id || index}

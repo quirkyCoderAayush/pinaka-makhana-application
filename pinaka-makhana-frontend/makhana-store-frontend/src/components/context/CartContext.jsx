@@ -26,6 +26,20 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true);
       const cartData = await ApiService.getCart();
+      console.log('🛒 Cart data loaded from backend:', cartData);
+
+      // Debug each cart item
+      if (cartData && cartData.length > 0) {
+        cartData.forEach((item, index) => {
+          console.log(`📦 Cart item ${index}:`, {
+            id: item.id,
+            productName: item.product?.name,
+            quantity: item.quantity,
+            fullItem: item
+          });
+        });
+      }
+
       setCartItems(cartData || []);
     } catch (error) {
       console.error('Failed to load cart:', error);

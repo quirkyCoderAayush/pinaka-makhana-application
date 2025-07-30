@@ -33,20 +33,25 @@ function Navbar() {
     logout();
   };
 
-  // Mobile menu handlers
+  // Mobile menu handlers with debugging
   const handleMenuToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsMenuOpen(prev => !prev);
+    console.log('🔍 HAMBURGER CLICKED - Current state:', isMenuOpen);
+    const newState = !isMenuOpen;
+    setIsMenuOpen(newState);
+    console.log('🔍 HAMBURGER - New state will be:', newState);
   };
 
   const handleSearchClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('🔍 SEARCH CLICKED - Opening menu');
     setIsMenuOpen(true);
   };
 
   const handleMenuClose = () => {
+    console.log('🔍 MENU CLOSE - Closing menu');
     setIsMenuOpen(false);
   };
 
@@ -765,10 +770,22 @@ function Navbar() {
           </button>
         </div>
         
-        {/* Adaptive Mobile Menu */}
+        {/* Adaptive Mobile Menu - Alternative Implementation */}
         {isMenuOpen && (
           <div
-            className="lg:hidden fixed top-20 left-0 right-0 bottom-0 backdrop-blur-lg shadow-xl bg-white/98 border-t border-gray-200/50 z-[60] overflow-y-auto"
+            className="mobile-menu-overlay"
+            style={{
+              position: 'fixed',
+              top: '80px',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(255, 255, 255, 0.98)',
+              backdropFilter: 'blur(10px)',
+              zIndex: 9999,
+              overflowY: 'auto',
+              display: window.innerWidth < 1024 ? 'block' : 'none'
+            }}
             onClick={(e) => {
               // Close menu if clicking on backdrop
               if (e.target === e.currentTarget) {
@@ -776,6 +793,11 @@ function Navbar() {
               }
             }}
           >
+            {/* Debug indicator - temporary */}
+            <div className="bg-red-500 text-white p-4 text-center font-bold text-lg">
+              🔍 MOBILE MENU IS OPEN - DEBUG MODE
+            </div>
+
             <div className="px-4 py-4 space-y-4">
               {/* Mobile Menu Header with Close Button */}
               <div className="flex justify-between items-center pb-2 border-b border-gray-200">

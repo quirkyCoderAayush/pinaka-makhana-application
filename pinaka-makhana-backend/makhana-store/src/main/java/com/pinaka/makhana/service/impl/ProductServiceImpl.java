@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.pinaka.makhana.dto.ProductDTO;
 import com.pinaka.makhana.entity.Product;
@@ -33,6 +34,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Transactional
 	public Product createProduct(ProductDTO dto) {
 		logger.info("🔄 Creating new product: {}", dto.getName());
 		logger.debug("📝 Product DTO: {}", dto);
@@ -123,6 +125,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Transactional
 	public Product updateProduct(Long id, ProductDTO dto) {
 		// Validate required fields
 		validateProductDTO(dto);
@@ -136,6 +139,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteProduct(Long id) {
 		productRepository.deleteById(id);
 	}

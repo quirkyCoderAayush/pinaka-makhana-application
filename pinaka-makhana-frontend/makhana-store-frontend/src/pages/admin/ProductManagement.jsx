@@ -74,119 +74,8 @@ const ProductManagement = () => {
   const loadProducts = async () => {
     try {
       setLoading(true);
-
-      try {
-        const data = await apiService.getProducts();
-        const localUpdates = JSON.parse(localStorage.getItem('productUpdates') || '{}');
-        const localProducts = JSON.parse(localStorage.getItem('localProducts') || '[]');
-
-        const mergedData = data.map(product => {
-          const updates = localUpdates[product.id] || {};
-          return {
-            ...product,
-            ...updates
-          };
-        });
-
-        const allProducts = [...mergedData, ...localProducts];
-        setProducts(allProducts);
-
-      } catch (apiError) {
-        // Fallback data when API is not available
-        const fallbackData = [
-          {
-            id: 1,
-            name: "Premium Peri Peri Makhana",
-            flavor: "Peri Peri",
-            price: 249,
-            originalPrice: 299,
-            description: "Spicy and tangy peri peri flavored makhana with authentic spices.",
-            shortDescription: "Spicy peri peri flavored makhana",
-            imageUrl: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=500",
-            rating: 4.5,
-            reviewCount: 127,
-            available: true,
-            stockQuantity: 150,
-            weight: "100g",
-            sku: "PM-PP-100",
-            category: "FLAVORED_MAKHANA",
-            isPremium: true,
-            isFeatured: true,
-            isNewArrival: false
-          },
-          {
-            id: 2,
-            name: "Cheese Burst Makhana",
-            flavor: "Cheese",
-            price: 199,
-            originalPrice: 249,
-            description: "Creamy cheese flavored makhana that melts in your mouth.",
-            shortDescription: "Creamy cheese flavored makhana",
-            imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500",
-            rating: 4.3,
-            reviewCount: 89,
-            available: true,
-            stockQuantity: 120,
-            weight: "100g",
-            sku: "PM-CH-100",
-            category: "FLAVORED_MAKHANA",
-            isPremium: true,
-            isFeatured: false,
-            isNewArrival: true
-          },
-          {
-            id: 3,
-            name: "Pudina Fresh Makhana",
-            flavor: "Mint",
-            price: 179,
-            originalPrice: 219,
-            description: "Refreshing mint flavored makhana with natural pudina extract.",
-            shortDescription: "Refreshing mint flavored makhana",
-            imageUrl: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500",
-            rating: 4.4,
-            reviewCount: 76,
-            available: true,
-            stockQuantity: 100,
-            weight: "100g",
-            sku: "PM-PD-100",
-            category: "FLAVORED_MAKHANA",
-            isPremium: false,
-            isFeatured: true,
-            isNewArrival: true
-          },
-          {
-            id: 4,
-            name: "Classic Salted Makhana",
-            flavor: "Salted",
-            price: 149,
-            originalPrice: 179,
-            description: "Traditional roasted makhana with perfect salt seasoning.",
-            shortDescription: "Traditional salted makhana",
-            imageUrl: "https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=500",
-            rating: 4.6,
-            reviewCount: 203,
-            available: true,
-            stockQuantity: 200,
-            weight: "100g",
-            sku: "PM-CS-100",
-            category: "ROASTED_MAKHANA",
-            isPremium: false,
-            isFeatured: true,
-            isNewArrival: false
-          }
-        ];
-
-        const localUpdates = JSON.parse(localStorage.getItem('productUpdates') || '{}');
-        const localProducts = JSON.parse(localStorage.getItem('localProducts') || '[]');
-
-        const mergedFallbackData = fallbackData.map(product => ({
-          ...product,
-          ...(localUpdates[product.id] || {})
-        }));
-
-        const allFallbackProducts = [...mergedFallbackData, ...localProducts];
-        setProducts(allFallbackProducts);
-      }
+      const data = await apiService.getProducts();
+      setProducts(data);
 
     } catch (error) {
       showError('Failed to load products. Please check your connection and try again.');
@@ -403,36 +292,15 @@ const ProductManagement = () => {
       };
 
       if (editingProduct) {
-        try {
-          await apiService.updateProduct(editingProduct.id, productData);
-          showSuccess('Product updated successfully!');
-        } catch (apiError) {
-          const localUpdates = JSON.parse(localStorage.getItem('productUpdates') || '{}');
-          localUpdates[editingProduct.id] = productData;
-          localStorage.setItem('productUpdates', JSON.stringify(localUpdates));
-          showSuccess('Product updated successfully! (Saved locally)');
-        }
+        await apiService.updateProduct(editingProduct.id, productData);
+        showSuccess('Product updated successfully!');
+        // Real-time update: reload products immediately
+        await loadProducts();
       } else {
-        try {
-          const result = await apiService.addProduct(productData);
-          showSuccess('Product added successfully!');
-        } catch (apiError) {
-          const newProductId = Date.now();
-          const newProduct = {
-            ...productData,
-            id: newProductId,
-            rating: productData.rating || 5.0,
-            reviewCount: productData.reviewCount || 0,
-            available: productData.available !== undefined ? productData.available : true
-          };
-
-          const localProducts = JSON.parse(localStorage.getItem('localProducts') || '[]');
-          localProducts.push(newProduct);
-          localStorage.setItem('localProducts', JSON.stringify(localProducts));
-
-          showSuccess('Product added successfully! (Saved locally)');
-          await loadProducts();
-        }
+        await apiService.addProduct(productData);
+        showSuccess('Product added successfully!');
+        // Real-time update: reload products immediately
+        await loadProducts();
       }
 
       resetForm();

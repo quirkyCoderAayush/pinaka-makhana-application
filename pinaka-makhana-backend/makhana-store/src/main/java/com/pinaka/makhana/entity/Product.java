@@ -35,7 +35,7 @@ public class Product {
 	private Double originalPrice; // For displaying discounts
 
 	@Lob
-	@Column(name = "image_url")
+	@Column(name = "image_url", columnDefinition = "LONGTEXT")
 	private String imageUrl;
 	
 	// @ElementCollection

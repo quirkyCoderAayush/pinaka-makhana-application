@@ -39,9 +39,9 @@ const ProductManagement = () => {
   const [imagePreview, setImagePreview] = useState('');
   const [uploadMethod, setUploadMethod] = useState('url');
   const [compressionSettings, setCompressionSettings] = useState({
-    maxWidth: 800,
-    maxHeight: 600,
-    quality: 0.85,
+    maxWidth: 600,
+    maxHeight: 400,
+    quality: 0.7,
     enabled: true
   });
 
@@ -216,7 +216,8 @@ const ProductManagement = () => {
         formData.append('file', processedBlob, file.name);
 
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8081/api/upload/image', {
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://pinaka-makhana-backend.onrender.com/api';
+        const response = await fetch(`${API_BASE_URL}/upload/image`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`

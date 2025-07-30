@@ -58,7 +58,10 @@ public class ProductServiceImpl implements ProductService {
 			return savedProduct;
 		} catch (Exception e) {
 			logger.error("❌ Failed to create product: {}", e.getMessage(), e);
-			throw e;
+			if (e.getMessage() != null && e.getMessage().contains("Data too long")) {
+				throw new RuntimeException("Image data is too large. Please use a smaller image or reduce quality.");
+			}
+			throw new RuntimeException("Failed to save product: " + e.getMessage());
 		}
 	}
 
@@ -135,7 +138,17 @@ public class ProductServiceImpl implements ProductService {
 		// Update all fields using the helper method
 		mapDTOToProduct(dto, product);
 
-		return productRepository.save(product);
+		try {
+			Product savedProduct = productRepository.save(product);
+			logger.info("✅ Product updated successfully with ID: {}", savedProduct.getId());
+			return savedProduct;
+		} catch (Exception e) {
+			logger.error("❌ Failed to update product: {}", e.getMessage(), e);
+			if (e.getMessage() != null && e.getMessage().contains("Data too long")) {
+				throw new RuntimeException("Image data is too large. Please use a smaller image or reduce quality.");
+			}
+			throw new RuntimeException("Failed to update product: " + e.getMessage());
+		}
 	}
 
 	@Override

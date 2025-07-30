@@ -137,16 +137,8 @@ const Cart = () => {
                 <div className="divide-y divide-gray-200">
                   {cartItems.map((item, index) => {
                     const product = item.product || item;
-                    const quantity = item.quantity || 1;
-
-                    // Debug logging
-                    console.log('🔍 Cart item debug:', {
-                      itemId: item.id,
-                      productName: product.name,
-                      rawQuantity: item.quantity,
-                      finalQuantity: quantity,
-                      fullItem: item
-                    });
+                    // Fix: Use proper quantity handling - don't default to 1 if quantity is 0
+                    const quantity = typeof item.quantity === 'number' ? item.quantity : 1;
 
                     return (
                       <div

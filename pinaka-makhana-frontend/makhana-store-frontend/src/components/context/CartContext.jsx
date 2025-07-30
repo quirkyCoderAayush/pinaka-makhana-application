@@ -35,7 +35,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const addToCart = async (product) => {
+  const addToCart = async (product, quantity = 1) => {
     if (!isAuthenticated) {
       showInfo('Please login to add items to cart');
       // Redirect to login page after a brief delay for toast to show
@@ -47,12 +47,12 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      console.log('Adding to cart:', product);
-      
-      await ApiService.addToCart(product.id, 1);
+      console.log('Adding to cart:', product, 'Quantity:', quantity);
+
+      await ApiService.addToCart(product.id, quantity);
       await loadCart(); // Reload cart to get updated data
-      
-      showSuccess(`${product.name} added to cart!`);
+
+      showSuccess(`${product.name} (${quantity}) added to cart!`);
       console.log('Item added to cart successfully');
     } catch (error) {
       console.error('Failed to add item to cart:', error);

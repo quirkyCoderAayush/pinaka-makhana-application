@@ -176,10 +176,8 @@ const Products = () => {
     setIsLoading(true);
     setActiveProductId(product.id);
 
-    // Add the specified quantity to cart
-    for (let i = 0; i < quantity; i++) {
-      await addToCart(product);
-    }
+    // Add the specified quantity to cart in one call
+    await addToCart(product, quantity);
 
     // Reset quantity selector for this product
     setQuantities(prev => ({

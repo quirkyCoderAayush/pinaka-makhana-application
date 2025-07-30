@@ -157,18 +157,16 @@ const Home = () => {
     const quantity = quantities[product.id] || 1;
     setIsLoading(true);
     setActiveProductId(product.id);
-    
-    // Add the specified quantity to cart
-    for (let i = 0; i < quantity; i++) {
-      await addToCart(product);
-    }
-    
+
+    // Add the specified quantity to cart in one call
+    await addToCart(product, quantity);
+
     // Reset quantity selector for this product
     setQuantities(prev => ({
       ...prev,
       [product.id]: 1
     }));
-    
+
     setIsLoading(false);
     setActiveProductId(null);
   };

@@ -33,6 +33,26 @@ function Navbar() {
     logout();
   };
 
+  // Mobile menu handlers with debugging
+  const handleMenuToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('🔍 Menu toggle clicked, current state:', isMenuOpen);
+    setIsMenuOpen(prev => !prev);
+  };
+
+  const handleSearchClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('🔍 Search icon clicked, opening menu');
+    setIsMenuOpen(true);
+  };
+
+  const handleMenuClose = () => {
+    console.log('🔍 Closing mobile menu');
+    setIsMenuOpen(false);
+  };
+
   // Handle search functionality
   const handleSearchToggle = () => {
     setIsSearchExpanded(!isSearchExpanded);
@@ -630,8 +650,8 @@ function Navbar() {
           <div className="lg:hidden flex items-center space-x-2">
             {/* Mobile Search Icon */}
             <button
-              onClick={() => setIsMenuOpen(true)}
-              className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-300 active:scale-95 ${
+              onClick={handleSearchClick}
+              className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-300 active:scale-95 cursor-pointer ${
                 isDarkBackground
                   ? 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
                   : 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
@@ -639,9 +659,12 @@ function Navbar() {
               style={{
                 filter: isDarkBackground
                   ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
-                  : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+                  : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))',
+                touchAction: 'manipulation',
+                WebkitTapHighlightColor: 'transparent'
               }}
               aria-label="Open search"
+              type="button"
             >
               <Search className="h-5 w-5 transition-transform duration-200" />
             </button>
@@ -721,8 +744,8 @@ function Navbar() {
 
           {/* Adaptive Mobile Menu Button */}
           <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`lg:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-300 active:scale-95 ${
+            onClick={handleMenuToggle}
+            className={`lg:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-300 active:scale-95 cursor-pointer ${
               isDarkBackground
                 ? 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
                 : 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
@@ -730,9 +753,12 @@ function Navbar() {
             style={{
               filter: isDarkBackground
                 ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
-                : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+                : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))',
+              touchAction: 'manipulation',
+              WebkitTapHighlightColor: 'transparent'
             }}
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            type="button"
           >
             {isMenuOpen ? (
               <X className="w-6 h-6 transition-transform duration-200" />
@@ -744,7 +770,11 @@ function Navbar() {
         
         {/* Adaptive Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden fixed top-full left-0 right-0 bottom-0 backdrop-blur-lg shadow-xl bg-white/98 border-t border-gray-200/50 z-50 overflow-y-auto">
+          <div className="lg:hidden fixed top-20 left-0 right-0 bottom-0 backdrop-blur-lg shadow-xl bg-white/98 border-t border-gray-200/50 z-[60] overflow-y-auto">
+            {/* Debug indicator */}
+            <div className="bg-red-500 text-white text-xs p-2 text-center">
+              🔍 DEBUG: Mobile Menu is Open (State: {isMenuOpen.toString()})
+            </div>
             <div className="px-4 py-4 space-y-4">
               {/* Enhanced Mobile Search */}
               <div className="relative">

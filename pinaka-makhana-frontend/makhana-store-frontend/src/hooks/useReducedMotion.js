@@ -80,48 +80,48 @@ export const getAnimationVariants = (prefersReducedMotion) => {
   return {
     fadeInUp: {
       hidden: {
-        opacity: 1,
-        y: 30,
-        scale: 0.98
+        opacity: 0,
+        y: 40,
+        scale: 0.96
       },
       visible: {
         opacity: 1,
         y: 0,
         scale: 1,
         transition: {
-          duration: 0.6,
+          duration: 0.8,
           ease: [0.25, 0.46, 0.45, 0.94]
         }
       }
     },
     slideInLeft: {
       hidden: {
-        opacity: 1,
-        x: -50,
-        scale: 0.95
+        opacity: 0,
+        x: -60,
+        scale: 0.94
       },
       visible: {
         opacity: 1,
         x: 0,
         scale: 1,
         transition: {
-          duration: 0.8,
+          duration: 1.0,
           ease: [0.25, 0.46, 0.45, 0.94]
         }
       }
     },
     slideInRight: {
       hidden: {
-        opacity: 1,
-        x: 50,
-        scale: 0.95
+        opacity: 0,
+        x: 60,
+        scale: 0.94
       },
       visible: {
         opacity: 1,
         x: 0,
         scale: 1,
         transition: {
-          duration: 0.8,
+          duration: 1.0,
           ease: [0.25, 0.46, 0.45, 0.94]
         }
       }
@@ -147,8 +147,8 @@ export const getAnimationVariants = (prefersReducedMotion) => {
       visible: {
         opacity: 1,
         transition: {
-          staggerChildren: 0.1,
-          delayChildren: 0.2
+          staggerChildren: 0.15,
+          delayChildren: 0.3
         }
       }
     }

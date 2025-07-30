@@ -76,4 +76,11 @@ public class CartServiceImpl implements CartService {
 		return cartItemRepository.findByUser(user);
 	}
 
+	@Override
+	@Transactional
+	public void clearCart(String email) {
+		User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+		cartItemRepository.deleteByUser(user);
+	}
+
 }

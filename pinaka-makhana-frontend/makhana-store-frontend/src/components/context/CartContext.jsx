@@ -92,8 +92,20 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const clearCart = () => {
-    setCartItems([]);
+  const clearCart = async () => {
+    if (!isAuthenticated) return;
+
+    try {
+      setLoading(true);
+      await ApiService.clearCart();
+      setCartItems([]);
+      showSuccess('Cart cleared successfully');
+    } catch (error) {
+      console.error('Failed to clear cart:', error);
+      showError('Failed to clear cart. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const value = {

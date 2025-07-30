@@ -6,12 +6,12 @@ import { useAuth } from "../components/context/AuthContext";
 import { useToast } from "../components/context/ToastContext";
 import { Link, useNavigate } from "react-router-dom";
 import { getProductImage } from "../utils/productImageMapper";
-import { Trash2, ShoppingBag, ArrowLeft, ShoppingCart, Tag, Heart } from "lucide-react";
+import { Trash2, ShoppingBag, ArrowLeft, ShoppingCart, Tag, Heart, AlertTriangle } from "lucide-react";
 import apiService from "../services/api";
 import QuantitySelector from "../components/QuantitySelector";
 
 const Cart = () => {
-  const { cartItems, removeFromCart, loading, updateCartItem } = useContext(CartContext);
+  const { cartItems, removeFromCart, loading, updateCartItem, clearCart } = useContext(CartContext);
   const { addToFavorites, isFavorite } = useFavorites();
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
@@ -19,6 +19,7 @@ const Cart = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [availableCoupons, setAvailableCoupons] = useState([]);
   const [loadingCoupons, setLoadingCoupons] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   
   // Fetch available coupons
   useEffect(() => {
@@ -73,6 +74,16 @@ const Cart = () => {
     }
   };
 
+  // Handle clearing entire cart
+  const handleClearCart = async () => {
+    try {
+      await clearCart();
+      setShowClearConfirm(false);
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-6xl">
@@ -90,13 +101,25 @@ const Cart = () => {
             </div>
           </div>
 
-          <Link
-            to="/products"
-            className="inline-flex items-center gap-2 text-red-600 hover:text-red-700 font-medium bg-white px-4 py-2 rounded-lg border border-gray-200 hover:border-red-300 transition-colors duration-200"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Continue Shopping</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            {cartItems.length > 0 && (
+              <button
+                onClick={() => setShowClearConfirm(true)}
+                disabled={loading}
+                className="inline-flex items-center gap-2 text-gray-600 hover:text-red-600 font-medium bg-white px-4 py-2 rounded-lg border border-gray-200 hover:border-red-300 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Clear Cart</span>
+              </button>
+            )}
+            <Link
+              to="/products"
+              className="inline-flex items-center gap-2 text-red-600 hover:text-red-700 font-medium bg-white px-4 py-2 rounded-lg border border-gray-200 hover:border-red-300 transition-colors duration-200"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Continue Shopping</span>
+            </Link>
+          </div>
         </div>
         
         {cartItems.length === 0 ? (
@@ -143,44 +166,58 @@ const Cart = () => {
                     return (
                       <div
                         key={product.id || index}
-                        className="py-4 px-6 flex items-center gap-4 hover:bg-gray-50 transition-colors duration-200"
+                        className="py-4 px-3 sm:px-6 hover:bg-gray-50 transition-colors duration-200"
                       >
-                        <div className="flex-shrink-0">
-                          <Link to={`/product/${product.id}`}>
-                            <img
-                              className="h-16 w-16 rounded-lg object-cover border border-gray-200 hover:border-red-300 transition-colors duration-200 cursor-pointer"
-                              src={getProductImage(product)}
-                              alt={product.name}
-                            />
-                          </Link>
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="flex-1 pr-4">
+                        {/* Mobile-first responsive layout */}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                          {/* Product Image and Basic Info */}
+                          <div className="flex items-start gap-3 sm:gap-4">
+                            <div className="flex-shrink-0">
                               <Link to={`/product/${product.id}`}>
-                                <h4 className="text-base font-semibold text-gray-900 hover:text-red-600 transition-colors duration-200 line-clamp-1 cursor-pointer">
+                                <img
+                                  className="h-16 w-16 sm:h-16 sm:w-16 rounded-lg object-cover border border-gray-200 hover:border-red-300 transition-colors duration-200 cursor-pointer"
+                                  src={getProductImage(product)}
+                                  alt={product.name}
+                                />
+                              </Link>
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <Link to={`/product/${product.id}`}>
+                                <h4 className="text-sm sm:text-base font-semibold text-gray-900 hover:text-red-600 transition-colors duration-200 line-clamp-2 cursor-pointer">
                                   {product.name}
                                 </h4>
                               </Link>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="text-sm text-gray-500">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mt-1">
+                                <span className="text-xs sm:text-sm text-gray-500">
                                   {product.weight || "30g"}
                                 </span>
-                                <span className="text-sm font-medium text-red-600">
+                                <span className="text-xs sm:text-sm font-medium text-red-600">
                                   ₹{formatPrice(product.price)} each
                                 </span>
                               </div>
                             </div>
-                            <div className="text-right">
+
+                            {/* Price - Desktop */}
+                            <div className="hidden sm:block text-right">
                               <div className="text-lg font-bold text-red-600">
                                 ₹{formatPrice(product.price * quantity)}
                               </div>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
+                          {/* Mobile Price */}
+                          <div className="sm:hidden flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Total:</span>
+                            <div className="text-lg font-bold text-red-600">
+                              ₹{formatPrice(product.price * quantity)}
+                            </div>
+                          </div>
+
+                          {/* Quantity and Actions */}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 w-full sm:w-auto">
+                            {/* Quantity Selector */}
+                            <div className="flex items-center space-x-2 sm:space-x-3">
                               <span className="text-sm text-gray-700">Qty:</span>
                               <QuantitySelector
                                 quantity={quantity}
@@ -193,26 +230,28 @@ const Cart = () => {
                               />
                             </div>
 
-                            <div className="flex items-center space-x-2">
+                            {/* Action Buttons - Mobile Optimized */}
+                            <div className="flex items-center justify-end space-x-1 sm:space-x-2">
                               {/* Save to Wishlist Button */}
                               <button
                                 onClick={() => handleSaveForLater(product)}
                                 disabled={loading}
-                                className="flex items-center space-x-1 text-gray-500 hover:text-red-600 px-3 py-1 rounded-md hover:bg-red-50 transition-colors duration-200"
+                                className="flex items-center justify-center min-w-[44px] h-[44px] sm:min-w-auto sm:h-auto sm:px-3 sm:py-1 text-gray-500 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors duration-200"
                                 title="Save to wishlist"
                               >
                                 <Heart className="h-4 w-4" />
-                                <span className="text-sm hidden sm:inline">Save</span>
+                                <span className="text-sm hidden sm:inline ml-1">Save</span>
                               </button>
 
                               {/* Remove Button */}
                               <button
                                 onClick={() => removeFromCart(product.id)}
                                 disabled={loading}
-                                className="flex items-center space-x-1 text-gray-500 hover:text-red-600 px-3 py-1 rounded-md hover:bg-red-50 transition-colors duration-200"
+                                className="flex items-center justify-center min-w-[44px] h-[44px] sm:min-w-auto sm:h-auto sm:px-3 sm:py-1 text-gray-500 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors duration-200"
+                                title="Remove from cart"
                               >
                                 <Trash2 className="h-4 w-4" />
-                                <span className="text-sm">Remove</span>
+                                <span className="text-sm hidden sm:inline ml-1">Remove</span>
                               </button>
                             </div>
                           </div>
@@ -304,6 +343,43 @@ const Cart = () => {
                       <span>Proceed to Checkout</span>
                     </>
                   )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Clear Cart Confirmation Dialog */}
+        {showClearConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="flex-shrink-0">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Clear Cart</h3>
+                  <p className="text-sm text-gray-600">This action cannot be undone</p>
+                </div>
+              </div>
+
+              <p className="text-gray-700 mb-6">
+                Are you sure you want to remove all {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'} from your cart?
+              </p>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowClearConfirm(false)}
+                  className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleClearCart}
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Clearing...' : 'Clear Cart'}
                 </button>
               </div>
             </div>

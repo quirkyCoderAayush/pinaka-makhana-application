@@ -75,6 +75,16 @@ public class CartController {
 		return ResponseEntity.ok(cartItems);
 	}
 
+	// 🗑️ Clear entire cart
+	@DeleteMapping("/clear")
+	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	public ResponseEntity<String> clearCart(@RequestHeader("Authorization") String authHeader) {
+
+		String email = extractEmail(authHeader);
+		cartService.clearCart(email);
+		return ResponseEntity.ok("Cart cleared successfully");
+	}
+
 	// 🔐 Utility method to extract email from token
 	private String extractEmail(String authHeader) {
 		String token = authHeader.replace("Bearer ", "");

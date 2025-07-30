@@ -113,7 +113,7 @@ class ApiService {
   async removeFromCart(productId) {
     const url = `${this.baseURL}/cart/remove/${productId}`;
     const token = localStorage.getItem('token');
-    
+
     const response = await fetch(url, {
       method: 'DELETE',
       headers: {
@@ -121,11 +121,30 @@ class ApiService {
         ...(token && { Authorization: `Bearer ${token}` }),
       },
     });
-    
+
     if (!response.ok) {
       throw new Error(`Failed to remove item from cart: ${response.status}`);
     }
-    
+
+    return await response.text(); // Backend returns text, not JSON
+  }
+
+  async clearCart() {
+    const url = `${this.baseURL}/cart/clear`;
+    const token = localStorage.getItem('token');
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to clear cart: ${response.status}`);
+    }
+
     return await response.text(); // Backend returns text, not JSON
   }
 

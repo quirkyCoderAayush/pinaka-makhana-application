@@ -4,7 +4,7 @@ import { CartContext } from "./context/CartContext";
 import { useAuth } from "./context/AuthContext";
 import { useFavorites } from "./context/FavoritesContext";
 import { useAdmin } from "./context/AdminContext";
-import { Heart, ShoppingCart, Search, Menu, X } from "lucide-react";
+import { Heart, ShoppingCart, Search, Menu, X, User, Package } from "lucide-react";
 import logo from "../images/logo.png";
 import "../styles/navbar-enhancements.css";
 
@@ -292,7 +292,9 @@ function Navbar() {
                 alt="Pinaka Makhana"
                 className="h-16 w-auto transition-all duration-300 group-hover:scale-105"
                 style={{
-                  filter: 'brightness(1.1) contrast(1.2) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.2))',
+                  filter: isDarkBackground
+                    ? 'brightness(1.3) contrast(1.4) saturate(1.2) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))'
+                    : 'brightness(1.4) contrast(1.5) saturate(1.3) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 16px rgba(255, 255, 255, 0.4))',
                   transition: 'all 0.3s ease-in-out'
                 }}
               />
@@ -609,7 +611,78 @@ function Navbar() {
               </div>
             )}
           </div>
-          
+
+          {/* Mobile Icons - Between Logo and Hamburger */}
+          <div className="lg:hidden flex items-center space-x-2">
+            {/* Mobile Search Icon */}
+            <button
+              onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+              className={`p-2 transition-colors duration-300 ${
+                isDarkBackground
+                  ? 'text-white hover:text-red-300'
+                  : 'text-white hover:text-red-300'
+              }`}
+              style={{
+                filter: isDarkBackground
+                  ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+                  : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+              }}
+              aria-label="Search"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+
+            {/* Mobile Wishlist Icon */}
+            {isAuthenticated && (
+              <Link
+                to="/wishlist"
+                className={`relative p-2 transition-colors duration-300 ${
+                  isDarkBackground
+                    ? 'text-white hover:text-red-300'
+                    : 'text-white hover:text-red-300'
+                }`}
+                style={{
+                  filter: isDarkBackground
+                    ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+                    : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+                }}
+                aria-label="Wishlist"
+              >
+                <Heart className="h-5 w-5" />
+                {favorites && favorites.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                    {favorites.length}
+                  </span>
+                )}
+              </Link>
+            )}
+
+            {/* Mobile Cart Icon */}
+            {isAuthenticated && (
+              <Link
+                to="/cart"
+                className={`relative p-2 transition-colors duration-300 ${
+                  isDarkBackground
+                    ? 'text-white hover:text-orange-300'
+                    : 'text-white hover:text-orange-300'
+                }`}
+                style={{
+                  filter: isDarkBackground
+                    ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+                    : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+                }}
+                aria-label="Shopping Cart"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                    {cartItems.length}
+                  </span>
+                )}
+              </Link>
+            )}
+          </div>
+
           {/* Adaptive Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -634,11 +707,7 @@ function Navbar() {
         
         {/* Adaptive Mobile Menu */}
         {isMenuOpen && (
-          <div className={`lg:hidden absolute top-full left-0 right-0 backdrop-blur-lg shadow-xl ${
-            isDarkBackground
-              ? 'bg-white/90 border-t border-white/20'
-              : 'bg-gray-800/85 border-t border-gray-700/30'
-          }`}>
+          <div className="lg:hidden absolute top-full left-0 right-0 backdrop-blur-lg shadow-xl bg-white/95 border-t border-gray-200/50 z-50">
             <div className="px-4 py-4 space-y-4">
               {/* Enhanced Mobile Search */}
               <div className="relative">
@@ -677,12 +746,10 @@ function Navbar() {
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`relative flex items-center justify-between px-4 py-3 font-medium transition-all duration-600 ease-in-out group ${
+                  className={`relative flex items-center justify-between px-4 py-3 font-medium transition-all duration-300 ease-in-out group rounded-lg ${
                     isActive(item.path)
-                      ? 'text-red-500'
-                      : isDarkBackground
-                        ? 'text-gray-700 hover:text-red-500'
-                        : 'text-white hover:text-red-500'
+                      ? 'text-red-600 bg-red-50'
+                      : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -713,6 +780,27 @@ function Navbar() {
                         <span className="text-xs text-gray-600">Welcome back!</span>
                       </div>
                     </div>
+
+                    {/* Profile Options */}
+                    <div className="space-y-2">
+                      <Link
+                        to="/profile"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors duration-200"
+                      >
+                        <User className="h-5 w-5" />
+                        <span>My Profile</span>
+                      </Link>
+                      <Link
+                        to="/orders"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors duration-200"
+                      >
+                        <Package className="h-5 w-5" />
+                        <span>My Orders</span>
+                      </Link>
+                    </div>
+
                     <button
                       onClick={handleLogout}
                       className="w-full bg-red-50 hover:bg-red-100 text-red-700 px-4 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2"

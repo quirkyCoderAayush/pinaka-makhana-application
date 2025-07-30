@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { formatPrice } from '../utils/formatPrice';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Eye, Star, BarChart2, Sparkles } from 'lucide-react';
+import { ShoppingCart, Star, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import QuantitySelector from './QuantitySelector';
 import FavoriteButton from './FavoriteButton';
@@ -117,21 +117,7 @@ const ModernProductCard = ({
         }}
         transition={{ duration: 0.2, ease: "easeOut" }}
       >
-        <motion.button
-          className="bg-white/90 backdrop-blur-xl shadow-md border border-white/50 rounded-xl p-2 text-gray-600 hover:text-red-500 hover:bg-red-50/90 transition-all duration-200"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Eye className="w-3.5 h-3.5" />
-        </motion.button>
 
-        <motion.button
-          className="bg-white/90 backdrop-blur-xl shadow-md border border-white/50 rounded-xl p-2 text-gray-600 hover:text-orange-500 hover:bg-orange-50/90 transition-all duration-200"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <BarChart2 className="w-3.5 h-3.5" />
-        </motion.button>
       </motion.div>
 
       {/* Compact Product Details */}

@@ -14,4 +14,6 @@ public interface CartService {
 
 	List<CartItem> getUserCart(String email);
 
+	void clearCart(String email);
+
 }

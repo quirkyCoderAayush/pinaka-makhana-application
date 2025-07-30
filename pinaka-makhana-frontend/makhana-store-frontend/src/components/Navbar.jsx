@@ -912,6 +912,7 @@ function Navbar() {
                         <span>Logout</span>
                       </button>
                     </div>
+                  ) : (
                     <div className="space-y-3">
                       <Link
                         to="/login"

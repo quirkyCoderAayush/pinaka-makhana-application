@@ -5,10 +5,10 @@ import { CartContext } from "./context/CartContext";
 import { useAuth } from "./context/AuthContext";
 import { useFavorites } from "./context/FavoritesContext";
 import { useAdmin } from "./context/AdminContext";
-import { Heart, ShoppingCart, Search, Menu, X, User, Package } from "lucide-react";
+import { Heart, ShoppingCart, Search, Menu, X, User, Package, Home, Info, ShoppingBag, Phone, LogOut } from "lucide-react";
 import logo from "../images/logo.png";
 import "../styles/navbar-enhancements.css";
-import "../styles/mobile-menu-debug.css";
+
 
 function Navbar() {
   const { cartItems } = useContext(CartContext);
@@ -35,35 +35,20 @@ function Navbar() {
     logout();
   };
 
-  // Mobile menu handlers with comprehensive debugging
+  // Mobile menu handlers
   const handleMenuToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('🔍 HAMBURGER CLICKED - Current state:', isMenuOpen);
-    console.log('🔍 Event details:', e.type, e.target);
-    const newState = !isMenuOpen;
-    setIsMenuOpen(newState);
-    console.log('🔍 HAMBURGER - Setting new state to:', newState);
-
-    // Force DOM update verification
-    setTimeout(() => {
-      const menuElement = document.querySelector('.mobile-menu-overlay');
-      console.log('🔍 Menu element after state change:', menuElement);
-      if (menuElement) {
-        console.log('🔍 Menu element styles:', window.getComputedStyle(menuElement));
-      }
-    }, 100);
+    setIsMenuOpen(prev => !prev);
   };
 
   const handleSearchClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('🔍 SEARCH CLICKED - Opening menu');
     setIsMenuOpen(true);
   };
 
   const handleMenuClose = () => {
-    console.log('🔍 MENU CLOSE - Closing menu');
     setIsMenuOpen(false);
   };
 
@@ -795,275 +780,163 @@ function Navbar() {
           </button>
         </div>
         
-        {/* Debug State Indicator */}
-        <div style={{
-          position: 'fixed',
-          top: '10px',
-          right: '10px',
-          background: 'red',
-          color: 'white',
-          padding: '5px',
-          zIndex: 10000,
-          fontSize: '12px'
-        }}>
-          Menu State: {isMenuOpen ? 'OPEN' : 'CLOSED'}
-        </div>
 
-        {/* Adaptive Mobile Menu - Robust Implementation */}
-        {isMenuOpen && (
+
+        {/* Mobile Menu - React Portal Implementation */}
+        {isMenuOpen && createPortal(
           <div
-            className="mobile-menu-overlay"
+            className="fixed inset-0 z-50 lg:hidden"
             style={{
-              position: 'fixed',
-              top: '80px',
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(255, 0, 0, 0.9)', // Red background for debugging
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              zIndex: 9999,
-              overflowY: 'auto',
-              display: 'block',
-              border: '5px solid yellow' // Yellow border for debugging
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)'
             }}
             onClick={(e) => {
-              console.log('🔍 Menu overlay clicked');
-              // Close menu if clicking on backdrop
               if (e.target === e.currentTarget) {
                 handleMenuClose();
               }
             }}
           >
-            <div className="px-4 py-4 space-y-4">
-              {/* Mobile Menu Header with Close Button */}
-              <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-800">Menu</h3>
-                <button
-                  onClick={handleMenuClose}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                  aria-label="Close menu"
-                >
-                  <X className="h-5 w-5 text-gray-600" />
-                </button>
-              </div>
-              {/* Enhanced Mobile Search */}
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-red-500" />
+            <div
+              className="bg-white/95 backdrop-blur-lg rounded-2xl mx-4 mt-20 mb-4 shadow-2xl border border-white/20"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6 space-y-6">
+                {/* Header */}
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-500 bg-clip-text text-transparent">
+                    Menu
+                  </h2>
+                  <button
+                    onClick={handleMenuClose}
+                    className="p-2 rounded-xl hover:bg-red-50 transition-colors duration-200"
+                  >
+                    <X className="w-6 h-6 text-gray-600" />
+                  </button>
                 </div>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && searchQuery.trim()) {
-                      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-                      setIsMenuOpen(false);
-                    }
-                  }}
-                  className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 placeholder-gray-500 shadow-sm"
-                  placeholder="Search for makhana products..."
-                />
-              </div>
 
-              {/* Enhanced Mobile Navigation Links */}
-              <div className="space-y-2">
-                {[
-                  { name: 'Home', path: '/' },
-                  { name: 'About', path: '/about' },
-                  { name: 'Products', path: '/products' },
-                  { name: 'Contact Us', path: '/contact' },
-                  ...(isAuthenticated ? [
-                    { name: 'Cart', path: '/cart', badge: cartItems.length, icon: ShoppingCart },
-                    { name: 'Wishlist', path: '/wishlist', badge: favorites?.length, icon: Heart }
-                  ] : []),
-                  ...(isAdmin ? [{ name: 'Admin Panel', path: '/admin/dashboard' }] : [])
-                ].map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`relative flex items-center justify-between px-4 py-3 font-medium transition-all duration-300 ease-in-out group rounded-lg ${
-                    isActive(item.path)
-                      ? 'text-red-600 bg-red-50'
-                      : 'text-gray-700 hover:text-red-600 hover:bg-red-50'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    {item.icon && <item.icon className="h-5 w-5" />}
-                    <span>{item.name}</span>
-                  </div>
-                  {item.badge > 0 && (
-                    <span className="bg-white text-red-600 text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-md">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              ))}
-              </div>
+                {/* Search */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && searchQuery.trim()) {
+                        navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+                        setIsMenuOpen(false);
+                      }
+                    }}
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300"
+                    placeholder="Search products..."
+                  />
+                </div>
 
-              {/* Mobile Auth */}
-              <div className="pt-4 border-t border-gray-200">
-                {isAuthenticated ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center">
-                        <span className="text-white font-medium text-sm">
-                          {(user?.fullName || user?.username || 'U').charAt(0).toUpperCase()}
+                {/* Navigation Links */}
+                <nav className="space-y-2">
+                  {[
+                    { name: 'Home', path: '/', icon: Home },
+                    { name: 'About', path: '/about', icon: Info },
+                    { name: 'Products', path: '/products', icon: ShoppingBag },
+                    { name: 'Contact', path: '/contact', icon: Phone },
+                    ...(isAuthenticated ? [
+                      { name: 'Cart', path: '/cart', badge: cartItems.length, icon: ShoppingCart },
+                      { name: 'Wishlist', path: '/wishlist', badge: favorites?.length, icon: Heart }
+                    ] : []),
+                    ...(isAdmin ? [{ name: 'Admin Panel', path: '/admin/dashboard' }] : [])
+                  ].map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={handleMenuClose}
+                      className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${
+                        isActive(item.path)
+                          ? 'bg-gradient-to-r from-red-50 to-orange-50 text-red-600 border border-red-200'
+                          : 'hover:bg-gray-50 text-gray-700 hover:text-red-600'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <item.icon className="w-5 h-5" />
+                        <span className="font-medium">{item.name}</span>
+                      </div>
+                      {item.badge > 0 && (
+                        <span className="bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                          {item.badge}
                         </span>
-                      </div>
-                      <div>
-                        <span className="font-medium text-gray-800 block text-sm">{user?.fullName || user?.username}</span>
-                        <span className="text-xs text-gray-600">Welcome back!</span>
-                      </div>
-                    </div>
+                      )}
+                    </Link>
+                  ))}
+                </nav>
 
-                    {/* Profile Options */}
-                    <div className="space-y-2">
-                      <Link
-                        to="/profile"
-                        onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors duration-200"
+                {/* Authentication Section */}
+                <div className="pt-4 border-t border-gray-200">
+                  {isAuthenticated ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-xl">
+                        <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold">
+                            {(user?.fullName || user?.username || 'U').charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800">{user?.fullName || user?.username}</p>
+                          <p className="text-sm text-gray-600">Welcome back!</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Link
+                          to="/profile"
+                          onClick={handleMenuClose}
+                          className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-colors duration-200"
+                        >
+                          <User className="w-5 h-5 text-gray-600" />
+                          <span className="font-medium text-gray-700">My Profile</span>
+                        </Link>
+                        <Link
+                          to="/orders"
+                          onClick={handleMenuClose}
+                          className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gray-50 transition-colors duration-200"
+                        >
+                          <Package className="w-5 h-5 text-gray-600" />
+                          <span className="font-medium text-gray-700">My Orders</span>
+                        </Link>
+                      </div>
+
+                      <button
+                        onClick={handleLogout}
+                        className="w-full bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl font-medium transition-colors duration-200 flex items-center justify-center space-x-2"
                       >
-                        <User className="h-5 w-5" />
-                        <span>My Profile</span>
+                        <LogOut className="w-4 h-4" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      <Link
+                        to="/login"
+                        onClick={handleMenuClose}
+                        className="block text-center bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl font-medium transition-colors duration-200"
+                      >
+                        Login
                       </Link>
                       <Link
-                        to="/orders"
-                        onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg font-medium transition-colors duration-200"
+                        to="/register"
+                        onClick={handleMenuClose}
+                        className="block text-center bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white p-3 rounded-xl font-medium transition-colors duration-200"
                       >
-                        <Package className="h-5 w-5" />
-                        <span>My Orders</span>
+                        Sign Up
                       </Link>
                     </div>
-
-                    <button
-                      onClick={handleLogout}
-                      className="w-full bg-red-50 hover:bg-red-100 text-red-700 px-4 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
-                      <span>Logout</span>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <Link
-                      to="/login"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="block text-center text-gray-700 hover:text-red-600 font-medium px-4 py-3 rounded-lg hover:bg-red-50 transition-colors duration-200"
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      to="/register"
-                      onClick={() => setIsMenuOpen(false)}
-                      className="block text-center bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg font-medium transition-colors duration-200"
-                    >
-                      Sign Up
-                    </Link>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
+            </div>,
+            document.body
+          )
         )}
 
-        {/* Alternative Portal-based Mobile Menu */}
-        {isMenuOpen && createPortal(
-          <div
-            id="portal-mobile-menu"
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0, 255, 0, 0.9)', // Green background for debugging
-              zIndex: 99999,
-              display: 'flex',
-              flexDirection: 'column',
-              padding: '80px 20px 20px 20px'
-            }}
-            onClick={(e) => {
-              if (e.target.id === 'portal-mobile-menu') {
-                handleMenuClose();
-              }
-            }}
-          >
-            <div style={{
-              backgroundColor: 'white',
-              borderRadius: '10px',
-              padding: '20px',
-              maxHeight: '80vh',
-              overflowY: 'auto'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ margin: 0, color: '#333' }}>PORTAL MENU (DEBUG)</h2>
-                <button
-                  onClick={handleMenuClose}
-                  style={{
-                    background: 'red',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    padding: '10px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  ✕ Close
-                </button>
-              </div>
 
-              {/* Navigation Links */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <Link to="/" onClick={handleMenuClose} style={{ padding: '15px', backgroundColor: '#f0f0f0', textDecoration: 'none', color: '#333', borderRadius: '5px' }}>
-                  🏠 Home
-                </Link>
-                <Link to="/about" onClick={handleMenuClose} style={{ padding: '15px', backgroundColor: '#f0f0f0', textDecoration: 'none', color: '#333', borderRadius: '5px' }}>
-                  ℹ️ About
-                </Link>
-                <Link to="/products" onClick={handleMenuClose} style={{ padding: '15px', backgroundColor: '#f0f0f0', textDecoration: 'none', color: '#333', borderRadius: '5px' }}>
-                  🛍️ Products
-                </Link>
-                <Link to="/contact" onClick={handleMenuClose} style={{ padding: '15px', backgroundColor: '#f0f0f0', textDecoration: 'none', color: '#333', borderRadius: '5px' }}>
-                  📞 Contact
-                </Link>
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
-
-        {/* Vanilla CSS Alternative Mobile Menu */}
-        <div className={`mobile-menu-debug ${isMenuOpen ? '' : 'hidden'}`}>
-          <div className="mobile-menu-content">
-            <div className="mobile-menu-header">
-              <h2 className="mobile-menu-title">VANILLA CSS MENU (DEBUG)</h2>
-              <button className="mobile-menu-close" onClick={handleMenuClose}>
-                ✕ Close
-              </button>
-            </div>
-
-            <div className="mobile-menu-links">
-              <Link to="/" className="mobile-menu-link" onClick={handleMenuClose}>
-                🏠 Home
-              </Link>
-              <Link to="/about" className="mobile-menu-link" onClick={handleMenuClose}>
-                ℹ️ About
-              </Link>
-              <Link to="/products" className="mobile-menu-link" onClick={handleMenuClose}>
-                🛍️ Products
-              </Link>
-              <Link to="/contact" className="mobile-menu-link" onClick={handleMenuClose}>
-                📞 Contact
-              </Link>
-            </div>
-          </div>
-        </div>
       </div>
     </nav>
     </>

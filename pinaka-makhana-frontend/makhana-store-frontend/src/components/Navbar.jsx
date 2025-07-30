@@ -262,6 +262,20 @@ function Navbar() {
     };
   }, []);
 
+  // Prevent body scrolling when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
+
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -303,7 +317,7 @@ function Navbar() {
 
           {/* Enhanced Navigation Links - Center Section */}
           <div className="hidden lg:flex items-center justify-center flex-1">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-6">
               {[
                 { name: 'Home', path: '/' },
                 { name: 'About', path: '/about' },
@@ -314,7 +328,7 @@ function Navbar() {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`relative px-6 py-3 font-medium transition-all duration-600 ease-in-out group ${
+                  className={`relative px-6 py-3 font-semibold text-lg transition-all duration-600 ease-in-out group ${
                     isActive(item.path)
                       ? 'text-red-500'
                       : isDarkBackground
@@ -348,7 +362,7 @@ function Navbar() {
           </div>
           
           {/* Right Section - Actions & Auth */}
-          <div className="hidden lg:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-2">
             {/* Compact Expandable Search */}
             <div className="relative" ref={searchRef}>
               <div className={`flex items-center transition-all duration-400 ease-in-out ${
@@ -369,7 +383,7 @@ function Navbar() {
                         : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
                     }}
                   >
-                    <Search className="h-6 w-6" />
+                    <Search className="h-7 w-7" />
                   </button>
                 ) : (
                   <div className="relative w-full">
@@ -424,7 +438,7 @@ function Navbar() {
                     : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
                 }}
               >
-                <Heart className="h-6 w-6 hover:fill-red-300 transition-all duration-300" />
+                <Heart className="h-7 w-7 hover:fill-red-300 transition-all duration-300" />
                 {favorites && favorites.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg animate-pulse">
                     {favorites.length}
@@ -449,7 +463,7 @@ function Navbar() {
                     : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
                 }}
               >
-                <ShoppingCart className="h-6 w-6" />
+                <ShoppingCart className="h-7 w-7" />
                 {cartItems.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg animate-pulse">
                     {cartItems.length}
@@ -616,7 +630,7 @@ function Navbar() {
           <div className="lg:hidden flex items-center space-x-2">
             {/* Mobile Search Icon */}
             <button
-              onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+              onClick={() => setIsMenuOpen(true)}
               className={`p-2 transition-colors duration-300 ${
                 isDarkBackground
                   ? 'text-white hover:text-red-300'
@@ -681,6 +695,28 @@ function Navbar() {
                 )}
               </Link>
             )}
+
+            {/* Mobile Authentication Icons for Non-Authenticated Users */}
+            {!isAuthenticated && (
+              <>
+                <Link
+                  to="/login"
+                  className={`p-2 transition-colors duration-300 ${
+                    isDarkBackground
+                      ? 'text-white hover:text-red-300'
+                      : 'text-white hover:text-red-300'
+                  }`}
+                  style={{
+                    filter: isDarkBackground
+                      ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+                      : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+                  }}
+                  aria-label="Sign In"
+                >
+                  <User className="h-5 w-5" />
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Adaptive Mobile Menu Button */}
@@ -707,7 +743,7 @@ function Navbar() {
         
         {/* Adaptive Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 backdrop-blur-lg shadow-xl bg-white/95 border-t border-gray-200/50 z-50">
+          <div className="lg:hidden fixed top-full left-0 right-0 bottom-0 backdrop-blur-lg shadow-xl bg-white/98 border-t border-gray-200/50 z-50 overflow-y-auto">
             <div className="px-4 py-4 space-y-4">
               {/* Enhanced Mobile Search */}
               <div className="relative">

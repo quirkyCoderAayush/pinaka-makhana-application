@@ -200,20 +200,20 @@ const Home = () => {
       >
         {/* Enhanced Animated Background Pattern */}
         <motion.div
-          className="absolute inset-0 opacity-10 w-full"
+          className="absolute inset-0 opacity-6 w-full"
           initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.1 }}
-          transition={{ duration: 2, ease: "easeOut" }}
+          animate={{ scale: 1, opacity: 0.06 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
         >
           <motion.div
             className="absolute top-20 left-20 w-72 h-72 bg-red-500 rounded-full mix-blend-multiply"
             animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.6, 0.3],
+              scale: [1, 1.1, 1],
+              opacity: [0.2, 0.4, 0.2],
               rotate: [0, 180, 360]
             }}
             transition={{
-              duration: 8,
+              duration: 10,
               repeat: Infinity,
               ease: "easeInOut"
             }}
@@ -221,12 +221,12 @@ const Home = () => {
           <motion.div
             className="absolute top-40 right-20 w-72 h-72 bg-orange-500 rounded-full mix-blend-multiply"
             animate={{
-              scale: [1.2, 1, 1.2],
-              opacity: [0.4, 0.7, 0.4],
+              scale: [1.1, 1, 1.1],
+              opacity: [0.25, 0.45, 0.25],
               rotate: [360, 180, 0]
             }}
             transition={{
-              duration: 10,
+              duration: 12,
               repeat: Infinity,
               ease: "easeInOut",
               delay: 1
@@ -235,12 +235,12 @@ const Home = () => {
           <motion.div
             className="absolute bottom-20 left-40 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply"
             animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.2, 0.5, 0.2],
+              scale: [1, 1.2, 1],
+              opacity: [0.15, 0.35, 0.15],
               rotate: [0, -180, -360]
             }}
             transition={{
-              duration: 12,
+              duration: 14,
               repeat: Infinity,
               ease: "easeInOut",
               delay: 2
@@ -248,7 +248,7 @@ const Home = () => {
           />
         </motion.div>
 
-        <div className="container mx-auto px-8 py-20 relative z-10 w-full">
+        <div className="container mx-auto px-8 py-20 relative z-10 w-full" style={{ padding: '2rem' }}>
           <motion.div
             className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
             variants={staggerContainer}
@@ -379,7 +379,7 @@ const Home = () => {
                 >
                   <Link
                     to="/products"
-                    className="group relative bg-gradient-to-r from-red-500 to-orange-500 text-white px-10 py-4 rounded-full font-bold text-lg overflow-hidden transition-all duration-300 hover:shadow-2xl inline-block"
+                    className="group relative bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-3 rounded-full font-semibold text-base overflow-hidden transition-all duration-300 hover:shadow-2xl inline-block"
                   >
                     <motion.span
                       className="relative z-10"
@@ -404,7 +404,7 @@ const Home = () => {
                 </motion.div>
 
                 <motion.button
-                  className="border-2 border-white text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-white hover:text-black transition-all duration-300"
+                  className="border-2 border-white text-white px-6 py-3 rounded-full font-semibold text-base hover:bg-white hover:text-black transition-all duration-300"
                   whileHover={{
                     scale: 1.05,
                     backgroundColor: "rgba(255,255,255,1)",

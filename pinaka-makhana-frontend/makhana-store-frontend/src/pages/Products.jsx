@@ -325,42 +325,44 @@ const Products = () => {
 
           {/* Enhanced Mobile Filter Button */}
           <motion.div
-            className="lg:hidden flex justify-between items-center mb-6"
+            className="lg:hidden flex flex-col space-y-3 mb-6 px-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
           >
-            <motion.button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-3 bg-white/90 backdrop-blur-xl px-6 py-3 rounded-2xl border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Filter className="w-5 h-5 text-red-600" />
-              <span className="font-semibold text-gray-700">Filters</span>
-              <motion.div
-                animate={{ rotate: showFilters ? 180 : 0 }}
-                transition={{ duration: 0.3 }}
+            <div className="flex justify-between items-center space-x-3">
+              <motion.button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 bg-white/90 backdrop-blur-xl px-4 py-2.5 rounded-xl border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300 flex-1 max-w-[45%]"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              </motion.div>
-            </motion.button>
-
-            <div className="flex items-center space-x-3">
-              <label className="text-sm font-semibold text-gray-700">Sort:</label>
-              <div className="relative">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none bg-white/90 backdrop-blur-xl px-4 py-3 pr-10 border border-gray-200/50 rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                <Filter className="w-4 h-4 text-red-600" />
+                <span className="font-medium text-gray-700 text-sm">Filter</span>
+                <motion.div
+                  animate={{ rotate: showFilters ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <option value="relevance">Relevance</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="name">Name A-Z</option>
-                  <option value="popularity">Popularity</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                  <ChevronDown className="w-3 h-3 text-gray-500" />
+                </motion.div>
+              </motion.button>
+
+              <div className="flex items-center space-x-2 flex-1 max-w-[50%]">
+                <label className="text-xs font-medium text-gray-700 whitespace-nowrap">Sort:</label>
+                <div className="relative flex-1">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="appearance-none bg-white/90 backdrop-blur-xl px-3 py-2.5 pr-8 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 text-xs font-medium shadow-lg hover:shadow-xl transition-all duration-300 w-full"
+                  >
+                    <option value="relevance">Relevance</option>
+                    <option value="price-low">Low to High</option>
+                    <option value="price-high">High to Low</option>
+                    <option value="name">Name A-Z</option>
+                    <option value="popularity">Popular</option>
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-500 pointer-events-none" />
+                </div>
               </div>
             </div>
           </motion.div>

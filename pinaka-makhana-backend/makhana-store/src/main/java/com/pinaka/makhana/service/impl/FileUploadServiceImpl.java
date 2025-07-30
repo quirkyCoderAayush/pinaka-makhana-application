@@ -1,20 +1,14 @@
 package com.pinaka.makhana.service.impl;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.pinaka.makhana.service.FileUploadService;
@@ -24,11 +18,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileUploadServiceImpl.class);
     
-    @Value("${app.upload.dir:uploads/images/}")
-    private String uploadDir;
-    
-    @Value("${server.port:8081}")
-    private String serverPort;
+
     
     private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "gif", "webp");
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -36,31 +26,30 @@ public class FileUploadServiceImpl implements FileUploadService {
     @Override
     public String uploadImage(MultipartFile file) {
         logger.info("🔄 Starting image upload for file: {}", file.getOriginalFilename());
-        
+
         try {
             // Validate the file
             if (!isValidImage(file)) {
                 throw new IllegalArgumentException("Invalid image file");
             }
-            
-            // Create upload directory if it doesn't exist
-            createUploadDirectoryIfNotExists();
-            
-            // Generate unique filename
-            String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
-            String extension = FilenameUtils.getExtension(originalFilename);
-            String uniqueFilename = UUID.randomUUID().toString() + "." + extension;
-            
-            // Save file to disk
-            Path targetLocation = Paths.get(uploadDir).resolve(uniqueFilename);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            
-            // Generate URL to access the file
-            String imageUrl = generateImageUrl(uniqueFilename);
-            
-            logger.info("✅ Image uploaded successfully: {}", imageUrl);
-            return imageUrl;
-            
+
+            // For deployment, convert to base64 instead of saving to disk
+            // This works better on cloud platforms like Render
+            byte[] imageBytes = file.getBytes();
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+            // Get content type
+            String contentType = file.getContentType();
+            if (contentType == null) {
+                contentType = "image/jpeg"; // Default fallback
+            }
+
+            // Create data URL
+            String dataUrl = "data:" + contentType + ";base64," + base64Image;
+
+            logger.info("✅ Image converted to base64 successfully (length: {} characters)", dataUrl.length());
+            return dataUrl;
+
         } catch (IOException e) {
             logger.error("❌ Failed to upload image: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to upload image: " + e.getMessage());
@@ -69,26 +58,11 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     @Override
     public boolean deleteImage(String imageUrl) {
-        try {
-            if (imageUrl == null || !imageUrl.contains("/uploads/images/")) {
-                return false; // Not our uploaded image
-            }
-            
-            // Extract filename from URL
-            String filename = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
-            Path filePath = Paths.get(uploadDir).resolve(filename);
-            
-            if (Files.exists(filePath)) {
-                Files.delete(filePath);
-                logger.info("🗑️ Deleted image file: {}", filename);
-                return true;
-            }
-            
-            return false;
-        } catch (IOException e) {
-            logger.error("❌ Failed to delete image: {}", e.getMessage(), e);
-            return false;
-        }
+        // For base64 images, we don't need to delete files from disk
+        // Just return true to indicate "deletion" was successful
+        logger.info("🗑️ Base64 image deletion requested (no file to delete): {}",
+                   imageUrl != null && imageUrl.length() > 50 ? imageUrl.substring(0, 50) + "..." : imageUrl);
+        return true;
     }
 
     @Override
@@ -127,17 +101,5 @@ public class FileUploadServiceImpl implements FileUploadService {
         logger.debug("✅ File validation passed: {}", originalFilename);
         return true;
     }
-    
-    private void createUploadDirectoryIfNotExists() throws IOException {
-        Path uploadPath = Paths.get(uploadDir);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-            logger.info("📁 Created upload directory: {}", uploadPath.toAbsolutePath());
-        }
-    }
-    
-    private String generateImageUrl(String filename) {
-        // Generate URL that can be accessed via the static file serving endpoint
-        return String.format("http://localhost:%s/uploads/images/%s", serverPort, filename);
-    }
+
 }

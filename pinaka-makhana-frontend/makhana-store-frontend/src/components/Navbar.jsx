@@ -33,23 +33,20 @@ function Navbar() {
     logout();
   };
 
-  // Mobile menu handlers with debugging
+  // Mobile menu handlers
   const handleMenuToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('🔍 Menu toggle clicked, current state:', isMenuOpen);
     setIsMenuOpen(prev => !prev);
   };
 
   const handleSearchClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('🔍 Search icon clicked, opening menu');
     setIsMenuOpen(true);
   };
 
   const handleMenuClose = () => {
-    console.log('🔍 Closing mobile menu');
     setIsMenuOpen(false);
   };
 
@@ -770,12 +767,27 @@ function Navbar() {
         
         {/* Adaptive Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden fixed top-20 left-0 right-0 bottom-0 backdrop-blur-lg shadow-xl bg-white/98 border-t border-gray-200/50 z-[60] overflow-y-auto">
-            {/* Debug indicator */}
-            <div className="bg-red-500 text-white text-xs p-2 text-center">
-              🔍 DEBUG: Mobile Menu is Open (State: {isMenuOpen.toString()})
-            </div>
+          <div
+            className="lg:hidden fixed top-20 left-0 right-0 bottom-0 backdrop-blur-lg shadow-xl bg-white/98 border-t border-gray-200/50 z-[60] overflow-y-auto"
+            onClick={(e) => {
+              // Close menu if clicking on backdrop
+              if (e.target === e.currentTarget) {
+                handleMenuClose();
+              }
+            }}
+          >
             <div className="px-4 py-4 space-y-4">
+              {/* Mobile Menu Header with Close Button */}
+              <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800">Menu</h3>
+                <button
+                  onClick={handleMenuClose}
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                  aria-label="Close menu"
+                >
+                  <X className="h-5 w-5 text-gray-600" />
+                </button>
+              </div>
               {/* Enhanced Mobile Search */}
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

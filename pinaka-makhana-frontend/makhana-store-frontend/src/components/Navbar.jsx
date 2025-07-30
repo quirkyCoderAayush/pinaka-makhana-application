@@ -295,7 +295,7 @@ function Navbar() {
           ? 'bg-gradient-to-r from-white/2 via-white/5 to-white/2'
           : 'bg-gradient-to-r from-gray-800/3 via-gray-800/5 to-gray-800/3'
       }`}></div>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div className="container mx-auto px-2 sm:px-4 lg:px-6 relative">
         <div className="flex items-center justify-between h-20">
 
           {/* Enhanced Logo with Visibility Optimization */}
@@ -317,7 +317,7 @@ function Navbar() {
 
           {/* Enhanced Navigation Links - Center Section */}
           <div className="hidden lg:flex items-center justify-center flex-1">
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-4">
               {[
                 { name: 'Home', path: '/' },
                 { name: 'About', path: '/about' },
@@ -328,7 +328,7 @@ function Navbar() {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`relative px-6 py-3 font-semibold text-lg transition-all duration-600 ease-in-out group ${
+                  className={`relative px-4 py-2 font-medium text-base transition-all duration-600 ease-in-out group ${
                     isActive(item.path)
                       ? 'text-red-500'
                       : isDarkBackground
@@ -362,7 +362,7 @@ function Navbar() {
           </div>
           
           {/* Right Section - Actions & Auth */}
-          <div className="hidden lg:flex items-center space-x-2">
+          <div className="hidden lg:flex items-center space-x-1">
             {/* Compact Expandable Search */}
             <div className="relative" ref={searchRef}>
               <div className={`flex items-center transition-all duration-400 ease-in-out ${
@@ -383,7 +383,7 @@ function Navbar() {
                         : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
                     }}
                   >
-                    <Search className="h-7 w-7" />
+                    <Search className="h-5 w-5" />
                   </button>
                 ) : (
                   <div className="relative w-full">
@@ -438,7 +438,7 @@ function Navbar() {
                     : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
                 }}
               >
-                <Heart className="h-7 w-7 hover:fill-red-300 transition-all duration-300" />
+                <Heart className="h-5 w-5 hover:fill-red-300 transition-all duration-300" />
                 {favorites && favorites.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg animate-pulse">
                     {favorites.length}
@@ -463,7 +463,7 @@ function Navbar() {
                     : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
                 }}
               >
-                <ShoppingCart className="h-7 w-7" />
+                <ShoppingCart className="h-5 w-5" />
                 {cartItems.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg animate-pulse">
                     {cartItems.length}
@@ -631,29 +631,29 @@ function Navbar() {
             {/* Mobile Search Icon */}
             <button
               onClick={() => setIsMenuOpen(true)}
-              className={`p-2 transition-colors duration-300 ${
+              className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-300 active:scale-95 ${
                 isDarkBackground
-                  ? 'text-white hover:text-red-300'
-                  : 'text-white hover:text-red-300'
+                  ? 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
+                  : 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
               }`}
               style={{
                 filter: isDarkBackground
                   ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
                   : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
               }}
-              aria-label="Search"
+              aria-label="Open search"
             >
-              <Search className="h-5 w-5" />
+              <Search className="h-5 w-5 transition-transform duration-200" />
             </button>
 
             {/* Mobile Wishlist Icon */}
             {isAuthenticated && (
               <Link
                 to="/wishlist"
-                className={`relative p-2 transition-colors duration-300 ${
+                className={`relative min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-300 active:scale-95 ${
                   isDarkBackground
-                    ? 'text-white hover:text-red-300'
-                    : 'text-white hover:text-red-300'
+                    ? 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
+                    : 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
                 }`}
                 style={{
                   filter: isDarkBackground
@@ -662,7 +662,7 @@ function Navbar() {
                 }}
                 aria-label="Wishlist"
               >
-                <Heart className="h-5 w-5" />
+                <Heart className="h-5 w-5 transition-transform duration-200" />
                 {favorites && favorites.length > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
                     {favorites.length}
@@ -675,10 +675,10 @@ function Navbar() {
             {isAuthenticated && (
               <Link
                 to="/cart"
-                className={`relative p-2 transition-colors duration-300 ${
+                className={`relative min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-300 active:scale-95 ${
                   isDarkBackground
-                    ? 'text-white hover:text-orange-300'
-                    : 'text-white hover:text-orange-300'
+                    ? 'text-white hover:text-orange-300 hover:bg-white/10 active:bg-white/20'
+                    : 'text-white hover:text-orange-300 hover:bg-white/10 active:bg-white/20'
                 }`}
                 style={{
                   filter: isDarkBackground
@@ -687,7 +687,7 @@ function Navbar() {
                 }}
                 aria-label="Shopping Cart"
               >
-                <ShoppingCart className="h-5 w-5" />
+                <ShoppingCart className="h-5 w-5 transition-transform duration-200" />
                 {cartItems.length > 0 && (
                   <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
                     {cartItems.length}
@@ -701,10 +701,10 @@ function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className={`p-2 transition-colors duration-300 ${
+                  className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-300 active:scale-95 ${
                     isDarkBackground
-                      ? 'text-white hover:text-red-300'
-                      : 'text-white hover:text-red-300'
+                      ? 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
+                      : 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
                   }`}
                   style={{
                     filter: isDarkBackground
@@ -713,7 +713,7 @@ function Navbar() {
                   }}
                   aria-label="Sign In"
                 >
-                  <User className="h-5 w-5" />
+                  <User className="h-5 w-5 transition-transform duration-200" />
                 </Link>
               </>
             )}
@@ -722,21 +722,22 @@ function Navbar() {
           {/* Adaptive Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`lg:hidden p-3 transition-colors duration-300 ${
+            className={`lg:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-300 active:scale-95 ${
               isDarkBackground
-                ? 'text-white hover:text-red-300'
-                : 'text-white hover:text-red-300'
+                ? 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
+                : 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
             }`}
             style={{
               filter: isDarkBackground
                 ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
                 : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
             }}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
             {isMenuOpen ? (
-              <X className="w-6 h-6" />
+              <X className="w-6 h-6 transition-transform duration-200" />
             ) : (
-              <Menu className="w-6 h-6" />
+              <Menu className="w-6 h-6 transition-transform duration-200" />
             )}
           </button>
         </div>

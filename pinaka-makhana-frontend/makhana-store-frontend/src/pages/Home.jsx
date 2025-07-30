@@ -266,6 +266,8 @@ const Home = () => {
               <motion.div
                 className="space-y-6"
                 variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
               >
                 {/* Modern Badge */}
                 <motion.div
@@ -298,15 +300,19 @@ const Home = () => {
                 >
                   <motion.span
                     className="block text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300"
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5, duration: 0.8 }}
+                    initial={{ opacity: 0, y: 60, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{
+                      delay: 0.3,
+                      duration: 1.0,
+                      ease: [0.25, 0.46, 0.45, 0.94]
+                    }}
                   >
                     PINAKA
                   </motion.span>
                   <motion.span
                     className="block text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400"
-                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                    initial={{ opacity: 0, y: 60, scale: 0.95 }}
                     animate={{
                       opacity: 1,
                       y: 0,
@@ -314,12 +320,13 @@ const Home = () => {
                       backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
                     }}
                     transition={{
-                      delay: 0.8,
-                      duration: 0.8,
+                      delay: 0.6,
+                      duration: 1.2,
+                      ease: [0.25, 0.46, 0.45, 0.94],
                       backgroundPosition: {
-                        duration: 3,
+                        duration: 4,
                         repeat: Infinity,
-                        ease: "linear"
+                        ease: "easeInOut"
                       }
                     }}
                     style={{
@@ -373,24 +380,35 @@ const Home = () => {
                 transition={{ delay: 1.5, duration: 0.8 }}
               >
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 300 }}
+                  whileHover={{
+                    scale: 1.08,
+                    y: -2
+                  }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 25
+                  }}
                 >
                   <Link
                     to="/products"
-                    className="group relative bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-3 rounded-full font-semibold text-base overflow-hidden transition-all duration-300 hover:shadow-2xl inline-block"
+                    className="group relative bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-3 rounded-full font-semibold text-base overflow-hidden transition-all duration-500 hover:shadow-2xl inline-block"
                   >
                     <motion.span
                       className="relative z-10"
                       animate={{
                         textShadow: [
                           "0 0 0px rgba(255,255,255,0)",
-                          "0 0 10px rgba(255,255,255,0.3)",
+                          "0 0 8px rgba(255,255,255,0.2)",
                           "0 0 0px rgba(255,255,255,0)"
                         ]
                       }}
-                      transition={{ duration: 2, repeat: Infinity }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
                     >
                       Explore Collection
                     </motion.span>
@@ -398,23 +416,44 @@ const Home = () => {
                       className="absolute inset-0 bg-gradient-to-r from-red-600 to-orange-600"
                       initial={{ scaleX: 0 }}
                       whileHover={{ scaleX: 1 }}
-                      transition={{ duration: 0.3, originX: 0 }}
+                      transition={{
+                        duration: 0.4,
+                        originX: 0,
+                        ease: [0.25, 0.46, 0.45, 0.94]
+                      }}
                     />
                   </Link>
                 </motion.div>
 
                 <motion.button
-                  className="border-2 border-white text-white px-6 py-3 rounded-full font-semibold text-base hover:bg-white hover:text-black transition-all duration-300"
+                  className="border-2 border-white text-white px-6 py-3 rounded-full font-semibold text-base hover:bg-white hover:text-black transition-all duration-500"
                   whileHover={{
-                    scale: 1.05,
+                    scale: 1.08,
+                    y: -2,
                     backgroundColor: "rgba(255,255,255,1)",
                     color: "rgba(0,0,0,1)",
-                    boxShadow: "0 10px 30px rgba(255,255,255,0.3)"
+                    boxShadow: "0 15px 40px rgba(255,255,255,0.25)",
+                    borderColor: "rgba(255,255,255,1)"
                   }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 300 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 25
+                  }}
                 >
-                  Watch Story
+                  <motion.span
+                    animate={{
+                      opacity: [1, 0.8, 1]
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    Watch Story
+                  </motion.span>
                 </motion.button>
               </motion.div>
 

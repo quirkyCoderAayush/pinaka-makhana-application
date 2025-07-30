@@ -163,7 +163,7 @@ const Products = () => {
     });
   };
 
-  const handleAddToCart = async (product) => {
+  const handleAddToCart = async (product, cardQuantity = null) => {
     if (!isAuthenticated) {
       showInfo('Please login to add items to cart');
       setTimeout(() => {
@@ -172,7 +172,8 @@ const Products = () => {
       return;
     }
 
-    const quantity = quantities[product.id] || 1;
+    // Use the quantity from the card if provided, otherwise use the page-level quantity
+    const quantity = cardQuantity || quantities[product.id] || 1;
     setIsLoading(true);
     setActiveProductId(product.id);
 
@@ -664,7 +665,7 @@ const Products = () => {
                   >
                     <ModernProductCard
                       product={product}
-                      onAddToCart={(product) => handleAddToCart(product)}
+                      onAddToCart={(product, quantity) => handleAddToCart(product, quantity)}
                       onToggleFavorite={(product) => handleToggleFavorite(product)}
                       isFavorite={favorites.includes(product.id)}
                       loading={isLoading && activeProductId === product.id}

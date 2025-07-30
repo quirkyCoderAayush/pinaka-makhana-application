@@ -65,9 +65,7 @@ class ApiService {
   }
 
   async addToCart(productId, quantity = 1) {
-    console.log('🔍 API addToCart called with:', { productId, quantity, type: typeof quantity });
     const url = `${this.baseURL}/cart/add?productId=${productId}&quantity=${quantity}`;
-    console.log('🔍 API URL:', url);
     const token = localStorage.getItem('token');
 
     const response = await fetch(url, {

@@ -153,8 +153,9 @@ const Home = () => {
     });
   };
 
-  const handleAddToCart = async (product) => {
-    const quantity = quantities[product.id] || 1;
+  const handleAddToCart = async (product, cardQuantity = null) => {
+    // Use the quantity from the card if provided, otherwise use the page-level quantity
+    const quantity = cardQuantity || quantities[product.id] || 1;
     setIsLoading(true);
     setActiveProductId(product.id);
 
@@ -976,7 +977,7 @@ const Home = () => {
               >
                 <ModernProductCard
                   product={product}
-                  onAddToCart={(product) => handleAddToCart(product)}
+                  onAddToCart={(product, quantity) => handleAddToCart(product, quantity)}
                   loading={isLoading && activeProductId === product.id}
                   className="w-full flex flex-col transform transition-all duration-300 hover:z-10"
                 />

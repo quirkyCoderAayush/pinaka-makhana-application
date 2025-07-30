@@ -36,9 +36,8 @@ public class CartController {
 	@PostMapping("/add")
 	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 	public ResponseEntity<String> addToCart(@RequestHeader("Authorization") String authHeader,
-			@RequestParam Long productId, @RequestParam int quantity) {
+			@RequestParam Long productId, @RequestParam(defaultValue = "1") int quantity) {
 
-		System.out.println("🔍 CartController.addToCart - ProductId: " + productId + ", Quantity: " + quantity);
 		String email = extractEmail(authHeader);
 		cartService.addToCart(email, productId, quantity);
 		return ResponseEntity.ok("Product added to cart successfully");

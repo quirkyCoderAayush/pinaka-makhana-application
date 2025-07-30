@@ -33,25 +33,20 @@ function Navbar() {
     logout();
   };
 
-  // Mobile menu handlers with debugging
+  // Mobile menu handlers
   const handleMenuToggle = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('🔍 HAMBURGER CLICKED - Current state:', isMenuOpen);
-    const newState = !isMenuOpen;
-    setIsMenuOpen(newState);
-    console.log('🔍 HAMBURGER - New state will be:', newState);
+    setIsMenuOpen(prev => !prev);
   };
 
   const handleSearchClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('🔍 SEARCH CLICKED - Opening menu');
     setIsMenuOpen(true);
   };
 
   const handleMenuClose = () => {
-    console.log('🔍 MENU CLOSE - Closing menu');
     setIsMenuOpen(false);
   };
 
@@ -301,16 +296,29 @@ function Navbar() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-lg transition-all duration-400 ease-in-out ${
-        isVisible ? 'translate-y-0' : '-translate-y-full'
-      } ${
-        isDarkBackground
-          ? 'bg-white/5 border-b border-white/20'
-          : 'bg-gray-800/60 border-b border-gray-700/30'
-      }`}
-      style={{ opacity: navbarOpacity }}
-    >
+    <>
+      {/* Mobile Menu CSS */}
+      <style jsx>{`
+        .mobile-menu-overlay {
+          display: block;
+        }
+        @media (min-width: 1024px) {
+          .mobile-menu-overlay {
+            display: none !important;
+          }
+        }
+      `}</style>
+
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-lg transition-all duration-400 ease-in-out ${
+          isVisible ? 'translate-y-0' : '-translate-y-full'
+        } ${
+          isDarkBackground
+            ? 'bg-white/5 border-b border-white/20'
+            : 'bg-gray-800/60 border-b border-gray-700/30'
+        }`}
+        style={{ opacity: navbarOpacity }}
+      >
       {/* Subtle gradient overlay for enhanced transparency */}
       <div className={`absolute inset-0 ${
         isDarkBackground
@@ -770,7 +778,7 @@ function Navbar() {
           </button>
         </div>
         
-        {/* Adaptive Mobile Menu - Alternative Implementation */}
+        {/* Adaptive Mobile Menu - Robust Implementation */}
         {isMenuOpen && (
           <div
             className="mobile-menu-overlay"
@@ -782,9 +790,10 @@ function Navbar() {
               bottom: 0,
               backgroundColor: 'rgba(255, 255, 255, 0.98)',
               backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               zIndex: 9999,
               overflowY: 'auto',
-              display: window.innerWidth < 1024 ? 'block' : 'none'
+              display: 'block'
             }}
             onClick={(e) => {
               // Close menu if clicking on backdrop
@@ -793,11 +802,6 @@ function Navbar() {
               }
             }}
           >
-            {/* Debug indicator - temporary */}
-            <div className="bg-red-500 text-white p-4 text-center font-bold text-lg">
-              🔍 MOBILE MENU IS OPEN - DEBUG MODE
-            </div>
-
             <div className="px-4 py-4 space-y-4">
               {/* Mobile Menu Header with Close Button */}
               <div className="flex justify-between items-center pb-2 border-b border-gray-200">
@@ -936,6 +940,7 @@ function Navbar() {
         )}
       </div>
     </nav>
+    </>
   );
 }
 

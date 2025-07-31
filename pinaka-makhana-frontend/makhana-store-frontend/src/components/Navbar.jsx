@@ -21,6 +21,7 @@ function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [navbarOpacity, setNavbarOpacity] = useState(1);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -45,11 +46,24 @@ function Navbar() {
   const handleSearchClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsMenuOpen(true);
+    setIsMobileSearchOpen(true);
   };
 
   const handleMenuClose = () => {
     setIsMenuOpen(false);
+  };
+
+  const handleMobileSearchClose = () => {
+    setIsMobileSearchOpen(false);
+    setSearchQuery('');
+  };
+
+  const handleMobileSearchSubmit = () => {
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsMobileSearchOpen(false);
+      setSearchQuery('');
+    }
   };
 
   // Handle search functionality
@@ -281,9 +295,9 @@ function Navbar() {
     };
   }, []);
 
-  // Prevent body scrolling when mobile menu is open
+  // Prevent body scrolling when mobile menu or search is open
   useEffect(() => {
-    if (isMenuOpen) {
+    if (isMenuOpen || isMobileSearchOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -293,7 +307,7 @@ function Navbar() {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isMenuOpen]);
+  }, [isMenuOpen, isMobileSearchOpen]);
 
   const isActive = (path) => location.pathname === path;
 
@@ -937,6 +951,74 @@ function Navbar() {
           document.body
         )}
 
+        {/* Mobile Search Overlay */}
+        {isMobileSearchOpen && createPortal(
+          <div
+            className="fixed inset-0 z-50 lg:hidden"
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)'
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                handleMobileSearchClose();
+              }
+            }}
+          >
+            <div
+              className="bg-white/95 backdrop-blur-lg rounded-2xl mx-4 mt-20 mb-4 shadow-2xl border border-white/20"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6 space-y-6">
+                {/* Header */}
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-500 bg-clip-text text-transparent">
+                    Search Products
+                  </h2>
+                  <button
+                    onClick={handleMobileSearchClose}
+                    className="p-2 rounded-xl hover:bg-red-50 transition-colors duration-200"
+                  >
+                    <X className="w-6 h-6 text-gray-600" />
+                  </button>
+                </div>
+
+                {/* Search Input */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-red-500" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleMobileSearchSubmit();
+                      }
+                      if (e.key === 'Escape') {
+                        handleMobileSearchClose();
+                      }
+                    }}
+                    className="w-full pl-10 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 text-lg"
+                    placeholder="Search for makhana products..."
+                    autoFocus
+                  />
+                </div>
+
+                {/* Search Button */}
+                <button
+                  onClick={handleMobileSearchSubmit}
+                  disabled={!searchQuery.trim()}
+                  className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 disabled:from-gray-300 disabled:to-gray-400 text-white p-4 rounded-xl font-medium transition-colors duration-200 flex items-center justify-center space-x-2"
+                >
+                  <Search className="w-5 h-5" />
+                  <span>Search Products</span>
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
 
       </div>
     </nav>

@@ -295,7 +295,7 @@ const Home = () => {
 
                 {/* Main Heading with Enhanced Animations */}
                 <motion.h1
-                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight sm:leading-none"
+                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight"
                   variants={fadeInUp}
                 >
                   <motion.span
@@ -339,7 +339,7 @@ const Home = () => {
 
                 {/* Subheading */}
                 <motion.p
-                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed"
+                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light text-gray-300 leading-relaxed"
                   variants={fadeInUp}
                 >
                   The Future of
@@ -360,7 +360,7 @@ const Home = () => {
 
                 {/* Description */}
                 <motion.p
-                  className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
+                  className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400 leading-relaxed max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl"
                   variants={fadeInUp}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -459,7 +459,7 @@ const Home = () => {
 
               {/* Enhanced Stats with Animations */}
               <motion.div
-                className="flex space-x-12 pt-8"
+                className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-12 pt-8 max-w-full"
                 variants={staggerContainer}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -472,7 +472,7 @@ const Home = () => {
                   transition={{ type: "spring", stiffness: 300 }}
                 >
                   <motion.div
-                    className="text-4xl font-bold text-red-400"
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-400"
                     animate={{
                       scale: [1, 1.1, 1],
                       textShadow: [
@@ -485,7 +485,7 @@ const Home = () => {
                   >
                     100%
                   </motion.div>
-                  <div className="text-sm text-gray-400 uppercase tracking-wider">Natural</div>
+                  <div className="text-xs sm:text-sm text-gray-400 uppercase tracking-wider">Natural</div>
                 </motion.div>
                 <motion.div
                   className="text-center"
@@ -494,7 +494,7 @@ const Home = () => {
                   transition={{ type: "spring", stiffness: 300 }}
                 >
                   <motion.div
-                    className="text-4xl font-bold text-orange-400"
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-400"
                     animate={{
                       scale: [1, 1.1, 1],
                       textShadow: [
@@ -507,7 +507,7 @@ const Home = () => {
                   >
                     0
                   </motion.div>
-                  <div className="text-sm text-gray-400 uppercase tracking-wider">Chemicals</div>
+                  <div className="text-xs sm:text-sm text-gray-400 uppercase tracking-wider">Chemicals</div>
                 </motion.div>
                 <motion.div
                   className="text-center"
@@ -516,7 +516,7 @@ const Home = () => {
                   transition={{ type: "spring", stiffness: 300 }}
                 >
                   <motion.div
-                    className="text-4xl font-bold text-yellow-400"
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400"
                     animate={{
                       scale: [1, 1.1, 1],
                       textShadow: [
@@ -529,7 +529,7 @@ const Home = () => {
                   >
                     High
                   </motion.div>
-                  <div className="text-sm text-gray-400 uppercase tracking-wider">Protein</div>
+                  <div className="text-xs sm:text-sm text-gray-400 uppercase tracking-wider">Protein</div>
                 </motion.div>
               </motion.div>
             </motion.div>
@@ -829,7 +829,7 @@ const Home = () => {
 
         {/* Enhanced Scroll Indicator */}
         <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white"
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white z-20"
           animate={{
             y: [0, -10, 0],
             opacity: [0.7, 1, 0.7]

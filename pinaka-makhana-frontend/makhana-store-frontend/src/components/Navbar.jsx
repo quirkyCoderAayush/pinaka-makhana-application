@@ -929,10 +929,23 @@ function Navbar() {
             }}
           >
             <div
-              className="bg-white/95 backdrop-blur-lg rounded-2xl mx-4 mt-16 mb-4 shadow-2xl border border-white/20 max-h-[85vh] overflow-y-auto"
+              className="bg-white/95 backdrop-blur-lg rounded-2xl mx-4 mt-12 mb-4 shadow-2xl border border-white/20 max-h-[85vh] overflow-y-auto relative"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="p-6 space-y-6">
+              {/* Makhana Balls Background */}
+              <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+                {/* Floating Makhana Balls */}
+                <div className="absolute top-4 left-4 w-8 h-8 bg-gradient-to-br from-red-200 to-orange-200 rounded-full opacity-20 animate-pulse"></div>
+                <div className="absolute top-12 right-6 w-6 h-6 bg-gradient-to-br from-orange-200 to-yellow-200 rounded-full opacity-15 animate-bounce" style={{animationDelay: '0.5s'}}></div>
+                <div className="absolute top-20 left-8 w-4 h-4 bg-gradient-to-br from-red-100 to-pink-100 rounded-full opacity-25 animate-pulse" style={{animationDelay: '1s'}}></div>
+                <div className="absolute top-32 right-4 w-5 h-5 bg-gradient-to-br from-yellow-200 to-orange-200 rounded-full opacity-20 animate-bounce" style={{animationDelay: '1.5s'}}></div>
+                <div className="absolute bottom-20 left-6 w-7 h-7 bg-gradient-to-br from-orange-100 to-red-100 rounded-full opacity-15 animate-pulse" style={{animationDelay: '2s'}}></div>
+                <div className="absolute bottom-32 right-8 w-6 h-6 bg-gradient-to-br from-red-200 to-orange-200 rounded-full opacity-20 animate-bounce" style={{animationDelay: '2.5s'}}></div>
+                <div className="absolute bottom-12 left-12 w-4 h-4 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-full opacity-25 animate-pulse" style={{animationDelay: '3s'}}></div>
+                <div className="absolute bottom-6 right-12 w-5 h-5 bg-gradient-to-br from-orange-200 to-red-200 rounded-full opacity-15 animate-bounce" style={{animationDelay: '3.5s'}}></div>
+              </div>
+
+              <div className="p-6 space-y-6 relative z-10">
                 {/* Header */}
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-500 bg-clip-text text-transparent">

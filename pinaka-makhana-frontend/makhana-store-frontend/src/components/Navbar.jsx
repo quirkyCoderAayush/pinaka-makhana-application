@@ -22,6 +22,8 @@ function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [navbarOpacity, setNavbarOpacity] = useState(1);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -56,6 +58,8 @@ function Navbar() {
   const handleMobileSearchClose = () => {
     setIsMobileSearchOpen(false);
     setSearchQuery('');
+    setSearchSuggestions([]);
+    setShowSuggestions(false);
   };
 
   const handleMobileSearchSubmit = () => {
@@ -63,6 +67,33 @@ function Navbar() {
       navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
       setIsMobileSearchOpen(false);
       setSearchQuery('');
+      setShowSuggestions(false);
+    }
+  };
+
+  // Fetch search suggestions
+  const fetchSearchSuggestions = async (query) => {
+    if (query.length < 2) {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/products`);
+      const products = await response.json();
+
+      const filtered = products.filter(product =>
+        product.name.toLowerCase().includes(query.toLowerCase()) ||
+        product.description.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 5); // Limit to 5 suggestions
+
+      setSearchSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } catch (error) {
+      console.error('Error fetching search suggestions:', error);
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
     }
   };
 
@@ -94,6 +125,17 @@ function Navbar() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isSearchExpanded]);
+
+  // Debounced search suggestions
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchQuery && isMobileSearchOpen) {
+        fetchSearchSuggestions(searchQuery);
+      }
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, isMobileSearchOpen]);
 
   const handleSearchSubmit = () => {
     if (searchQuery.trim()) {
@@ -701,8 +743,8 @@ function Navbar() {
                 to="/wishlist"
                 className={`relative min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-300 active:scale-95 ${
                   isDarkBackground
-                    ? 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
-                    : 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
+                    ? 'text-white hover:text-red-500 hover:bg-white/10 active:bg-white/20'
+                    : 'text-white hover:text-red-500 hover:bg-white/10 active:bg-white/20'
                 }`}
                 style={{
                   filter: isDarkBackground
@@ -743,6 +785,80 @@ function Navbar() {
                   </span>
                 )}
               </Link>
+            )}
+
+            {/* Mobile Profile Icon */}
+            {isAuthenticated && (
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg transition-all duration-300 active:scale-95 ${
+                    isDarkBackground
+                      ? 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
+                      : 'text-white hover:text-red-300 hover:bg-white/10 active:bg-white/20'
+                  }`}
+                  style={{
+                    filter: isDarkBackground
+                      ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+                      : 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+                  }}
+                  aria-label="Profile Menu"
+                >
+                  <User className="h-5 w-5 transition-transform duration-200" />
+                </button>
+
+                {/* Mobile Profile Dropdown */}
+                {isProfileOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-white/95 backdrop-blur-lg rounded-xl shadow-2xl border border-white/20 z-50">
+                    <div className="p-4 space-y-3">
+                      {/* User Info */}
+                      <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-red-50 to-orange-50 rounded-lg">
+                        <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">
+                            {(user?.fullName || user?.username || 'U').charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800 text-sm">{user?.fullName || user?.username}</p>
+                          <p className="text-xs text-gray-600">Welcome back!</p>
+                        </div>
+                      </div>
+
+                      {/* Profile Links */}
+                      <div className="space-y-1">
+                        <Link
+                          to="/profile"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                        >
+                          <User className="w-4 h-4 text-gray-600" />
+                          <span className="font-medium text-gray-700 text-sm">My Profile</span>
+                        </Link>
+                        <Link
+                          to="/orders"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                        >
+                          <Package className="w-4 h-4 text-gray-600" />
+                          <span className="font-medium text-gray-700 text-sm">My Orders</span>
+                        </Link>
+                      </div>
+
+                      {/* Logout Button */}
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsProfileOpen(false);
+                        }}
+                        className="w-full bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2 text-sm"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Mobile Authentication Icons for Non-Authenticated Users */}
@@ -812,7 +928,7 @@ function Navbar() {
             }}
           >
             <div
-              className="bg-white/95 backdrop-blur-lg rounded-2xl mx-4 mt-20 mb-4 shadow-2xl border border-white/20"
+              className="bg-white/95 backdrop-blur-lg rounded-2xl mx-4 mt-16 mb-4 shadow-2xl border border-white/20 max-h-[85vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6 space-y-6">
@@ -1004,6 +1120,37 @@ function Navbar() {
                     autoFocus
                   />
                 </div>
+
+                {/* Search Suggestions */}
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-lg max-h-60 overflow-y-auto">
+                    {searchSuggestions.map((product) => (
+                      <button
+                        key={product.id}
+                        onClick={() => {
+                          navigate(`/products/${product.id}`);
+                          setIsMobileSearchOpen(false);
+                          setSearchQuery('');
+                          setShowSuggestions(false);
+                        }}
+                        className="w-full p-3 text-left hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 last:border-b-0"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <img
+                            src={product.imageUrl || '/api/placeholder/40/40'}
+                            alt={product.name}
+                            className="w-10 h-10 object-cover rounded-lg"
+                          />
+                          <div>
+                            <p className="font-medium text-gray-800 text-sm">{product.name}</p>
+                            <p className="text-xs text-gray-600 truncate">{product.description}</p>
+                            <p className="text-sm font-semibold text-red-600">₹{product.price}</p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {/* Search Button */}
                 <button

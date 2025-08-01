@@ -603,7 +603,7 @@ const Home = () => {
                     <motion.img
                       src={makhanaImage}
                       alt="Pinaka Premium Makhana"
-                      className="relative z-10 w-full h-96 object-contain p-4"
+                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 object-contain p-2 sm:p-4"
                       style={{
                         filter: 'brightness(1.2) contrast(1.1) saturate(1.3) drop-shadow(0 20px 40px rgba(0,0,0,0.3))',
                         mixBlendMode: 'normal'

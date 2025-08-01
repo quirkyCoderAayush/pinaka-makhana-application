@@ -8,6 +8,8 @@ import { useAdmin } from "./context/AdminContext";
 import { Heart, ShoppingCart, Search, Menu, X, User, Package, Home, Info, ShoppingBag, Phone, LogOut } from "lucide-react";
 import logo from "../images/logo.png";
 import "../styles/navbar-enhancements.css";
+import apiService from "../services/api";
+import { getProductImage } from "../utils/productImageMapper";
 
 
 function Navbar() {
@@ -80,12 +82,11 @@ function Navbar() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/api/products`);
-      const products = await response.json();
+      const products = await apiService.getProducts();
 
       const filtered = products.filter(product =>
         product.name.toLowerCase().includes(query.toLowerCase()) ||
-        product.description.toLowerCase().includes(query.toLowerCase())
+        (product.description && product.description.toLowerCase().includes(query.toLowerCase()))
       ).slice(0, 5); // Limit to 5 suggestions
 
       setSearchSuggestions(filtered);
@@ -1137,7 +1138,7 @@ function Navbar() {
                       >
                         <div className="flex items-center space-x-3">
                           <img
-                            src={product.imageUrl || '/api/placeholder/40/40'}
+                            src={getProductImage(product)}
                             alt={product.name}
                             className="w-10 h-10 object-cover rounded-lg"
                           />

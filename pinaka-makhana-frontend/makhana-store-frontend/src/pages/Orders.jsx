@@ -165,10 +165,10 @@ const Orders = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-24 pb-12 px-8">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black pt-24 pb-12 px-8">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">Order History</h1>
-          <p className="text-gray-600 mb-8">Please login to view your order history.</p>
+          <h1 className="text-3xl font-bold text-white mb-4">Order History</h1>
+          <p className="text-gray-300 mb-8">Please login to view your order history.</p>
           <a href="/login" className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium">
             Login
           </a>
@@ -179,21 +179,21 @@ const Orders = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black pt-24 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your orders...</p>
+          <p className="text-gray-300">Loading your orders...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-12 px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black pt-24 pb-12 px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Order History</h1>
-          <p className="text-gray-600">Track all your Pinaka Makhana orders</p>
+          <h1 className="text-4xl font-bold text-white mb-2">Order History</h1>
+          <p className="text-gray-300">Track all your Pinaka Makhana orders</p>
         </div>
 
         {error && (
@@ -209,7 +209,7 @@ const Orders = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">No orders yet</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">No orders yet</h3>
             <p className="text-gray-600 mb-8">Start shopping to see your order history here!</p>
             <a href="/products" className="inline-block bg-red-600 text-white px-8 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium">
               Shop Now

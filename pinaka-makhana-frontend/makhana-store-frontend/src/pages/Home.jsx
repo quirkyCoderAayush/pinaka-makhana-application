@@ -295,7 +295,7 @@ const Home = () => {
 
                 {/* Main Heading with Enhanced Animations */}
                 <motion.h1
-                  className="text-6xl lg:text-8xl font-black leading-none"
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight sm:leading-none"
                   variants={fadeInUp}
                 >
                   <motion.span
@@ -339,7 +339,7 @@ const Home = () => {
 
                 {/* Subheading */}
                 <motion.p
-                  className="text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed"
+                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed"
                   variants={fadeInUp}
                 >
                   The Future of
@@ -360,7 +360,7 @@ const Home = () => {
 
                 {/* Description */}
                 <motion.p
-                  className="text-lg text-gray-400 leading-relaxed max-w-md"
+                  className="text-sm sm:text-base md:text-lg text-gray-400 leading-relaxed max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg"
                   variants={fadeInUp}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -603,7 +603,7 @@ const Home = () => {
                     <motion.img
                       src={makhanaImage}
                       alt="Pinaka Premium Makhana"
-                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 object-contain p-2 sm:p-4"
+                      className="relative z-10 w-full h-72 sm:h-96 md:h-[28rem] lg:h-[32rem] object-contain p-2 sm:p-4"
                       style={{
                         filter: 'brightness(1.2) contrast(1.1) saturate(1.3) drop-shadow(0 20px 40px rgba(0,0,0,0.3))',
                         mixBlendMode: 'normal'

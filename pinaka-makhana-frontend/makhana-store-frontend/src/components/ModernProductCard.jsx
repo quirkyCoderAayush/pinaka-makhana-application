@@ -121,7 +121,7 @@ const ModernProductCard = ({
       </motion.div>
 
       {/* Compact Product Details */}
-      <div className="p-4 space-y-3">
+      <div className="p-2 sm:p-3 md:p-4 space-y-2 sm:space-y-3">
         {/* Compact Rating */}
         {product.rating && (
           <div className="flex items-center justify-between">
@@ -146,7 +146,7 @@ const ModernProductCard = ({
         {/* Compact Product Name */}
         <Link to={`/product/${product.id}`}>
           <h3
-            className="font-bold text-gray-900 text-lg mb-1 line-clamp-2 hover:text-red-600 transition-colors duration-300 leading-tight"
+            className="font-bold text-gray-900 text-sm sm:text-base md:text-lg mb-1 line-clamp-2 hover:text-red-600 transition-colors duration-300 leading-tight"
             style={{
               background: isHovered
                 ? 'linear-gradient(135deg, #dc2626 0%, #ea580c 100%)'
@@ -175,7 +175,7 @@ const ModernProductCard = ({
         {/* Compact Price and Discount Section */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-2">
-            <span className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+            <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
               ₹{formatPrice(product.price)}
             </span>
             {product.originalPrice && product.originalPrice > product.price && (

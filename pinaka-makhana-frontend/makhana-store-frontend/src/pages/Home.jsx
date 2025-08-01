@@ -248,9 +248,9 @@ const Home = () => {
           />
         </motion.div>
 
-        <div className="container mx-auto px-8 py-20 relative z-10 w-full" style={{ padding: '2rem' }}>
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-20 md:py-24 relative z-10 w-full">
           <motion.div
-            className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[80vh]"
             variants={staggerContainer}
             initial="visible"
             animate="visible"
@@ -258,13 +258,13 @@ const Home = () => {
 
             {/* Left Content */}
             <motion.div
-              className="text-white space-y-8 home-content"
+              className="text-white home-content w-full flex flex-col justify-center"
               variants={slideInLeft}
               initial={{ opacity: 1 }}
               animate={{ opacity: 1 }}
             >
               <motion.div
-                className="space-y-6"
+                className="space-y-8 sm:space-y-10 md:space-y-12"
                 variants={staggerContainer}
                 initial="hidden"
                 animate="visible"
@@ -295,7 +295,7 @@ const Home = () => {
 
                 {/* Main Heading with Enhanced Animations */}
                 <motion.h1
-                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight"
+                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-[0.9] sm:leading-[0.85] mb-6 sm:mb-8 md:mb-10"
                   variants={fadeInUp}
                 >
                   <motion.span
@@ -363,7 +363,7 @@ const Home = () => {
 
                 {/* Subheading */}
                 <motion.p
-                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed mb-4 sm:mb-6 md:mb-8"
+                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light text-gray-300 leading-relaxed mb-6 sm:mb-8 md:mb-10"
                   variants={fadeInUp}
                 >
                   The Future of
@@ -392,7 +392,7 @@ const Home = () => {
 
                 {/* Description */}
                 <motion.p
-                  className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 leading-relaxed max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl"
+                  className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400 leading-relaxed max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mb-8 sm:mb-10 md:mb-12"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{
                     opacity: 1,

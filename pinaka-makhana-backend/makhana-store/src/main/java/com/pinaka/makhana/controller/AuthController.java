@@ -21,17 +21,10 @@ import com.pinaka.makhana.util.JwtUtil;
 public class AuthController {
 
 	private final AuthService authService;
-	private final UserRepository userRepository;
-	private final JwtUtil jwtUtil;
-	private final PasswordEncoder passwordEncoder;
-
 	public AuthController(AuthService authService, UserRepository userRepository, JwtUtil jwtUtil,
 			PasswordEncoder passwordEncoder) {
 		super();
 		this.authService = authService;
-		this.userRepository = userRepository;
-		this.jwtUtil = jwtUtil;
-		this.passwordEncoder = passwordEncoder;
 	}
 
 	@PostMapping("/register")

@@ -17,5 +17,4 @@ public class MakhanaStoreApplication {
 		System.out.println("🏥 Health check available at: /api/health");
 		System.out.println("Hello quirkyCoder, all looks good here and perfect!!!");
 	}
-
 }

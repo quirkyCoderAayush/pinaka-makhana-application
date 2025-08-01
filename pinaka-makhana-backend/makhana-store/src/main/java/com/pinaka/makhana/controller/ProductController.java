@@ -2,8 +2,7 @@ package com.pinaka.makhana.controller;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,7 +24,7 @@ import com.pinaka.makhana.service.ProductService;
 @CrossOrigin(origins = "*")
 public class ProductController {
 
-	private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+
 	private final ProductService productService;
 
 	public ProductController(ProductService productService) {

@@ -295,7 +295,7 @@ const Home = () => {
 
                 {/* Main Heading with Enhanced Animations */}
                 <motion.h1
-                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight"
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight"
                   variants={fadeInUp}
                 >
                   <motion.span
@@ -339,7 +339,7 @@ const Home = () => {
 
                 {/* Subheading */}
                 <motion.p
-                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light text-gray-300 leading-relaxed"
+                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed"
                   variants={fadeInUp}
                 >
                   The Future of
@@ -360,7 +360,7 @@ const Home = () => {
 
                 {/* Description */}
                 <motion.p
-                  className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400 leading-relaxed max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl"
+                  className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 leading-relaxed max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl"
                   variants={fadeInUp}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

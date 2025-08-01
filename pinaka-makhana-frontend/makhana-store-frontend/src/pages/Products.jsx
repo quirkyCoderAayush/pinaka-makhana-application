@@ -37,9 +37,20 @@ const Products = () => {
   const [favorites, setFavorites] = useState([]);
   const [activeProductId, setActiveProductId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   useEffect(() => {
     fetchProducts();
+  }, []);
+
+  // Handle screen width changes for responsive grid
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Update price range when products change
@@ -646,7 +657,12 @@ const Products = () => {
 
             {/* Enhanced Modern Products Grid */}
             <motion.div
-              className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
+              className={`grid gap-4 sm:gap-6 md:gap-8 ${
+                screenWidth < 640 ? 'grid-cols-2' :
+                screenWidth < 768 ? 'grid-cols-2' :
+                screenWidth <= 1300 ? 'grid-cols-3' :
+                'grid-cols-4'
+              }`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.2, duration: 0.6 }}

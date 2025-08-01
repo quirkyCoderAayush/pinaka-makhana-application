@@ -300,37 +300,61 @@ const Home = () => {
                 >
                   <motion.span
                     className="block text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300"
-                    initial={{ opacity: 0, y: 60, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                      scale: 1,
+                      textShadow: [
+                        "0 0 0px rgba(255, 255, 255, 0)",
+                        "0 0 20px rgba(255, 255, 255, 0.1)",
+                        "0 0 0px rgba(255, 255, 255, 0)"
+                      ]
+                    }}
                     transition={{
-                      delay: 0.3,
-                      duration: 1.0,
-                      ease: [0.25, 0.46, 0.45, 0.94]
+                      delay: 0.2,
+                      duration: 1.2,
+                      ease: [0.16, 1, 0.3, 1],
+                      textShadow: {
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }
                     }}
                   >
                     PINAKA
                   </motion.span>
                   <motion.span
-                    className="block text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400"
-                    initial={{ opacity: 0, y: 60, scale: 0.95 }}
+                    className="block text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500"
+                    initial={{ opacity: 0, y: 40, scale: 0.9 }}
                     animate={{
                       opacity: 1,
                       y: 0,
                       scale: 1,
-                      backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                      backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                      filter: [
+                        "brightness(1) saturate(1)",
+                        "brightness(1.1) saturate(1.2)",
+                        "brightness(1) saturate(1)"
+                      ]
                     }}
                     transition={{
-                      delay: 0.6,
-                      duration: 1.2,
-                      ease: [0.25, 0.46, 0.45, 0.94],
+                      delay: 0.5,
+                      duration: 1.4,
+                      ease: [0.16, 1, 0.3, 1],
                       backgroundPosition: {
+                        duration: 5,
+                        repeat: Infinity,
+                        ease: [0.4, 0.0, 0.2, 1]
+                      },
+                      filter: {
                         duration: 4,
                         repeat: Infinity,
                         ease: "easeInOut"
                       }
                     }}
                     style={{
-                      backgroundSize: "200% 200%"
+                      backgroundSize: "300% 300%"
                     }}
                   >
                     MAKHANA
@@ -339,19 +363,27 @@ const Home = () => {
 
                 {/* Subheading */}
                 <motion.p
-                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed"
+                  className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-gray-300 leading-relaxed mb-4 sm:mb-6 md:mb-8"
                   variants={fadeInUp}
                 >
                   The Future of
                   <motion.span
                     className="text-red-400 font-medium"
                     animate={{
-                      color: ["#f87171", "#fb923c", "#fbbf24", "#f87171"]
+                      color: ["#ef4444", "#f97316", "#eab308", "#dc2626", "#ef4444"],
+                      textShadow: [
+                        "0 0 0px rgba(239, 68, 68, 0)",
+                        "0 0 10px rgba(249, 115, 22, 0.3)",
+                        "0 0 15px rgba(234, 179, 8, 0.4)",
+                        "0 0 10px rgba(220, 38, 38, 0.3)",
+                        "0 0 0px rgba(239, 68, 68, 0)"
+                      ]
                     }}
                     transition={{
-                      duration: 4,
+                      duration: 6,
                       repeat: Infinity,
-                      ease: "easeInOut"
+                      ease: [0.4, 0.0, 0.2, 1],
+                      repeatType: "reverse"
                     }}
                   >
                     {" "}Healthy Snacking
@@ -361,10 +393,22 @@ const Home = () => {
                 {/* Description */}
                 <motion.p
                   className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 leading-relaxed max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl"
-                  variants={fadeInUp}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1.2, duration: 0.8 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    color: ["#9ca3af", "#a1a1aa", "#9ca3af"]
+                  }}
+                  transition={{
+                    delay: 1.0,
+                    duration: 1.0,
+                    ease: [0.16, 1, 0.3, 1],
+                    color: {
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }
+                  }}
                 >
                   Experience premium roasted fox nuts that redefine taste and nutrition.
                   Zero guilt, maximum flavor.

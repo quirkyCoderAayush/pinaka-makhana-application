@@ -67,7 +67,7 @@ const ModernProductCard = ({
       <div className="absolute top-4 right-4 z-20">
         <FavoriteButton
           product={product}
-          size="md"
+          size="sm"
           className="shadow-lg"
         />
       </div>
@@ -172,9 +172,9 @@ const ModernProductCard = ({
           )}
         </div>
 
-        {/* Compact Price and Discount Section */}
-        <div className="flex items-center justify-between mb-3 gap-2">
-          <div className="flex items-center space-x-1 sm:space-x-2 flex-1 min-w-0">
+        {/* Price Section */}
+        <div className="mb-3">
+          <div className="flex items-center space-x-2 mb-1">
             <span className="text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
               ₹{formatPrice(product.price)}
             </span>
@@ -185,9 +185,11 @@ const ModernProductCard = ({
             )}
           </div>
           {product.originalPrice && product.originalPrice > product.price && (
-            <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full font-bold whitespace-nowrap flex-shrink-0">
-              {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
-            </span>
+            <div className="flex justify-start">
+              <span className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+              </span>
+            </div>
           )}
         </div>
 

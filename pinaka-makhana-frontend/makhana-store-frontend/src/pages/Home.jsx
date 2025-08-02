@@ -869,7 +869,7 @@ const Home = () => {
 
         {/* Enhanced Scroll Indicator */}
         <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white z-20"
+          className="absolute bottom-8 left-0 right-0 text-white z-20 flex justify-center"
           animate={{
             y: [0, -10, 0],
             opacity: [0.7, 1, 0.7]

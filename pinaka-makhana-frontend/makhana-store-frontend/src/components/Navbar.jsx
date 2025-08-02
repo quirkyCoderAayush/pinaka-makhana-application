@@ -5,7 +5,7 @@ import { CartContext } from "./context/CartContext";
 import { useAuth } from "./context/AuthContext";
 import { useFavorites } from "./context/FavoritesContext";
 import { useAdmin } from "./context/AdminContext";
-import { Heart, ShoppingCart, Search, Menu, X, User, Package, Home, Info, ShoppingBag, Phone, LogOut } from "lucide-react";
+import { Heart, ShoppingCart, Search, Menu, X, User, Package, Home, Info, ShoppingBag, Phone, LogOut, Settings } from "lucide-react";
 import logo from "../images/logo.png";
 import "../styles/navbar-enhancements.css";
 import apiService from "../services/api";
@@ -988,7 +988,7 @@ function Navbar() {
                       { name: 'Cart', path: '/cart', badge: cartItems.length, icon: ShoppingCart },
                       { name: 'Wishlist', path: '/wishlist', badge: favorites?.length, icon: Heart }
                     ] : []),
-                    ...(isAdmin ? [{ name: 'Admin Panel', path: '/admin/dashboard' }] : [])
+                    ...(isAdmin ? [{ name: 'Admin Panel', path: '/admin/dashboard', icon: Settings }] : [])
                   ].map((item) => (
                     <Link
                       key={item.path}
@@ -1001,7 +1001,7 @@ function Navbar() {
                       }`}
                     >
                       <div className="flex items-center space-x-3">
-                        <item.icon className="w-5 h-5" />
+                        {item.icon && <item.icon className="w-5 h-5" />}
                         <span className="font-medium">{item.name}</span>
                       </div>
                       {item.badge > 0 && (

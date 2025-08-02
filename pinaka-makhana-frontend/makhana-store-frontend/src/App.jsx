@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import AdminRoute from './components/AdminRoute'
+import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
 import About from './pages/About'
 import Contact from './pages/Contact'
@@ -81,11 +82,11 @@ function App() {
           </>
         } />
         <Route path="/orders" element={
-          <>
+          <ProtectedRoute>
             <Navbar />
             <Orders />
             <Footer />
-          </>
+          </ProtectedRoute>
         } />
         <Route path="/login" element={
           <>
@@ -102,11 +103,11 @@ function App() {
           </>
         } />
         <Route path="/profile" element={
-          <>
+          <ProtectedRoute>
             <Navbar />
             <Account />
             <Footer />
-          </>
+          </ProtectedRoute>
         } />
         <Route path="/wishlist" element={
           <>

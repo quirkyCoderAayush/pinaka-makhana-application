@@ -248,7 +248,7 @@ const Home = () => {
           />
         </motion.div>
 
-        <div className="container mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16 relative z-10 w-full">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 pt-24 pb-8 sm:pt-28 sm:pb-12 md:pt-32 md:pb-16 relative z-10 w-full">
           <motion.div
             className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[85vh]"
             variants={staggerContainer}
@@ -300,23 +300,22 @@ const Home = () => {
                 >
                   <motion.span
                     className="block text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300"
-                    initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{
                       opacity: 1,
                       y: 0,
-                      scale: 1,
                       textShadow: [
                         "0 0 0px rgba(255, 255, 255, 0)",
-                        "0 0 20px rgba(255, 255, 255, 0.1)",
+                        "0 0 15px rgba(255, 255, 255, 0.08)",
                         "0 0 0px rgba(255, 255, 255, 0)"
                       ]
                     }}
                     transition={{
-                      delay: 0.1,
-                      duration: 1.0,
-                      ease: [0.16, 1, 0.3, 1],
+                      delay: 0.2,
+                      duration: 0.8,
+                      ease: [0.25, 0.46, 0.45, 0.94],
                       textShadow: {
-                        duration: 3,
+                        duration: 4,
                         repeat: Infinity,
                         ease: "easeInOut"
                       }
@@ -326,29 +325,28 @@ const Home = () => {
                   </motion.span>
                   <motion.span
                     className="block text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500"
-                    initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{
                       opacity: 1,
                       y: 0,
-                      scale: 1,
                       backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
                       filter: [
                         "brightness(1) saturate(1)",
-                        "brightness(1.1) saturate(1.2)",
+                        "brightness(1.05) saturate(1.1)",
                         "brightness(1) saturate(1)"
                       ]
                     }}
                     transition={{
-                      delay: 0.3,
-                      duration: 1.2,
-                      ease: [0.16, 1, 0.3, 1],
+                      delay: 0.4,
+                      duration: 0.8,
+                      ease: [0.25, 0.46, 0.45, 0.94],
                       backgroundPosition: {
-                        duration: 5,
+                        duration: 6,
                         repeat: Infinity,
-                        ease: [0.4, 0.0, 0.2, 1]
+                        ease: "easeInOut"
                       },
                       filter: {
-                        duration: 4,
+                        duration: 5,
                         repeat: Infinity,
                         ease: "easeInOut"
                       }
@@ -370,20 +368,18 @@ const Home = () => {
                   <motion.span
                     className="text-red-400 font-medium"
                     animate={{
-                      color: ["#ef4444", "#f97316", "#eab308", "#dc2626", "#ef4444"],
+                      color: ["#ef4444", "#f97316", "#eab308", "#ef4444"],
                       textShadow: [
                         "0 0 0px rgba(239, 68, 68, 0)",
-                        "0 0 10px rgba(249, 115, 22, 0.3)",
-                        "0 0 15px rgba(234, 179, 8, 0.4)",
-                        "0 0 10px rgba(220, 38, 38, 0.3)",
+                        "0 0 8px rgba(249, 115, 22, 0.2)",
+                        "0 0 12px rgba(234, 179, 8, 0.3)",
                         "0 0 0px rgba(239, 68, 68, 0)"
                       ]
                     }}
                     transition={{
-                      duration: 6,
+                      duration: 8,
                       repeat: Infinity,
-                      ease: [0.4, 0.0, 0.2, 1],
-                      repeatType: "reverse"
+                      ease: "easeInOut"
                     }}
                   >
                     {" "}Healthy Snacking
@@ -393,7 +389,7 @@ const Home = () => {
                 {/* Description */}
                 <motion.p
                   className="text-base sm:text-lg md:text-xl lg:text-lg xl:text-xl text-gray-400 leading-relaxed max-w-md sm:max-w-lg md:max-w-xl lg:max-w-lg xl:max-w-xl mb-6 sm:mb-8 md:mb-10"
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{
                     opacity: 1,
                     y: 0,
@@ -401,10 +397,10 @@ const Home = () => {
                   }}
                   transition={{
                     delay: 0.6,
-                    duration: 0.8,
-                    ease: [0.16, 1, 0.3, 1],
+                    duration: 0.6,
+                    ease: [0.25, 0.46, 0.45, 0.94],
                     color: {
-                      duration: 4,
+                      duration: 6,
                       repeat: Infinity,
                       ease: "easeInOut"
                     }
@@ -417,7 +413,7 @@ const Home = () => {
 
               {/* Enhanced CTA Buttons */}
               <motion.div
-                className="flex flex-col sm:flex-row gap-3 sm:gap-4"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:mt-8"
                 variants={fadeInUp}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -691,7 +687,7 @@ const Home = () => {
 
                 {/* Enhanced Floating Cards with Sophisticated Animations */}
                 <motion.div
-                  className="absolute -top-8 -left-8 bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-2 border-red-200"
+                  className="absolute top-4 -left-8 bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-2 border-red-200"
                   animate={{
                     y: [0, -10, 0],
                     rotate: [0, 2, 0],
@@ -1069,7 +1065,7 @@ const Home = () => {
           </motion.div>
 
           {/* Enhanced Show More Products Button */}
-          {products.length > 4 && (
+          {products.length > 0 && (
             <motion.div
               className="text-center mt-12"
               initial={{ opacity: 0, y: 30 }}

@@ -248,7 +248,7 @@ const Home = () => {
           />
         </motion.div>
 
-        <div className="container mx-auto px-4 sm:px-6 md:px-8 pt-24 pb-8 sm:pt-28 sm:pb-12 md:pt-32 md:pb-16 lg:pb-4 xl:pb-2 2xl:pb-0 relative z-10 w-full">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 pt-20 pb-8 sm:pt-24 sm:pb-12 md:pt-28 md:pb-16 lg:pt-20 lg:pb-4 xl:pt-18 xl:pb-2 2xl:pt-16 2xl:pb-0 relative z-10 w-full">
           <motion.div
             className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[85vh] lg:min-h-[70vh] xl:min-h-[65vh] 2xl:min-h-[60vh]"
             variants={staggerContainer}
@@ -576,14 +576,14 @@ const Home = () => {
 
             {/* Enhanced Right Visual */}
             <motion.div
-              className="relative home-content lg:block lg:h-auto lg:max-h-[70vh] xl:max-h-[65vh] 2xl:max-h-[60vh] lg:flex lg:items-center lg:justify-center"
+              className="relative home-content lg:block lg:h-auto lg:max-h-[80vh] xl:max-h-[75vh] 2xl:max-h-[70vh] lg:flex lg:items-center lg:justify-center"
               variants={slideInRight}
               initial={{ opacity: 1 }}
               animate={{ opacity: 1 }}
             >
               {/* Main Product Container */}
               <motion.div
-                className="relative group lg:h-auto lg:max-h-[65vh] xl:max-h-[60vh] 2xl:max-h-[55vh] lg:flex lg:items-center lg:justify-center"
+                className="relative group lg:h-auto lg:max-h-[75vh] xl:max-h-[70vh] 2xl:max-h-[65vh] lg:flex lg:items-center lg:justify-center"
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
@@ -635,7 +635,7 @@ const Home = () => {
 
                   {/* Enhanced Image Container with Animation Boundaries */}
                   <motion.div
-                    className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-100 flex items-center justify-center fullscreen:h-full lg:max-h-[60vh] xl:max-h-[55vh] 2xl:max-h-[50vh] hero-image-container-fullscreen"
+                    className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-100 flex items-center justify-center fullscreen:h-full lg:max-h-[70vh] xl:max-h-[65vh] 2xl:max-h-[60vh] hero-image-container-fullscreen"
                     whileHover={{ scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     style={{ minHeight: '280px' }}
@@ -644,7 +644,7 @@ const Home = () => {
                     <motion.img
                       src={bannerImage}
                       alt="Pinaka Premium Makhana Banner"
-                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-auto lg:max-h-[55vh] xl:max-h-[50vh] 2xl:max-h-[45vh] fullscreen:h-full object-cover sm:object-contain lg:object-cover fullscreen:object-cover p-1 sm:p-2 md:p-3 lg:p-2 xl:p-3 fullscreen:p-0 hero-banner-fullscreen"
+                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-auto lg:max-h-[65vh] xl:max-h-[60vh] 2xl:max-h-[55vh] fullscreen:h-full object-cover sm:object-contain md:object-cover lg:object-cover fullscreen:object-cover p-1 sm:p-2 md:p-1 lg:p-2 xl:p-3 fullscreen:p-0 hero-banner-fullscreen"
                       style={{
                         filter: 'brightness(1.15) contrast(1.05) saturate(1.2) drop-shadow(0 15px 35px rgba(0,0,0,0.25))',
                         mixBlendMode: 'normal',
@@ -695,7 +695,7 @@ const Home = () => {
 
                 {/* Enhanced Floating Cards with Sophisticated Animations */}
                 <motion.div
-                  className="absolute top-4 -left-8 bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-2 border-red-200 hidden lg:block"
+                  className="absolute top-4 -left-8 bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-2 border-red-200 hidden lg:block z-20"
                   animate={{
                     y: [0, -10, 0],
                     rotate: [0, 2, 0],
@@ -745,7 +745,7 @@ const Home = () => {
                 </motion.div>
 
                 <motion.div
-                  className="absolute -bottom-8 -right-8 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-5 shadow-2xl hidden lg:block"
+                  className="absolute -bottom-8 -right-8 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-5 shadow-2xl hidden lg:block z-20"
                   initial={{ opacity: 0, scale: 0.8, y: 50 }}
                   animate={{
                     opacity: 1,

@@ -43,12 +43,12 @@ const QuantitySelector = ({
         variant === 'compact' ? 'h-10 flex-1 text-base' : 'h-12 flex-1 text-lg'
   };
   
-  // Container classes based on variant with fixed width
+  // Enhanced container classes with glass morphism and gradients
   const containerClasses = variant === 'mini'
-    ? 'inline-flex items-center gap-0 border border-gray-200 rounded-lg bg-white shadow-sm w-20'
+    ? 'inline-flex items-center gap-0 border border-white/30 rounded-lg bg-white/20 backdrop-blur-sm shadow-lg w-20 hover:bg-white/30 transition-all duration-300'
     : variant === 'compact'
-      ? 'inline-flex items-center gap-0 border border-gray-300 rounded-xl bg-white shadow-sm w-24'
-      : 'inline-flex items-center gap-0 border border-gray-300 rounded-xl bg-white shadow-md w-28';
+      ? 'inline-flex items-center gap-0 border border-white/40 rounded-xl bg-gradient-to-r from-white/25 to-white/15 backdrop-blur-md shadow-xl w-24 hover:from-white/35 hover:to-white/25 transition-all duration-300'
+      : 'inline-flex items-center gap-0 border border-white/50 rounded-xl bg-gradient-to-r from-white/30 to-white/20 backdrop-blur-lg shadow-2xl w-28 hover:from-white/40 hover:to-white/30 transition-all duration-300 hover:scale-105';
 
   // SVG size based on component size and variant
   const svgSize = {
@@ -66,14 +66,14 @@ const QuantitySelector = ({
         type="button"
         onClick={handleDecrement}
         disabled={disabled || quantity <= min}
-        className={`${sizeClasses[size]} flex items-center justify-center text-gray-600 hover:text-white hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 rounded-l-xl border-r border-gray-200`}
+        className={`${sizeClasses[size]} flex items-center justify-center text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-red-500 hover:to-orange-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 rounded-l-xl border-r border-white/30 hover:shadow-lg hover:scale-110 active:scale-95`}
       >
         <svg className={svgSize[size]} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
         </svg>
       </button>
 
-      <div className={`${inputSizeClasses[size]} flex items-center justify-center font-semibold text-gray-800 bg-gray-50 border-r border-gray-200`}>
+      <div className={`${inputSizeClasses[size]} flex items-center justify-center font-bold text-gray-800 bg-gradient-to-r from-white/60 to-white/40 border-r border-white/30 backdrop-blur-sm`}>
         {quantity}
       </div>
 
@@ -81,7 +81,7 @@ const QuantitySelector = ({
         type="button"
         onClick={handleIncrement}
         disabled={disabled || quantity >= max}
-        className={`${sizeClasses[size]} flex items-center justify-center text-gray-600 hover:text-white hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 rounded-r-xl`}
+        className={`${sizeClasses[size]} flex items-center justify-center text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-orange-500 hover:to-red-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 rounded-r-xl hover:shadow-lg hover:scale-110 active:scale-95`}
       >
         <svg className={svgSize[size]} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />

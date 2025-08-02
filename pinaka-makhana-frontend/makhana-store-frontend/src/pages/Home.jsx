@@ -644,7 +644,7 @@ const Home = () => {
                     <motion.img
                       src={bannerImage}
                       alt="Pinaka Premium Makhana Banner"
-                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[30rem] xl:h-[34rem] object-contain p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10"
+                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[36rem] xl:h-[40rem] 2xl:h-[44rem] object-contain p-3 sm:p-4 md:p-6 lg:p-6 xl:p-8"
                       style={{
                         filter: 'brightness(1.15) contrast(1.05) saturate(1.2) drop-shadow(0 15px 35px rgba(0,0,0,0.25))',
                         mixBlendMode: 'normal',
@@ -873,7 +873,7 @@ const Home = () => {
 
         {/* Enhanced Scroll Indicator */}
         <motion.div
-          className="absolute bottom-8 left-0 right-0 text-white z-20 flex justify-center"
+          className="absolute bottom-4 sm:bottom-6 md:bottom-8 lg:bottom-12 xl:bottom-16 left-0 right-0 text-white z-20 flex justify-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{
             y: [0, -10, 0],
@@ -929,15 +929,17 @@ const Home = () => {
           style={{ backgroundSize: "400% 400%" }}
         />
 
-        {/* Enhanced Scattered Makhana-like Shapes */}
+        {/* Enhanced Scattered Makhana-like Shapes with More Variety */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none w-full">
           {/* Large floating shapes with enhanced animations */}
           <motion.div
             className="absolute top-20 left-10 w-16 h-16 bg-gradient-to-br from-orange-200 to-red-200 rounded-full opacity-20"
             animate={{
-              y: [0, -20, 0],
-              scale: [1, 1.2, 1],
-              opacity: [0.2, 0.4, 0.2]
+              y: [0, -25, 0],
+              x: [0, 15, 0],
+              scale: [1, 1.3, 1],
+              opacity: [0.15, 0.35, 0.15],
+              rotate: [0, 180, 360]
             }}
             transition={{
               duration: 6,
@@ -1001,6 +1003,72 @@ const Home = () => {
           <div className="absolute top-3/4 right-1/4 w-3 h-3 bg-orange-300 rounded-full opacity-25"></div>
           <div className="absolute top-1/2 left-1/6 w-5 h-5 bg-yellow-300 rounded-full opacity-15"></div>
           
+          {/* Additional Floating Makhana Balls */}
+          <motion.div
+            className="absolute top-1/3 left-1/5 w-18 h-18 bg-gradient-to-br from-amber-200 to-orange-300 rounded-full opacity-25"
+            animate={{
+              y: [0, -30, 0],
+              x: [0, 20, 0],
+              scale: [1, 1.4, 1],
+              opacity: [0.2, 0.4, 0.2],
+              rotate: [0, -180, -360]
+            }}
+            transition={{
+              duration: 9,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 3
+            }}
+          />
+          <motion.div
+            className="absolute top-2/3 right-1/5 w-10 h-10 bg-gradient-to-br from-rose-200 to-red-300 rounded-full opacity-30"
+            animate={{
+              y: [0, 20, 0],
+              x: [0, -15, 0],
+              scale: [1, 1.2, 1],
+              opacity: [0.25, 0.45, 0.25],
+              rotate: [0, 90, 180]
+            }}
+            transition={{
+              duration: 7,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1.5
+            }}
+          />
+          <motion.div
+            className="absolute bottom-1/4 left-2/3 w-14 h-14 bg-gradient-to-br from-yellow-200 to-amber-300 rounded-full opacity-20"
+            animate={{
+              y: [0, -22, 0],
+              x: [0, 12, 0],
+              scale: [1, 1.25, 1],
+              opacity: [0.15, 0.35, 0.15],
+              rotate: [0, 270, 360]
+            }}
+            transition={{
+              duration: 11,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 4
+            }}
+          />
+          <motion.div
+            className="absolute top-1/6 right-2/5 w-8 h-8 bg-gradient-to-br from-orange-300 to-red-400 rounded-full opacity-35"
+            animate={{
+              y: [0, 18, 0],
+              x: [0, -8, 0],
+              scale: [1, 1.15, 1],
+              opacity: [0.3, 0.5, 0.3],
+              rotate: [0, 120, 240]
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2.5
+            }}
+          />
+
           {/* Geometric patterns */}
           <div className="absolute top-1/3 right-1/6 w-12 h-12 border-2 border-orange-200 rounded-full opacity-20 animate-spin" style={{animationDuration: '20s'}}></div>
           <div className="absolute bottom-1/3 left-1/3 w-8 h-8 border border-red-200 rotate-45 opacity-25"></div>

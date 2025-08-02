@@ -393,12 +393,17 @@ function Navbar() {
               <img
                 src={logo}
                 alt="Pinaka Makhana"
-                className="h-16 w-auto transition-all duration-300 group-hover:scale-105"
+                className="h-16 w-auto transition-all duration-300 group-hover:scale-105 relative z-10"
                 style={{
                   filter: isDarkBackground
-                    ? 'brightness(1.3) contrast(1.4) saturate(1.2) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))'
-                    : 'brightness(1.4) contrast(1.5) saturate(1.3) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 16px rgba(255, 255, 255, 0.4))',
-                  transition: 'all 0.3s ease-in-out'
+                    ? 'brightness(1.5) contrast(1.6) saturate(1.4) drop-shadow(0 3px 15px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 30px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 50px rgba(255, 165, 0, 0.3))'
+                    : 'brightness(1.3) contrast(1.4) saturate(1.3) drop-shadow(0 3px 12px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 20px rgba(255, 165, 0, 0.4)) drop-shadow(0 0 35px rgba(255, 69, 0, 0.2))',
+                  transition: 'all 0.3s ease-in-out',
+                  background: isDarkBackground
+                    ? 'radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 0%, transparent 70%)'
+                    : 'radial-gradient(circle at center, rgba(255, 165, 0, 0.06) 0%, transparent 70%)',
+                  borderRadius: '8px',
+                  padding: '3px'
                 }}
               />
             </Link>
@@ -451,7 +456,7 @@ function Navbar() {
           </div>
           
           {/* Right Section - Actions & Auth */}
-          <div className="hidden lg:flex items-center space-x-1">
+          <div className="hidden lg:flex items-center space-x-1 xl:space-x-3 2xl:space-x-4">
             {/* Compact Expandable Search */}
             <div className="relative" ref={searchRef}>
               <div className={`flex items-center transition-all duration-400 ease-in-out ${
@@ -560,6 +565,10 @@ function Navbar() {
                 )}
               </Link>
             )}
+
+            {/* Spacer for large screens between cart and profile */}
+            <div className="hidden xl:block w-4 2xl:w-6"></div>
+
             {/* Modern Minimalist Profile Section */}
             {isAuthenticated ? (
               <div className="relative" ref={profileRef}>

@@ -265,3 +265,23 @@ h1, h2, h3, h4, h5, h6, p, span, div, img, button, a {
   opacity: 1;
   transform: none;
 }
+
+/* Full Screen Hero Banner Optimization (1920px+) */
+@media (min-width: 1920px) {
+  .hero-banner-fullscreen {
+    object-fit: cover !important;
+    padding: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  .hero-container-fullscreen {
+    height: 100vh !important;
+    min-height: 600px !important;
+  }
+
+  .hero-image-container-fullscreen {
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+}

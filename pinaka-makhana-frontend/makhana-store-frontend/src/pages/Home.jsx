@@ -195,7 +195,7 @@ const Home = () => {
       <motion.section
         ref={heroRef}
         id="hero"
-        className="hero-section relative min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center overflow-hidden"
+        className="hero-section relative min-h-screen fullscreen:h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center overflow-hidden hero-container-fullscreen"
         style={{ y: heroY, opacity: heroOpacity }}
       >
         {/* Enhanced Animated Background Pattern */}
@@ -635,7 +635,7 @@ const Home = () => {
 
                   {/* Enhanced Image Container with Animation Boundaries */}
                   <motion.div
-                    className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-100 flex items-center justify-center"
+                    className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-100 flex items-center justify-center fullscreen:h-full hero-image-container-fullscreen"
                     whileHover={{ scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     style={{ minHeight: '280px' }}
@@ -644,7 +644,7 @@ const Home = () => {
                     <motion.img
                       src={bannerImage}
                       alt="Pinaka Premium Makhana Banner"
-                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[36rem] xl:h-[40rem] 2xl:h-[44rem] object-cover sm:object-contain p-1 sm:p-2 md:p-3 lg:p-2 xl:p-3"
+                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[36rem] xl:h-[40rem] 2xl:h-[44rem] fullscreen:h-full object-cover sm:object-contain fullscreen:object-cover p-1 sm:p-2 md:p-3 lg:p-2 xl:p-3 fullscreen:p-0 hero-banner-fullscreen"
                       style={{
                         filter: 'brightness(1.15) contrast(1.05) saturate(1.2) drop-shadow(0 15px 35px rgba(0,0,0,0.25))',
                         mixBlendMode: 'normal',

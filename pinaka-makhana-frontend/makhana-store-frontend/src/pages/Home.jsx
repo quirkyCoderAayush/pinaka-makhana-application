@@ -643,7 +643,7 @@ const Home = () => {
                     <motion.img
                       src={makhanaImage}
                       alt="Pinaka Premium Makhana"
-                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[28rem] xl:h-[32rem] object-contain p-4 sm:p-6"
+                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[28rem] xl:h-[32rem] object-contain lg:object-cover p-4 sm:p-6 lg:p-0"
                       style={{
                         filter: 'brightness(1.2) contrast(1.1) saturate(1.3) drop-shadow(0 20px 40px rgba(0,0,0,0.3))',
                         mixBlendMode: 'normal'
@@ -703,9 +703,6 @@ const Home = () => {
                     borderColor: "rgb(248 113 113)",
                     boxShadow: "0 25px 50px rgba(239, 68, 68, 0.3)"
                   }}
-                  initial={{ opacity: 0, scale: 0.8, y: -50 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ delay: 2, duration: 0.8 }}
                 >
                   <div className="text-center">
                     <motion.div
@@ -741,24 +738,23 @@ const Home = () => {
 
                 <motion.div
                   className="absolute -bottom-8 -right-8 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-5 shadow-2xl hidden lg:block"
+                  initial={{ opacity: 0, scale: 0.8, y: 50 }}
                   animate={{
+                    opacity: 1,
                     y: [0, 10, 0],
                     rotate: [0, -2, 0],
                     scale: [1, 1.05, 1]
                   }}
                   transition={{
-                    duration: 5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1
+                    opacity: { delay: 2.5, duration: 0.8 },
+                    y: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 },
+                    rotate: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 },
+                    scale: { duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }
                   }}
                   whileHover={{
                     scale: 1.15,
                     boxShadow: "0 25px 50px rgba(34, 197, 94, 0.4)"
                   }}
-                  initial={{ opacity: 0, scale: 0.8, y: 50 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ delay: 2.5, duration: 0.8 }}
                 >
                   <div className="flex items-center space-x-3">
                     <motion.div
@@ -792,8 +788,10 @@ const Home = () => {
                 {/* Enhanced Additional highlighting element */}
                 <motion.div
                   className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-full p-3 shadow-xl hidden lg:block"
+                  initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
                   animate={{
-                    scale: [1, 1.1, 1],
+                    opacity: 1,
+                    scale: [0.8, 1, 1.1, 1],
                     rotate: [0, 5, 0],
                     boxShadow: [
                       "0 10px 25px rgba(251, 191, 36, 0.3)",
@@ -804,11 +802,9 @@ const Home = () => {
                   transition={{
                     duration: 3,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: "easeInOut",
+                    delay: 3
                   }}
-                  initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  transition={{ delay: 3, duration: 0.8 }}
                 >
                   <div className="text-xs font-bold">100% Natural</div>
                 </motion.div>
@@ -870,18 +866,17 @@ const Home = () => {
         {/* Enhanced Scroll Indicator */}
         <motion.div
           className="absolute bottom-8 left-0 right-0 text-white z-20 flex justify-center"
+          initial={{ opacity: 0, y: 20 }}
           animate={{
             y: [0, -10, 0],
             opacity: [0.7, 1, 0.7]
           }}
           transition={{
+            delay: 3.5,
             duration: 2,
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 0.7, y: 0 }}
-          transition={{ delay: 3.5, duration: 1 }}
         >
           <div className="flex flex-col items-center space-y-2">
             <span className="text-xs sm:text-sm uppercase tracking-wider">Scroll</span>

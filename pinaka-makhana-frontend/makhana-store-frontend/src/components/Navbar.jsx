@@ -19,6 +19,7 @@ function Navbar() {
   const { isAdmin } = useAdmin();
   const location = useLocation();
   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -827,22 +828,30 @@ function Navbar() {
 
                       {/* Profile Links */}
                       <div className="space-y-1">
-                        <Link
-                          to="/profile"
-                          onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            console.log('Profile button clicked');
+                            setIsProfileOpen(false);
+                            navigate('/profile');
+                          }}
+                          className="w-full flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left"
                         >
                           <User className="w-4 h-4 text-gray-600" />
                           <span className="font-medium text-gray-700 text-sm">My Profile</span>
-                        </Link>
-                        <Link
-                          to="/orders"
-                          onClick={() => setIsProfileOpen(false)}
-                          className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            console.log('Orders button clicked');
+                            setIsProfileOpen(false);
+                            navigate('/orders');
+                          }}
+                          className="w-full flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left"
                         >
                           <Package className="w-4 h-4 text-gray-600" />
                           <span className="font-medium text-gray-700 text-sm">My Orders</span>
-                        </Link>
+                        </button>
                       </div>
 
                       {/* Logout Button */}

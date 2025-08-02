@@ -19,7 +19,6 @@ function Navbar() {
   const { isAdmin } = useAdmin();
   const location = useLocation();
   const navigate = useNavigate();
-  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

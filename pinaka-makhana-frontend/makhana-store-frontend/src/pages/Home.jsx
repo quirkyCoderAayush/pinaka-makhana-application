@@ -869,7 +869,7 @@ const Home = () => {
 
         {/* Enhanced Scroll Indicator */}
         <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white z-20 w-full flex justify-center"
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white z-20"
           animate={{
             y: [0, -10, 0],
             opacity: [0.7, 1, 0.7]
@@ -883,7 +883,7 @@ const Home = () => {
           animate={{ opacity: 0.7, y: 0 }}
           transition={{ delay: 3.5, duration: 1 }}
         >
-          <div className="flex flex-col items-center space-y-2 mx-auto">
+          <div className="flex flex-col items-center space-y-2">
             <span className="text-xs sm:text-sm uppercase tracking-wider">Scroll</span>
             <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
               <motion.div

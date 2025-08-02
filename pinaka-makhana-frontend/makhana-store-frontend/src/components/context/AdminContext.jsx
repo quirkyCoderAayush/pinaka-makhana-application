@@ -23,11 +23,20 @@ export const AdminProvider = ({ children }) => {
   // Also check when user logs in through regular login
   useEffect(() => {
     const handleUserLogin = () => {
+      setTimeout(() => checkAdminStatus(), 100); // Small delay to ensure token is set
+    };
+
+    const handleStorageChange = () => {
       checkAdminStatus();
     };
 
     window.addEventListener('userLoggedIn', handleUserLogin);
-    return () => window.removeEventListener('userLoggedIn', handleUserLogin);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('userLoggedIn', handleUserLogin);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const checkAdminStatus = async () => {
@@ -110,6 +119,10 @@ export const AdminProvider = ({ children }) => {
         
         setIsAdmin(true);
         setAdminUser(adminUserData);
+
+        // Force a re-render by dispatching a custom event
+        window.dispatchEvent(new CustomEvent('adminLoggedIn'));
+
         return { success: true };
       } else if (response.token && response.role !== 'ROLE_ADMIN') {
         return { success: false, error: 'Access denied. Admin privileges required.' };

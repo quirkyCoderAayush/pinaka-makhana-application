@@ -295,6 +295,19 @@ h1, h2, h3, h4, h5, h6, p, span, div, img, button, a {
   .hero-section .grid {
     min-height: 70vh !important;
   }
+
+  /* Right visual container optimization */
+  .home-content.lg\:block {
+    max-height: 70vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Banner image container optimization */
+  .hero-image-container-fullscreen {
+    max-height: 60vh !important;
+  }
 }
 
 @media (min-width: 1280px) {
@@ -305,6 +318,14 @@ h1, h2, h3, h4, h5, h6, p, span, div, img, button, a {
   .hero-section .grid {
     min-height: 65vh !important;
   }
+
+  .home-content.lg\:block {
+    max-height: 65vh !important;
+  }
+
+  .hero-image-container-fullscreen {
+    max-height: 55vh !important;
+  }
 }
 
 @media (min-width: 1536px) {
@@ -314,5 +335,13 @@ h1, h2, h3, h4, h5, h6, p, span, div, img, button, a {
 
   .hero-section .grid {
     min-height: 60vh !important;
+  }
+
+  .home-content.lg\:block {
+    max-height: 60vh !important;
+  }
+
+  .hero-image-container-fullscreen {
+    max-height: 50vh !important;
   }
 }

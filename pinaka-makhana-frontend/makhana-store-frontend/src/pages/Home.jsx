@@ -576,14 +576,14 @@ const Home = () => {
 
             {/* Enhanced Right Visual */}
             <motion.div
-              className="relative home-content lg:block"
+              className="relative home-content lg:block lg:h-auto lg:max-h-[70vh] xl:max-h-[65vh] 2xl:max-h-[60vh] lg:flex lg:items-center lg:justify-center"
               variants={slideInRight}
               initial={{ opacity: 1 }}
               animate={{ opacity: 1 }}
             >
               {/* Main Product Container */}
               <motion.div
-                className="relative group"
+                className="relative group lg:h-auto lg:max-h-[65vh] xl:max-h-[60vh] 2xl:max-h-[55vh] lg:flex lg:items-center lg:justify-center"
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
@@ -635,7 +635,7 @@ const Home = () => {
 
                   {/* Enhanced Image Container with Animation Boundaries */}
                   <motion.div
-                    className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-100 flex items-center justify-center fullscreen:h-full hero-image-container-fullscreen"
+                    className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-100 flex items-center justify-center fullscreen:h-full lg:max-h-[60vh] xl:max-h-[55vh] 2xl:max-h-[50vh] hero-image-container-fullscreen"
                     whileHover={{ scale: 1.01 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     style={{ minHeight: '280px' }}
@@ -644,7 +644,7 @@ const Home = () => {
                     <motion.img
                       src={bannerImage}
                       alt="Pinaka Premium Makhana Banner"
-                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[36rem] xl:h-[40rem] 2xl:h-[44rem] fullscreen:h-full object-cover sm:object-contain fullscreen:object-cover p-1 sm:p-2 md:p-3 lg:p-2 xl:p-3 fullscreen:p-0 hero-banner-fullscreen"
+                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-auto lg:max-h-[55vh] xl:max-h-[50vh] 2xl:max-h-[45vh] fullscreen:h-full object-cover sm:object-contain lg:object-cover fullscreen:object-cover p-1 sm:p-2 md:p-3 lg:p-2 xl:p-3 fullscreen:p-0 hero-banner-fullscreen"
                       style={{
                         filter: 'brightness(1.15) contrast(1.05) saturate(1.2) drop-shadow(0 15px 35px rgba(0,0,0,0.25))',
                         mixBlendMode: 'normal',

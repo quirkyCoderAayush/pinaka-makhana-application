@@ -8,7 +8,7 @@ import ModernProductCard from "../components/ModernProductCard";
 import ApiService from "../services/api";
 import { useIntersectionObserver, usePerformanceOptimization } from "../hooks/useSmoothScroll";
 import { useReducedMotion, getAnimationVariants } from "../hooks/useReducedMotion";
-import makhanaImage from "../images/makhana.png";
+import bannerImage from "../images/banner.png";
 import pack1 from "../images/pack1.jpg";
 import pack2 from "../images/pack2.jpg";
 import pack3 from "../images/pack3.jpg";
@@ -633,53 +633,61 @@ const Home = () => {
                     }}
                   />
 
-                  {/* Enhanced Image Container */}
+                  {/* Enhanced Image Container with Animation Boundaries */}
                   <motion.div
-                    className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-100"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 400 }}
+                    className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-100 flex items-center justify-center"
+                    whileHover={{ scale: 1.01 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    style={{ minHeight: '280px' }}
                   >
-                    {/* Enhanced Makhana Image */}
+                    {/* Enhanced Banner Image with Optimized Positioning */}
                     <motion.img
-                      src={makhanaImage}
-                      alt="Pinaka Premium Makhana"
-                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[28rem] xl:h-[32rem] object-contain lg:object-cover p-4 sm:p-6 lg:p-0"
+                      src={bannerImage}
+                      alt="Pinaka Premium Makhana Banner"
+                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[30rem] xl:h-[34rem] object-contain p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10"
                       style={{
-                        filter: 'brightness(1.2) contrast(1.1) saturate(1.3) drop-shadow(0 20px 40px rgba(0,0,0,0.3))',
-                        mixBlendMode: 'normal'
+                        filter: 'brightness(1.15) contrast(1.05) saturate(1.2) drop-shadow(0 15px 35px rgba(0,0,0,0.25))',
+                        mixBlendMode: 'normal',
+                        transformOrigin: 'center center'
                       }}
                       animate={{
-                        y: [0, -10, 0],
-                        rotate: [0, 2, 0]
+                        y: [0, -8, 0],
+                        rotate: [0, 1.5, 0],
+                        scale: [1, 1.02, 1]
+                      }}
+                      transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: [0.4, 0.0, 0.2, 1],
+                        times: [0, 0.5, 1]
+                      }}
+                      whileHover={{
+                        scale: 1.08,
+                        rotate: 3,
+                        y: -5,
+                        filter: 'brightness(1.25) contrast(1.1) saturate(1.3) drop-shadow(0 20px 45px rgba(0,0,0,0.35))',
+                        transition: { duration: 0.4, ease: "easeOut" }
+                      }}
+                    />
+
+                    {/* Optimized highlighting overlays for banner */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/10 pointer-events-none rounded-2xl"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-orange-500/10 pointer-events-none rounded-2xl"></div>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-yellow-400/5 to-transparent pointer-events-none rounded-2xl"></div>
+
+                    {/* Enhanced Spotlight effect optimized for banner */}
+                    <motion.div
+                      className="absolute top-1/3 left-1/3 w-1/3 h-1/3 bg-white/15 rounded-full blur-2xl pointer-events-none"
+                      animate={{
+                        opacity: [0.1, 0.3, 0.1],
+                        scale: [1, 1.05, 1],
+                        x: [0, 10, 0],
+                        y: [0, -5, 0]
                       }}
                       transition={{
                         duration: 6,
                         repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                      whileHover={{
-                        scale: 1.1,
-                        rotate: 5,
-                        filter: 'brightness(1.3) contrast(1.2) saturate(1.4) drop-shadow(0 25px 50px rgba(0,0,0,0.4))'
-                      }}
-                    />
-
-                    {/* Enhanced highlighting overlays */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-white/20 pointer-events-none"></div>
-                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/15 via-transparent to-orange-500/15 pointer-events-none"></div>
-                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-yellow-400/10 to-transparent pointer-events-none"></div>
-
-                    {/* Enhanced Spotlight effect */}
-                    <motion.div
-                      className="absolute top-1/4 left-1/4 w-1/2 h-1/2 bg-white/20 rounded-full blur-3xl pointer-events-none"
-                      animate={{
-                        opacity: [0.2, 0.4, 0.2],
-                        scale: [1, 1.1, 1]
-                      }}
-                      transition={{
-                        duration: 4,
-                        repeat: Infinity,
-                        ease: "easeInOut"
+                        ease: [0.4, 0.0, 0.2, 1]
                       }}
                     />
                   </motion.div>

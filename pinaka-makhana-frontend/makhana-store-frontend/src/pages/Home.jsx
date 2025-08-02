@@ -576,7 +576,7 @@ const Home = () => {
 
             {/* Enhanced Right Visual */}
             <motion.div
-              className="relative home-content"
+              className="relative home-content lg:block"
               variants={slideInRight}
               initial={{ opacity: 1 }}
               animate={{ opacity: 1 }}
@@ -643,7 +643,7 @@ const Home = () => {
                     <motion.img
                       src={makhanaImage}
                       alt="Pinaka Premium Makhana"
-                      className="relative z-10 w-full h-72 sm:h-96 md:h-[28rem] lg:h-[32rem] object-contain p-2 sm:p-4"
+                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[28rem] xl:h-[32rem] object-contain p-4 sm:p-6"
                       style={{
                         filter: 'brightness(1.2) contrast(1.1) saturate(1.3) drop-shadow(0 20px 40px rgba(0,0,0,0.3))',
                         mixBlendMode: 'normal'
@@ -687,7 +687,7 @@ const Home = () => {
 
                 {/* Enhanced Floating Cards with Sophisticated Animations */}
                 <motion.div
-                  className="absolute top-4 -left-8 bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-2 border-red-200"
+                  className="absolute top-4 -left-8 bg-white/95 backdrop-blur-xl rounded-2xl p-5 shadow-2xl border-2 border-red-200 hidden lg:block"
                   animate={{
                     y: [0, -10, 0],
                     rotate: [0, 2, 0],
@@ -740,7 +740,7 @@ const Home = () => {
                 </motion.div>
 
                 <motion.div
-                  className="absolute -bottom-8 -right-8 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-5 shadow-2xl"
+                  className="absolute -bottom-8 -right-8 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-5 shadow-2xl hidden lg:block"
                   animate={{
                     y: [0, 10, 0],
                     rotate: [0, -2, 0],
@@ -791,7 +791,7 @@ const Home = () => {
 
                 {/* Enhanced Additional highlighting element */}
                 <motion.div
-                  className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-full p-3 shadow-xl"
+                  className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-full p-3 shadow-xl hidden lg:block"
                   animate={{
                     scale: [1, 1.1, 1],
                     rotate: [0, 5, 0],
@@ -869,7 +869,7 @@ const Home = () => {
 
         {/* Enhanced Scroll Indicator */}
         <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white z-20"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white z-20 w-full flex justify-center"
           animate={{
             y: [0, -10, 0],
             opacity: [0.7, 1, 0.7]
@@ -883,8 +883,8 @@ const Home = () => {
           animate={{ opacity: 0.7, y: 0 }}
           transition={{ delay: 3.5, duration: 1 }}
         >
-          <div className="flex flex-col items-center space-y-2">
-            <span className="text-sm uppercase tracking-wider">Scroll</span>
+          <div className="flex flex-col items-center space-y-2 mx-auto">
+            <span className="text-xs sm:text-sm uppercase tracking-wider">Scroll</span>
             <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
               <motion.div
                 className="w-1 h-3 bg-white rounded-full mt-2"

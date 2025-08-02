@@ -393,18 +393,7 @@ function Navbar() {
               <img
                 src={logo}
                 alt="Pinaka Makhana"
-                className="h-16 w-auto transition-all duration-300 group-hover:scale-105 relative z-10"
-                style={{
-                  filter: isDarkBackground
-                    ? 'brightness(1.5) contrast(1.6) saturate(1.4) drop-shadow(0 3px 15px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 30px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 50px rgba(255, 165, 0, 0.3))'
-                    : 'brightness(1.3) contrast(1.4) saturate(1.3) drop-shadow(0 3px 12px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 20px rgba(255, 165, 0, 0.4)) drop-shadow(0 0 35px rgba(255, 69, 0, 0.2))',
-                  transition: 'all 0.3s ease-in-out',
-                  background: isDarkBackground
-                    ? 'radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 0%, transparent 70%)'
-                    : 'radial-gradient(circle at center, rgba(255, 165, 0, 0.06) 0%, transparent 70%)',
-                  borderRadius: '8px',
-                  padding: '3px'
-                }}
+                className="h-16 w-auto transition-all duration-300 group-hover:scale-105"
               />
             </Link>
           </div>
@@ -839,11 +828,12 @@ function Navbar() {
                         <button
                           onClick={(e) => {
                             e.preventDefault();
-                            console.log('Profile button clicked');
+                            e.stopPropagation();
+                            console.log('Mobile Profile button clicked - navigating to /profile');
                             setIsProfileOpen(false);
-                            navigate('/profile');
+                            setTimeout(() => navigate('/profile'), 100);
                           }}
-                          className="w-full flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left"
+                          className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left min-h-[44px]"
                         >
                           <User className="w-4 h-4 text-gray-600" />
                           <span className="font-medium text-gray-700 text-sm">My Profile</span>
@@ -851,11 +841,12 @@ function Navbar() {
                         <button
                           onClick={(e) => {
                             e.preventDefault();
-                            console.log('Orders button clicked');
+                            e.stopPropagation();
+                            console.log('Mobile Orders button clicked - navigating to /orders');
                             setIsProfileOpen(false);
-                            navigate('/orders');
+                            setTimeout(() => navigate('/orders'), 100);
                           }}
-                          className="w-full flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left"
+                          className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left min-h-[44px]"
                         >
                           <Package className="w-4 h-4 text-gray-600" />
                           <span className="font-medium text-gray-700 text-sm">My Orders</span>
@@ -864,11 +855,14 @@ function Navbar() {
 
                       {/* Logout Button */}
                       <button
-                        onClick={() => {
-                          logout();
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          console.log('Mobile Logout button clicked');
                           setIsProfileOpen(false);
+                          setTimeout(() => logout(), 100);
                         }}
-                        className="w-full bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2 text-sm"
+                        className="w-full bg-red-500 hover:bg-red-600 text-white p-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2 text-sm min-h-[44px]"
                       >
                         <LogOut className="w-4 h-4" />
                         <span>Logout</span>

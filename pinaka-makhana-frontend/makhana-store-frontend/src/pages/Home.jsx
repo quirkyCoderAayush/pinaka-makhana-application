@@ -644,7 +644,7 @@ const Home = () => {
                     <motion.img
                       src={bannerImage}
                       alt="Pinaka Premium Makhana Banner"
-                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[36rem] xl:h-[40rem] 2xl:h-[44rem] object-contain p-3 sm:p-4 md:p-6 lg:p-6 xl:p-8"
+                      className="relative z-10 w-full h-64 sm:h-80 md:h-96 lg:h-[36rem] xl:h-[40rem] 2xl:h-[44rem] object-cover sm:object-contain p-1 sm:p-2 md:p-3 lg:p-2 xl:p-3"
                       style={{
                         filter: 'brightness(1.15) contrast(1.05) saturate(1.2) drop-shadow(0 15px 35px rgba(0,0,0,0.25))',
                         mixBlendMode: 'normal',
@@ -873,7 +873,7 @@ const Home = () => {
 
         {/* Enhanced Scroll Indicator */}
         <motion.div
-          className="absolute bottom-4 sm:bottom-6 md:bottom-8 lg:bottom-12 xl:bottom-16 left-0 right-0 text-white z-20 flex justify-center"
+          className="absolute bottom-0 left-0 right-0 text-white z-20 flex justify-center pb-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{
             y: [0, -10, 0],
@@ -1066,6 +1066,104 @@ const Home = () => {
               repeat: Infinity,
               ease: "easeInOut",
               delay: 2.5
+            }}
+          />
+
+          {/* Additional Floating Makhana Balls - More Variety */}
+          <motion.div
+            className="absolute top-1/6 left-1/12 w-12 h-12 bg-gradient-to-br from-pink-200 to-red-300 rounded-full opacity-25"
+            animate={{
+              y: [0, -35, 0],
+              x: [0, 25, 0],
+              scale: [1, 1.5, 1],
+              opacity: [0.2, 0.4, 0.2],
+              rotate: [0, -270, -360]
+            }}
+            transition={{
+              duration: 12,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 5
+            }}
+          />
+          <motion.div
+            className="absolute top-5/6 right-1/12 w-16 h-16 bg-gradient-to-br from-lime-200 to-green-300 rounded-full opacity-20"
+            animate={{
+              y: [0, 30, 0],
+              x: [0, -20, 0],
+              scale: [1, 1.3, 1],
+              opacity: [0.15, 0.35, 0.15],
+              rotate: [0, 180, 360]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 6
+            }}
+          />
+          <motion.div
+            className="absolute top-1/2 left-1/8 w-9 h-9 bg-gradient-to-br from-purple-200 to-pink-300 rounded-full opacity-30"
+            animate={{
+              y: [0, -20, 0],
+              x: [0, 18, 0],
+              scale: [1, 1.2, 1],
+              opacity: [0.25, 0.45, 0.25],
+              rotate: [0, 90, 180]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2.8
+            }}
+          />
+          <motion.div
+            className="absolute bottom-1/6 left-1/4 w-13 h-13 bg-gradient-to-br from-cyan-200 to-blue-300 rounded-full opacity-25"
+            animate={{
+              y: [0, 25, 0],
+              x: [0, -15, 0],
+              scale: [1, 1.4, 1],
+              opacity: [0.2, 0.4, 0.2],
+              rotate: [0, -180, -360]
+            }}
+            transition={{
+              duration: 14,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 7
+            }}
+          />
+          <motion.div
+            className="absolute top-1/4 right-1/8 w-7 h-7 bg-gradient-to-br from-indigo-200 to-purple-300 rounded-full opacity-35"
+            animate={{
+              y: [0, -15, 0],
+              x: [0, 12, 0],
+              scale: [1, 1.1, 1],
+              opacity: [0.3, 0.5, 0.3],
+              rotate: [0, 45, 90]
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 3.5
+            }}
+          />
+          <motion.div
+            className="absolute bottom-2/5 right-1/4 w-11 h-11 bg-gradient-to-br from-teal-200 to-cyan-300 rounded-full opacity-28"
+            animate={{
+              y: [0, 22, 0],
+              x: [0, -18, 0],
+              scale: [1, 1.25, 1],
+              opacity: [0.23, 0.43, 0.23],
+              rotate: [0, 135, 270]
+            }}
+            transition={{
+              duration: 9,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 4.5
             }}
           />
 

@@ -43,12 +43,12 @@ const QuantitySelector = ({
         variant === 'compact' ? 'h-10 flex-1 text-base' : 'h-12 flex-1 text-lg'
   };
   
-  // Enhanced container classes with glass morphism and gradients
+  // Enhanced container classes with red-orange gradient theme
   const containerClasses = variant === 'mini'
-    ? 'inline-flex items-center gap-0 border border-white/30 rounded-lg bg-white/20 backdrop-blur-sm shadow-lg w-20 hover:bg-white/30 transition-all duration-300'
+    ? 'inline-flex items-center gap-0 border border-red-200/50 rounded-lg bg-gradient-to-r from-red-50/80 to-orange-50/80 shadow-lg w-20 hover:from-red-100/90 hover:to-orange-100/90 transition-all duration-300'
     : variant === 'compact'
-      ? 'inline-flex items-center gap-0 border border-white/40 rounded-xl bg-gradient-to-r from-white/25 to-white/15 backdrop-blur-md shadow-xl w-24 hover:from-white/35 hover:to-white/25 transition-all duration-300'
-      : 'inline-flex items-center gap-0 border border-white/50 rounded-xl bg-gradient-to-r from-white/30 to-white/20 backdrop-blur-lg shadow-2xl w-28 hover:from-white/40 hover:to-white/30 transition-all duration-300 hover:scale-105';
+      ? 'inline-flex items-center gap-0 border border-orange-200/60 rounded-xl bg-gradient-to-r from-red-50/70 to-orange-50/70 shadow-xl w-24 hover:from-red-100/80 hover:to-orange-100/80 transition-all duration-300'
+      : 'inline-flex items-center gap-0 border border-red-300/40 rounded-xl bg-gradient-to-r from-red-50/60 to-orange-50/60 shadow-2xl w-28 hover:from-red-100/70 hover:to-orange-100/70 transition-all duration-300 hover:scale-105';
 
   // SVG size based on component size and variant
   const svgSize = {
@@ -66,14 +66,14 @@ const QuantitySelector = ({
         type="button"
         onClick={handleDecrement}
         disabled={disabled || quantity <= min}
-        className={`${sizeClasses[size]} flex items-center justify-center text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-red-500 hover:to-orange-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 rounded-l-xl border-r border-white/30 hover:shadow-lg hover:scale-110 active:scale-95`}
+        className={`${sizeClasses[size]} flex items-center justify-center text-red-600 hover:text-white hover:bg-gradient-to-r hover:from-red-500 hover:to-orange-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 rounded-l-xl border-r border-red-200/40 hover:shadow-lg hover:scale-110 active:scale-95`}
       >
         <svg className={svgSize[size]} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
         </svg>
       </button>
 
-      <div className={`${inputSizeClasses[size]} flex items-center justify-center font-bold text-gray-800 bg-gradient-to-r from-white/60 to-white/40 border-r border-white/30 backdrop-blur-sm`}>
+      <div className={`${inputSizeClasses[size]} flex items-center justify-center font-bold text-red-700 bg-gradient-to-r from-red-50/90 to-orange-50/90 border-r border-red-200/40`}>
         {quantity}
       </div>
 
@@ -81,7 +81,7 @@ const QuantitySelector = ({
         type="button"
         onClick={handleIncrement}
         disabled={disabled || quantity >= max}
-        className={`${sizeClasses[size]} flex items-center justify-center text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-orange-500 hover:to-red-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 rounded-r-xl hover:shadow-lg hover:scale-110 active:scale-95`}
+        className={`${sizeClasses[size]} flex items-center justify-center text-red-600 hover:text-white hover:bg-gradient-to-r hover:from-orange-500 hover:to-red-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 rounded-r-xl hover:shadow-lg hover:scale-110 active:scale-95`}
       >
         <svg className={svgSize[size]} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />

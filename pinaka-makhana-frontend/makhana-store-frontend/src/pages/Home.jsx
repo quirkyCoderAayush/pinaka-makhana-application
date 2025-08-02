@@ -195,7 +195,7 @@ const Home = () => {
       <motion.section
         ref={heroRef}
         id="hero"
-        className="hero-section relative min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center pt-20 overflow-hidden"
+        className="hero-section relative min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center overflow-hidden"
         style={{ y: heroY, opacity: heroOpacity }}
       >
         {/* Enhanced Animated Background Pattern */}
@@ -248,9 +248,9 @@ const Home = () => {
           />
         </motion.div>
 
-        <div className="container mx-auto px-4 sm:px-6 md:px-8 py-16 sm:py-20 md:py-24 relative z-10 w-full">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16 relative z-10 w-full">
           <motion.div
-            className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[80vh]"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[85vh]"
             variants={staggerContainer}
             initial="visible"
             animate="visible"
@@ -264,14 +264,14 @@ const Home = () => {
               animate={{ opacity: 1 }}
             >
               <motion.div
-                className="space-y-8 sm:space-y-10 md:space-y-12"
+                className="space-y-6 sm:space-y-8 md:space-y-10"
                 variants={staggerContainer}
                 initial="hidden"
                 animate="visible"
               >
                 {/* Modern Badge */}
                 <motion.div
-                  className="inline-flex items-center space-x-2 bg-gradient-to-r from-red-500 to-orange-500 px-6 py-3 rounded-full text-sm font-medium"
+                  className="inline-flex items-center space-x-2 bg-gradient-to-r from-red-500 to-orange-500 px-4 py-2 sm:px-6 sm:py-3 rounded-full text-xs sm:text-sm font-medium shadow-lg"
                   variants={fadeInUp}
                   whileHover={{
                     scale: 1.05,
@@ -295,7 +295,7 @@ const Home = () => {
 
                 {/* Main Heading with Enhanced Animations */}
                 <motion.h1
-                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-[0.9] sm:leading-[0.85] mb-6 sm:mb-8 md:mb-10"
+                  className="text-5xl sm:text-6xl md:text-7xl lg:text-6xl xl:text-7xl font-black leading-[0.9] sm:leading-[0.85] mb-4 sm:mb-6 md:mb-8"
                   variants={fadeInUp}
                 >
                   <motion.span
@@ -312,8 +312,8 @@ const Home = () => {
                       ]
                     }}
                     transition={{
-                      delay: 0.2,
-                      duration: 1.2,
+                      delay: 0.1,
+                      duration: 1.0,
                       ease: [0.16, 1, 0.3, 1],
                       textShadow: {
                         duration: 3,
@@ -339,8 +339,8 @@ const Home = () => {
                       ]
                     }}
                     transition={{
-                      delay: 0.5,
-                      duration: 1.4,
+                      delay: 0.3,
+                      duration: 1.2,
                       ease: [0.16, 1, 0.3, 1],
                       backgroundPosition: {
                         duration: 5,
@@ -363,7 +363,7 @@ const Home = () => {
 
                 {/* Subheading */}
                 <motion.p
-                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light text-gray-300 leading-relaxed mb-6 sm:mb-8 md:mb-10"
+                  className="text-xl sm:text-2xl md:text-3xl lg:text-2xl xl:text-3xl font-light text-gray-300 leading-relaxed mb-4 sm:mb-6 md:mb-8"
                   variants={fadeInUp}
                 >
                   The Future of
@@ -392,7 +392,7 @@ const Home = () => {
 
                 {/* Description */}
                 <motion.p
-                  className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-400 leading-relaxed max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mb-8 sm:mb-10 md:mb-12"
+                  className="text-base sm:text-lg md:text-xl lg:text-lg xl:text-xl text-gray-400 leading-relaxed max-w-md sm:max-w-lg md:max-w-xl lg:max-w-lg xl:max-w-xl mb-6 sm:mb-8 md:mb-10"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{
                     opacity: 1,
@@ -400,8 +400,8 @@ const Home = () => {
                     color: ["#9ca3af", "#a1a1aa", "#9ca3af"]
                   }}
                   transition={{
-                    delay: 1.0,
-                    duration: 1.0,
+                    delay: 0.6,
+                    duration: 0.8,
                     ease: [0.16, 1, 0.3, 1],
                     color: {
                       duration: 4,
@@ -417,11 +417,11 @@ const Home = () => {
 
               {/* Enhanced CTA Buttons */}
               <motion.div
-                className="flex flex-col sm:flex-row gap-4"
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4"
                 variants={fadeInUp}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.5, duration: 0.8 }}
+                transition={{ delay: 1.2, duration: 0.8 }}
               >
                 <motion.div
                   whileHover={{
@@ -503,7 +503,7 @@ const Home = () => {
 
               {/* Enhanced Stats with Animations */}
               <motion.div
-                className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-12 pt-8 max-w-full"
+                className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 lg:gap-8 pt-6 max-w-full"
                 variants={staggerContainer}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}

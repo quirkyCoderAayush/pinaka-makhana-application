@@ -248,9 +248,9 @@ const Home = () => {
           />
         </motion.div>
 
-        <div className="container mx-auto px-4 sm:px-6 md:px-8 pt-24 pb-8 sm:pt-28 sm:pb-12 md:pt-32 md:pb-16 relative z-10 w-full">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 pt-24 pb-8 sm:pt-28 sm:pb-12 md:pt-32 md:pb-16 lg:pb-4 xl:pb-2 2xl:pb-0 relative z-10 w-full">
           <motion.div
-            className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[85vh]"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[85vh] lg:min-h-[70vh] xl:min-h-[65vh] 2xl:min-h-[60vh]"
             variants={staggerContainer}
             initial="visible"
             animate="visible"

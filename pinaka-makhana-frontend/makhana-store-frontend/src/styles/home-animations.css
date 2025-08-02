@@ -285,3 +285,34 @@ h1, h2, h3, h4, h5, h6, p, span, div, img, button, a {
     overflow: hidden !important;
   }
 }
+
+/* Large Screen Container Height Optimization (1024px+) */
+@media (min-width: 1024px) {
+  .hero-section .container {
+    padding-bottom: 1rem !important;
+  }
+
+  .hero-section .grid {
+    min-height: 70vh !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .hero-section .container {
+    padding-bottom: 0.5rem !important;
+  }
+
+  .hero-section .grid {
+    min-height: 65vh !important;
+  }
+}
+
+@media (min-width: 1536px) {
+  .hero-section .container {
+    padding-bottom: 0 !important;
+  }
+
+  .hero-section .grid {
+    min-height: 60vh !important;
+  }
+}
